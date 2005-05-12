@@ -1,3 +1,7 @@
+# FIXME - break-build placeholder for devel
+# if you really want to build from this then comment out the following:
+echo "** ghc currently requires gcc32 to build in fc4! **" && exit 1
+
 %define build_version 6.4
 %define ghcver ghc64
 
