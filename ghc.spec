@@ -1,7 +1,3 @@
-# FIXME - break-build placeholder for devel
-# if you really want to build from this then comment out the following:
-echo "** ghc currently requires gcc32 to build in fc4! **" && exit 1
-
 %define build_version 6.4
 %define ghcver ghc64
 
@@ -88,7 +84,9 @@ you like to have local access to the documentation in HTML format.
 %define __spec_install_post /usr/lib/rpm/brp-compress
 
 %prep
-%setup -q -n ghc-%{version}
+## FIXME: ghc currently doesn't build with gcc4
+## to do a test build uncomment %%setup
+#%%setup -q -n ghc-%{version}
 %patch1 -p1 -b .1-ppc
 %patch2 -p1 -b .2-x86_64
 %patch3 -p1 -b .3-x86_64
