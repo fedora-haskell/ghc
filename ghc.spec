@@ -84,9 +84,7 @@ you like to have local access to the documentation in HTML format.
 %define __spec_install_post /usr/lib/rpm/brp-compress
 
 %prep
-## FIXME: ghc currently doesn't build with gcc4
-## to do a test build uncomment %%setup
-#%%setup -q -n ghc-%{version}
+%setup -q -n ghc-%{version}
 %patch1 -p1 -b .1-ppc
 %patch2 -p1 -b .2-x86_64
 %patch3 -p1 -b .3-x86_64
