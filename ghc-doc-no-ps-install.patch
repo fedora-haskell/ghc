@@ -1,0 +1,12 @@
+--- ghc-6.4/Makefile.in~	2005-03-09 00:01:08.000000000 +0900
++++ ghc-6.4/Makefile.in	2005-03-12 12:53:02.531724624 +0900
+@@ -274,9 +274,6 @@
+ 
+ install-docs : install-dirs-docs
+ 	if test -d share/html ; then $(CP) -r share/html/* $(htmldir) ; fi
+-	for i in share/*.ps; do \
+-		$(CP) $$i $(psdir) ; \
+-	done
+ 
+ install-dirs-docs:
+ 	$(INSTALL_DIR) $(htmldir) 

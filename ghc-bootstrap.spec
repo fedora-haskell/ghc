@@ -1,34 +1,23 @@
-%define build_version 6.4
+## ghc seeding bootstrap spec file
+
 %define ghcver ghc64
-
-# speed up test builds by not building profiled libraries
-%define build_prof 1
-%define build_doc 0
-
-# ghc-6.4 doesn't build with gcc-4.0 yet
-%define _with_gcc32 %{nil}
 
 Name:		ghc
 Version:	6.4
-Release:	8%{dist}
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
-Source:		http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-i386-unknown-linux.tar.bz2
+Source2:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-ppc-unknown-linux.tar.bz2
+Source3:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-x86_64-unknown-linux.tar.bz2
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: sed, %{ghcver}, %{?_with_gcc32: compat-gcc-32}
-Buildrequires: gmp-devel, readline-devel, xorg-x11-devel, freeglut-devel, openal-devel
-%if %{build_doc}
-# haddock generates libraries/ docs
-Buildrequires: libxslt, docbook-style-xsl, haddock
-%endif
+BuildRequires:  sed
 Prefix: %{_prefix}
-Patch1: ghc-6.4-powerpc.patch
-Patch2: rts-GCCompact.h-x86_64.patch
-Patch3: ghc-6.4-dsforeign-x86_64-1097471.patch
-Patch4: ghc-6.4-rts-adjustor-x86_64-1097471.patch
+Patch1:		ghc-doc-no-ps-install.patch
+ExclusiveArch:	i386 ppc x86_64
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -57,7 +46,6 @@ interfaces.
 
 This package contains all the main files and libraries of version %{version}.
 
-%if %{build_prof}
 %package -n %{ghcver}-prof
 Summary:	Profiling libraries for GHC
 Group:		Development/Libraries
@@ -68,7 +56,6 @@ Obsoletes:	ghc-prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System
 (GHC).  They should be installed when GHC's profiling subsystem is
 needed.
-%endif
 
 %package doc
 Summary:	Documentation for GHC
@@ -84,37 +71,19 @@ you like to have local access to the documentation in HTML format.
 %define __spec_install_post /usr/lib/rpm/brp-compress
 
 %prep
-%setup -q -n ghc-%{version}
-%patch1 -p1 -b .1-ppc
-%patch2 -p1 -b .2-x86_64
-%patch3 -p1 -b .3-x86_64
-%patch4 -p1 -b .4-x86_64
+rm -rf %{name}-%{version}
+tar jxf ${RPM_SOURCE_DIR}/%{name}-%{version}-%{_arch}-unknown-linux.tar.bz2
+%setup -T -D
+%patch1 -p1 -b .ps
 
 %build
-%ifarch x86_64
-echo "SplitObjs = NO" >> mk/build.mk
-echo "GhcWithInterpreter = NO" >> mk/build.mk
-%endif
-%if !%{build_prof}
-echo "GhcLibWays=" >> mk/build.mk
-echo "GhcRTSWays=thr debug" >> mk/build.mk
-%endif
-
-./configure --prefix=%{_prefix} --libdir=%{_libdir} --with-ghc=ghc-%{build_version} %{?_with_gcc32: --with-gcc=%{_bindir}/gcc32}
-
-make all
-%if %{build_doc}
-make html
-%endif
+./configure --prefix=%{_prefix} --libdir=%{_libdir}
+make prefix=%{_prefix} libdir=%{_libdir}/%{name}-%{version}
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make prefix=$RPM_BUILD_ROOT%{_prefix} libdir=$RPM_BUILD_ROOT%{_libdir}/%{name}-%{version} install
-
-%if %{build_doc}
-make datadir=$RPM_BUILD_ROOT%{_docdir}/ghc-%{version} XMLDocWays="html" install-docs
-%endif
+make prefix=$RPM_BUILD_ROOT%{_prefix} libdir=$RPM_BUILD_ROOT%{_libdir}/%{name}-%{version} datadir=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version} htmldir=$RPM_BUILD_ROOT%{_docdir}/%{name}-%{version} install-dirs install-bin install-libs install-datas install-docs
 
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
@@ -126,9 +95,7 @@ rm -f rpm-*-filelist rpm-*.files
 sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
 
 cat rpm-dir.files rpm-lib.files > rpm-base-filelist
-%if %{build_prof}
 cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
-%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -155,64 +122,39 @@ fi
 
 %files -n %{ghcver} -f rpm-base-filelist
 %defattr(-,root,root,-)
-%doc ghc/ANNOUNCE ghc/LICENSE ghc/README
+%doc ANNOUNCE LICENSE README
 %{_bindir}/ghc*%{version}
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
-%if %{build_prof}
 %files -n %{ghcver}-prof -f rpm-prof-filelist
 %defattr(-,root,root,-)
-%endif
 
-%if %{build_doc}
 %files doc
 %defattr(-,root,root,-)
 %{_docdir}/%{name}-%{version}
-%endif
 
 %changelog
 * Tue May 31 2005 Jens Petersen <petersen@redhat.com>
+- initial seed bootstrap package for Fedora Extras for i386, ppc and x86_64
 - add %%dist to release
-
-* Thu May 12 2005 Jens Petersen <petersen@redhat.com> - 6.4-8
-- initial import into Fedora Extras
 
 * Thu May 12 2005 Jens Petersen <petersen@haskell.org>
 - add build_prof and build_doc switches for -doc and -prof subpackages
-- add _with_gcc32 switch since ghc-6.4 doesn't build with gcc-4.0
 
-* Wed May 11 2005 Jens Petersen <petersen@haskell.org> - 6.4-7
+* Wed May 11 2005 Jens Petersen <petersen@haskell.org>
 - make package relocatable (ghc#1084122)
   - add post install scripts to replace prefix in driver scripts
-- buildrequire libxslt and docbook-style-xsl instead of docbook-utils and flex
 
-* Fri May  6 2005 Jens Petersen <petersen@haskell.org> - 6.4-6
-- add ghc-6.4-dsforeign-x86_64-1097471.patch and
-  ghc-6.4-rts-adjustor-x86_64-1097471.patch from trunk to hopefully fix
-  ffi support on x86_64 (Simon Marlow, ghc#1097471)
-- use XMLDocWays instead of SGMLDocWays to build documentation fully
-
-* Mon May  2 2005 Jens Petersen <petersen@haskell.org> - 6.4-5
-- add rts-GCCompact.h-x86_64.patch to fix GC issue on x86_64 (Simon Marlow)
-
-* Thu Mar 17 2005 Jens Petersen <petersen@haskell.org> - 6.4-4
-- add ghc-6.4-powerpc.patch (Ryan Lortie)
-- disable building interpreter rather than install and delete on x86_64
-
-* Wed Mar 16 2005 Jens Petersen <petersen@haskell.org> - 6.4-3
+* Wed Mar 16 2005 Jens Petersen <petersen@haskell.org>
 - make ghc require ghcver of same ver-rel
-- on x86_64 remove ghci for now since it doesn't work and all .o files
 
-* Tue Mar 15 2005 Jens Petersen <petersen@haskell.org> - 6.4-2
+* Tue Mar 15 2005 Jens Petersen <petersen@haskell.org>
 - ghc requires ghcver (Amanda Clare)
 
-* Sat Mar 12 2005 Jens Petersen <petersen@haskell.org> - 6.4-1
+* Sat Mar 12 2005 Jens Petersen <petersen@haskell.org>
 - 6.4 release
-  - x86_64 build no longer unregisterised
 - use sed instead of perl to tidy filelists
-- buildrequire ghc64 instead of ghc-6.4
 - no epoch for ghc64-prof's ghc64 requirement
-- install docs directly in docdir
 
 * Fri Jan 21 2005 Jens Petersen <petersen@haskell.org> - 6.2.2-2
 - add x86_64 port
