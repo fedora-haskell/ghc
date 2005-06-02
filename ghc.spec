@@ -10,7 +10,7 @@
 
 Name:		ghc
 Version:	6.4
-Release:	8%{dist}
+Release:	8%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
