@@ -1,16 +1,13 @@
 %define build_version 6.4
-%define ghcver ghc64
+%define ghcver ghc641
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 0
 
-# ghc-6.4 doesn't build with gcc-4.0 yet
-%define _with_gcc32 %{nil}
-
 Name:		ghc
-Version:	6.4
-Release:	8%{?dist}
+Version:	6.4.1
+Release:	0.1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -18,17 +15,13 @@ Source:		http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: sed, %{ghcver}, %{?_with_gcc32: compat-gcc-32}
+BuildRequires: ghc, sed
 Buildrequires: gmp-devel, readline-devel, xorg-x11-devel, freeglut-devel, openal-devel
 %if %{build_doc}
 # haddock generates libraries/ docs
 Buildrequires: libxslt, docbook-style-xsl, haddock
 %endif
 Prefix: %{_prefix}
-Patch1: ghc-6.4-powerpc.patch
-Patch2: rts-GCCompact.h-x86_64.patch
-Patch3: ghc-6.4-dsforeign-x86_64-1097471.patch
-Patch4: ghc-6.4-rts-adjustor-x86_64-1097471.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -85,22 +78,14 @@ you like to have local access to the documentation in HTML format.
 
 %prep
 %setup -q -n ghc-%{version}
-%patch1 -p1 -b .1-ppc
-%patch2 -p1 -b .2-x86_64
-%patch3 -p1 -b .3-x86_64
-%patch4 -p1 -b .4-x86_64
 
 %build
-%ifarch x86_64
-echo "SplitObjs = NO" >> mk/build.mk
-echo "GhcWithInterpreter = NO" >> mk/build.mk
-%endif
 %if !%{build_prof}
 echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
-./configure --prefix=%{_prefix} --libdir=%{_libdir} --with-ghc=ghc-%{build_version} %{?_with_gcc32: --with-gcc=%{_bindir}/gcc32}
+./configure --prefix=%{_prefix} --libdir=%{_libdir} --with-ghc=ghc-%{build_version}
 
 make all
 %if %{build_doc}
@@ -171,6 +156,14 @@ fi
 %endif
 
 %changelog
+* Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-0
+- 6.4.1 release
+  - the following patches are now upstream: ghc-6.4-powerpc.patch,
+    rts-GCCompact.h-x86_64.patch, ghc-6.4-dsforeign-x86_64-1097471.patch,
+    ghc-6.4-rts-adjustor-x86_64-1097471.patch
+  - builds with gcc4 so drop %%_with_gcc32
+  - x86_64 build restrictions (no ghci and split objects) no longer apply
+
 * Tue May 31 2005 Jens Petersen <petersen@redhat.com>
 - add %%dist to release
 
