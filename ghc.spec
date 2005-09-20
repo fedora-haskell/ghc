@@ -7,7 +7,7 @@
 
 Name:		ghc
 Version:	6.4.1
-Release:	0.1%{?dist}
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -156,7 +156,7 @@ fi
 %endif
 
 %changelog
-* Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-0
+* Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-1
 - 6.4.1 release
   - the following patches are now upstream: ghc-6.4-powerpc.patch,
     rts-GCCompact.h-x86_64.patch, ghc-6.4-dsforeign-x86_64-1097471.patch,
