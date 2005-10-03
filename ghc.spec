@@ -3,7 +3,7 @@
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
-%define build_doc 0
+%define build_doc 1
 
 Name:		ghc
 Version:	6.4.1
@@ -156,6 +156,9 @@ fi
 %endif
 
 %changelog
+* Mon Oct  3 2005 Jens Petersen <petersen@redhat.com>
+- turn on build_doc since haddock is now in Extras
+
 * Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-1
 - 6.4.1 release
   - the following patches are now upstream: ghc-6.4-powerpc.patch,
