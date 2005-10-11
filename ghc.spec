@@ -1,4 +1,3 @@
-%define build_version 6.4
 %define ghcver ghc641
 
 # speed up test builds by not building profiled libraries
@@ -7,7 +6,7 @@
 
 Name:		ghc
 Version:	6.4.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -85,7 +84,7 @@ echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
-./configure --prefix=%{_prefix} --libdir=%{_libdir} --with-ghc=ghc-%{build_version}
+./configure --prefix=%{_prefix} --libdir=%{_libdir}
 
 make all
 %if %{build_doc}
@@ -156,8 +155,9 @@ fi
 %endif
 
 %changelog
-* Mon Oct  3 2005 Jens Petersen <petersen@redhat.com>
+* Tue Oct 11 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-2
 - turn on build_doc since haddock is now in Extras
+- no longer specify ghc version to build with (Ville Skyttä, #170176)
 
 * Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-1
 - 6.4.1 release
