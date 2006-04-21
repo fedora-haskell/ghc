@@ -1,12 +1,12 @@
-%define ghcver ghc641
+%define ghcver ghc642
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 1
 
 Name:		ghc
-Version:	6.4.1
-Release:	3%{?dist}
+Version:	6.4.2
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -14,8 +14,8 @@ Source:		http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires: ghc, sed
-Buildrequires: gmp-devel, readline-devel, libX11-devel, freeglut-devel, openal-devel
+BuildRequires:  ghc, sed
+Buildrequires:  gmp-devel, readline-devel, libX11-devel, freeglut-devel, openal-devel
 %if %{build_doc}
 # haddock generates libraries/ docs
 Buildrequires: libxslt, docbook-style-xsl, haddock
@@ -156,15 +156,18 @@ fi
 %endif
 
 %changelog
-* Thu Mar  2 2006 Jens Petersen <petersen@redhat.com> - 6.4.1-3
+* Thu Apr 20 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-1
+- update to 6.4.2 release
+
+* Thu Mar  2 2006 Jens Petersen <petersen@redhat.com> - 6.4.1-3.fc5
 - buildrequire libX11-devel instead of xorg-x11-devel (Kevin Fenzi, #181024)
 - make ghc-doc require ghc (Michel Salim, #180449)
 
-* Tue Oct 11 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-2
+* Tue Oct 11 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-2.fc5
 - turn on build_doc since haddock is now in Extras
 - no longer specify ghc version to build with (Ville Skyttä, #170176)
 
-* Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-1
+* Tue Sep 20 2005 Jens Petersen <petersen@redhat.com> - 6.4.1-1.fc5
 - 6.4.1 release
   - the following patches are now upstream: ghc-6.4-powerpc.patch,
     rts-GCCompact.h-x86_64.patch, ghc-6.4-dsforeign-x86_64-1097471.patch,
