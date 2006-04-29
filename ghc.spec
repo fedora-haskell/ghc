@@ -6,7 +6,7 @@
 
 Name:		ghc
 Version:	6.4.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -15,12 +15,14 @@ URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  ghc, sed
-Buildrequires:  gmp-devel, readline-devel, libX11-devel, freeglut-devel, openal-devel
+Buildrequires:  gmp-devel, readline-devel
+Buildrequires:  libX11-devel, libXt-devel
+Buildrequires:  freeglut-devel, openal-devel
 %if %{build_doc}
-# haddock generates libraries/ docs
+# haddock generates docs in libraries
 Buildrequires: libxslt, docbook-style-xsl, haddock
 %endif
-Prefix: %{_prefix}
+Prefix:		%{_prefix}
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -156,7 +158,11 @@ fi
 %endif
 
 %changelog
-* Thu Apr 20 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-1
+* Sat Apr 29 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-2.fc6
+- buildrequire libXt-devel so that the X11 package and deps get built
+  (Garrett Mitchener, #190201)
+
+* Thu Apr 20 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-1.fc6
 - update to 6.4.2 release
 
 * Thu Mar  2 2006 Jens Petersen <petersen@redhat.com> - 6.4.1-3.fc5
