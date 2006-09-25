@@ -2,7 +2,7 @@
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
-%define build_doc 1
+%define build_doc 0
 
 Name:		ghc
 Version:	6.4.2
@@ -177,6 +177,7 @@ fi
 * Mon Sep 25 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-3.fc6
 - ghost package.conf.old (Gérard Milmeister)
 - set unconfined_execmem_exec_t context on executables with ghc rts (#195821)
+- turn off building docs until haddock is back
 
 * Sat Apr 29 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-2.fc6
 - buildrequire libXt-devel so that the X11 package and deps get built
