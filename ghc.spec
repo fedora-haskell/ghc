@@ -6,7 +6,7 @@
 
 Name:		ghc
 Version:	6.4.2
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -117,8 +117,13 @@ cat rpm-dir.files rpm-lib.files > rpm-base-filelist
 cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 %endif
 
+# create package.conf.old
+touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
+
+
 %clean
 rm -rf $RPM_BUILD_ROOT
+
 
 %post
 ## tweak prefix in drivers scripts if relocating
@@ -126,6 +131,9 @@ if [ "${RPM_INSTALL_PREFIX}" != "%{_prefix}" ]; then
   BINDIR=`echo %{_bindir} | sed -e "s|%{_prefix}|${RPM_INSTALL_PREFIX}|"`
   sed -i "s|%{_prefix}|${RPM_INSTALL_PREFIX}|" ${BINDIR}/{ghcprof,hsc2hs}
 fi
+
+/usr/bin/chcon -t unconfined_execmem_exec_t %{_bindir}/{hasktags,runghc,runhaskell} >/dev/null 2>&1 || :
+
 
 %post -n %{ghcver}
 ## tweak prefix in drivers scripts if relocating
@@ -135,21 +143,28 @@ if [ "${RPM_INSTALL_PREFIX}" != "%{_prefix}" ]; then
   sed -i "s|%{_prefix}|${RPM_INSTALL_PREFIX}|" ${BINDIR}/ghc*-%{version} ${LIBDIR}/ghc-%{version}/package.conf
 fi
 
+/usr/bin/chcon -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/{ghc-%{version},ghc-pkg.bin,hsc2hs-bin} >/dev/null 2>&1 || :
+
+
 %files
 %defattr(-,root,root,-)
 %{_bindir}/*
 %exclude %{_bindir}/ghc*%{version}
+
 
 %files -n %{ghcver} -f rpm-base-filelist
 %defattr(-,root,root,-)
 %doc ghc/ANNOUNCE ghc/LICENSE ghc/README
 %{_bindir}/ghc*%{version}
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
+%ghost %{_libdir}/ghc-%{version}/package.conf.old
+
 
 %if %{build_prof}
 %files -n %{ghcver}-prof -f rpm-prof-filelist
 %defattr(-,root,root,-)
 %endif
+
 
 %if %{build_doc}
 %files doc
@@ -157,7 +172,12 @@ fi
 %{_docdir}/%{name}-%{version}
 %endif
 
+
 %changelog
+* Mon Sep 25 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-3.fc6
+- ghost package.conf.old (Gérard Milmeister)
+- set unconfined_execmem_exec_t context on executables with ghc rts (#195821)
+
 * Sat Apr 29 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-2.fc6
 - buildrequire libXt-devel so that the X11 package and deps get built
   (Garrett Mitchener, #190201)
