@@ -2,11 +2,11 @@
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
-%define build_doc 0
+%define build_doc 1
 
 Name:		ghc
 Version:	6.4.2
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -174,6 +174,9 @@ fi
 
 
 %changelog
+* Thu Sep 28 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-4
+- turn on docs generation again
+
 * Mon Sep 25 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-3.fc6
 - ghost package.conf.old (Gérard Milmeister)
 - set unconfined_execmem_exec_t context on executables with ghc rts (#195821)
