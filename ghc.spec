@@ -1,16 +1,17 @@
-%define ghcver ghc642
+%define ghcver ghc66
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 1
 
 Name:		ghc
-Version:	6.4.2
-Release:	4%{?dist}
+Version:	6.6
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
-Source:		http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -20,7 +21,7 @@ Buildrequires:  libX11-devel, libXt-devel
 Buildrequires:  freeglut-devel, openal-devel
 %if %{build_doc}
 # haddock generates docs in libraries
-Buildrequires: libxslt, docbook-style-xsl, haddock
+Buildrequires: libxslt, docbook-style-xsl, haddock >= 0.8
 %endif
 Prefix:		%{_prefix}
 
@@ -35,7 +36,7 @@ extensions, including concurrency, exceptions, and a foreign language
 interface.
 
 %package -n %{ghcver}
-Summary:	Documentation for GHC
+Summary:	Glasgow Haskell Compilation system
 Group:		Development/Languages
 Requires:	gcc gmp-devel readline-devel
 
@@ -79,7 +80,7 @@ you like to have local access to the documentation in HTML format.
 %define __spec_install_post /usr/lib/rpm/brp-compress
 
 %prep
-%setup -q -n ghc-%{version}
+%setup -q -n ghc-%{version} -b1
 
 %build
 %if !%{build_prof}
@@ -154,7 +155,7 @@ fi
 
 %files -n %{ghcver} -f rpm-base-filelist
 %defattr(-,root,root,-)
-%doc ghc/ANNOUNCE ghc/LICENSE ghc/README
+%doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/ghc*%{version}
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 %ghost %{_libdir}/ghc-%{version}/package.conf.old
@@ -174,6 +175,11 @@ fi
 
 
 %changelog
+* Fri Nov  3 2006 Jens Petersen <petersen@redhat.com> - 6.6-1
+- update to 6.6 release
+- buildrequire haddock >= 0.8
+- fix summary of ghcver package (Michel Salim, #209574)
+
 * Thu Sep 28 2006 Jens Petersen <petersen@redhat.com> - 6.4.2-4
 - turn on docs generation again
 
