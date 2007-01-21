@@ -6,7 +6,7 @@
 
 Name:		ghc
 Version:	6.6
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -89,6 +89,9 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
 ./configure --prefix=%{_prefix} --libdir=%{_libdir}
+
+# drop truncated copy of header (#222865)
+rm libraries/network/include/Typeable.h
 
 make all
 %if %{build_doc}
@@ -175,6 +178,10 @@ fi
 
 
 %changelog
+* Mon Jan 22 2007 Jens Petersen <petersen@redhat.com> - 6.6-2
+- remove truncated duplicate Typeable.h header in network package
+  (Bryan O'Sullivan, #222865)
+
 * Fri Nov  3 2006 Jens Petersen <petersen@redhat.com> - 6.6-1
 - update to 6.6 release
 - buildrequire haddock >= 0.8
