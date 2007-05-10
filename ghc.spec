@@ -6,8 +6,10 @@
 
 Name:		ghc
 Version:	6.6.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
+# See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
+ExcludeArch:	ppc64
 License:	BSD style
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -178,6 +180,9 @@ fi
 
 
 %changelog
+* Thu May 10 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-2
+- exclude ppc64 for now, due to lack of time to bootstrap
+
 * Wed May  9 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-1
 - update to 6.6.1 release
 
