@@ -6,7 +6,7 @@
 
 Name:		ghc
 Version:	6.6.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	ppc64
@@ -106,7 +106,7 @@ rm -rf $RPM_BUILD_ROOT
 make prefix=$RPM_BUILD_ROOT%{_prefix} libdir=$RPM_BUILD_ROOT%{_libdir}/%{name}-%{version} install
 
 %if %{build_doc}
-make datadir=$RPM_BUILD_ROOT%{_docdir}/ghc-%{version} XMLDocWays="html" install-docs
+make mandir=$RPM_BUILD_ROOT%{_mandir} datadir=$RPM_BUILD_ROOT%{_docdir}/ghc-%{version} XMLDocWays="html" install-docs
 %endif
 
 SRC_TOP=$PWD
@@ -156,6 +156,7 @@ fi
 %defattr(-,root,root,-)
 %{_bindir}/*
 %exclude %{_bindir}/ghc*%{version}
+%doc %{_mandir}/man1/ghc.*
 
 
 %files -n %{ghcver} -f rpm-base-filelist
@@ -180,6 +181,9 @@ fi
 
 
 %changelog
+* Thu May 10 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-3
+- install man page for ghc
+
 * Thu May 10 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-2
 - exclude ppc64 for now, due to lack of time to bootstrap
 
