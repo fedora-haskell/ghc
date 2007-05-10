@@ -1,12 +1,12 @@
-%define ghcver ghc66
+%define ghcver ghc661
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 1
 
 Name:		ghc
-Version:	6.6
-Release:	2%{?dist}
+Version:	6.6.1
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 License:	BSD style
 Group:		Development/Languages
@@ -178,6 +178,9 @@ fi
 
 
 %changelog
+* Wed May  9 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-1
+- update to 6.6.1 release
+
 * Mon Jan 22 2007 Jens Petersen <petersen@redhat.com> - 6.6-2
 - remove truncated duplicate Typeable.h header in network package
   (Bryan O'Sullivan, #222865)
