@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.0.20070928
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	ppc64
@@ -29,7 +29,7 @@ Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}, chkconfig
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-BuildRequires:  ghc, sed
+BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, readline-devel
 BuildRequires:  libX11-devel, libXt-devel
 BuildRequires:  freeglut-devel, openal-devel
@@ -235,6 +235,9 @@ fi
 
 
 %changelog
+* Sat Sep 29 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.0.20070928-2
+- add happy to BuildRequires
+
 * Sat Sep 29 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.0.20070928-1
 - prepare for GHC 6.8.1 by building a release candidate snapshot
 
