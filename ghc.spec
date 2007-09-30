@@ -1,12 +1,24 @@
-%define ghcver ghc661
+%define ghcver ghc680
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 1
 
+# Fixing packaging problems can be a tremendous pain because it
+# generally requires a complete rebuild, which takes hours.  To offset
+# the misery, do a complete build once using "rpmbuild -bc", then copy
+# your built tree to a directory of the same name suffixed with
+# ".built", using "cp -al".  Finally, set this variable, and it will
+# copy the already-built tree into place during %build instead of
+# actually doing the build.
+#
+# Obviously, this can only work if you leave the %build section
+# completely untouched between builds.
+%define package_debugging 0
+
 Name:		ghc
-Version:	6.6.1
-Release:	3%{?dist}
+Version:	6.8.0.20070928
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	ppc64
@@ -15,15 +27,15 @@ Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 URL:		http://haskell.org/ghc/
-Requires:	%{ghcver} = %{version}-%{release}
+Requires:	%{ghcver} = %{version}-%{release}, chkconfig
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  ghc, sed
-Buildrequires:  gmp-devel, readline-devel
-Buildrequires:  libX11-devel, libXt-devel
-Buildrequires:  freeglut-devel, openal-devel
+BuildRequires:  gmp-devel, readline-devel
+BuildRequires:  libX11-devel, libXt-devel
+BuildRequires:  freeglut-devel, openal-devel
 %if %{build_doc}
 # haddock generates docs in libraries
-Buildrequires: libxslt, docbook-style-xsl, haddock >= 0.8
+BuildRequires: libxslt, docbook-style-xsl, haddock >= 0.8
 %endif
 Prefix:		%{_prefix}
 
@@ -82,31 +94,49 @@ you like to have local access to the documentation in HTML format.
 %define __spec_install_post /usr/lib/rpm/brp-compress
 
 %prep
-%setup -q -n ghc-%{version} -b1
+%setup -q -n %{name}-%{version} -b1
 
 %build
+%if %{package_debugging}
+cd ..
+rm -rf %{name}-%{version}
+cp -al %{name}-%{version}.built %{name}-%{version}
+cd %{name}-%{version}
+exit 0
+%endif
+
 %if !%{build_prof}
 echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
-./configure --prefix=%{_prefix} --libdir=%{_libdir}
+./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
+  --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
+  --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
+  --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
 
 # drop truncated copy of header (#222865)
 rm libraries/network/include/Typeable.h
 
-make all
+make %{_smp_mflags} docdir=%{_docdir}/%{name}-%{version} all
 %if %{build_doc}
-make html
+make %{_smp_mflags} docdir=%{_docdir}/%{name}-%{version} html
+make %{_smp_mflags} -C libraries HADDOCK_DOCS=YES
+( cd libraries/Cabal && docbook2html doc/Cabal.xml --output doc/Cabal )
 %endif
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make prefix=$RPM_BUILD_ROOT%{_prefix} libdir=$RPM_BUILD_ROOT%{_libdir}/%{name}-%{version} install
+make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} install
 
 %if %{build_doc}
-make mandir=$RPM_BUILD_ROOT%{_mandir} datadir=$RPM_BUILD_ROOT%{_docdir}/ghc-%{version} XMLDocWays="html" install-docs
+make DESTDIR=${RPM_BUILD_ROOT} docdir=%{_docdir}/%{name}-%{version} \
+  XMLDocWays="html" HADDOCK_DOCS=YES install-docs
+mv ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries \
+  ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}
+cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 %endif
 
 SRC_TOP=$PWD
@@ -126,6 +156,7 @@ cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 # create package.conf.old
 touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
 
+mv ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs-ghc
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -140,6 +171,22 @@ fi
 
 /usr/bin/chcon -t unconfined_execmem_exec_t %{_bindir}/{hasktags,runghc,runhaskell} >/dev/null 2>&1 || :
 
+# Alas, GHC, Hugs, and nhc all come with different set of tools in
+# addition to a runFOO:
+#
+#   * GHC:  hsc2hs
+#   * Hugs: hsc2hs, cpphs
+#   * nhc:  cpphs
+#
+# Therefore it is currently not possible to use --slave below to form
+# link groups under a single name 'runhaskell'. Either these tools
+# should be disentangled from the Haskell implementations, or all
+# implementations should have the same set of tools. *sigh*
+
+update-alternatives --install %{_bindir}/runhaskell runhaskell \
+  %{_bindir}/runghc 500
+update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
+  %{_bindir}/hsc2hs-ghc 500
 
 %post -n %{ghcver}
 ## tweak prefix in drivers scripts if relocating
@@ -150,6 +197,13 @@ if [ "${RPM_INSTALL_PREFIX}" != "%{_prefix}" ]; then
 fi
 
 /usr/bin/chcon -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/{ghc-%{version},ghc-pkg.bin,hsc2hs-bin} >/dev/null 2>&1 || :
+
+
+%preun
+if test "$1" = 0; then
+  update-alternatives --remove runhaskell %{_bindir}/runghc
+  update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
+fi
 
 
 %files
@@ -181,6 +235,9 @@ fi
 
 
 %changelog
+* Sat Sep 29 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.0.20070928-1
+- prepare for GHC 6.8.1 by building a release candidate snapshot
+
 * Thu May 10 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.6.1-3
 - install man page for ghc
 
