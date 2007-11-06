@@ -1,4 +1,4 @@
-%define ghcver ghc680
+%define ghcver ghc681
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
@@ -17,12 +17,12 @@
 %define package_debugging 0
 
 Name:		ghc
-Version:	6.8.0.20070928
-Release:	2%{?dist}
+Version:	6.8.1
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	ppc64
-License:	BSD style
+License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
@@ -37,7 +37,6 @@ BuildRequires:  freeglut-devel, openal-devel
 # haddock generates docs in libraries
 BuildRequires: libxslt, docbook-style-xsl, haddock >= 0.8
 %endif
-Prefix:		%{_prefix}
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -82,7 +81,7 @@ needed.
 %package doc
 Summary:	Documentation for GHC
 Group:		Development/Languages
-Requires:	%{name}
+Requires:	%{name} = %{version}-%{release}
 
 %description doc
 Preformatted documentation for the Glorious Glasgow Haskell
@@ -235,6 +234,9 @@ fi
 
 
 %changelog
+* Sun Nov  4 2007 Michel Salim <michel.sylvan@gmail.com> - 6.8.1-1
+- Update to 6.8.1
+
 * Sat Sep 29 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.0.20070928-2
 - add happy to BuildRequires
 
