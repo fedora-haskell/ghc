@@ -1,4 +1,4 @@
-%define ghcver ghc681
+%define ghcver ghc682
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
@@ -17,8 +17,8 @@
 %define package_debugging 0
 
 Name:		ghc
-Version:	6.8.1
-Release:	2%{?dist}
+Version:	6.8.2
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -234,6 +234,9 @@ fi
 
 
 %changelog
+* Tue Dec 12 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-1
+- Update to 6.8.2
+
 * Fri Nov 23 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.1-2
 - Exclude alpha
 
