@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -162,12 +162,6 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %post
-## tweak prefix in drivers scripts if relocating
-if [ "${RPM_INSTALL_PREFIX}" != "%{_prefix}" ]; then
-  BINDIR=`echo %{_bindir} | sed -e "s|%{_prefix}|${RPM_INSTALL_PREFIX}|"`
-  sed -i "s|%{_prefix}|${RPM_INSTALL_PREFIX}|" ${BINDIR}/{ghcprof,hsc2hs}
-fi
-
 /usr/bin/chcon -t unconfined_execmem_exec_t %{_bindir}/{hasktags,runghc,runhaskell} >/dev/null 2>&1 || :
 
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
@@ -188,13 +182,6 @@ update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
 %post -n %{ghcver}
-## tweak prefix in drivers scripts if relocating
-if [ "${RPM_INSTALL_PREFIX}" != "%{_prefix}" ]; then
-  BINDIR=`echo %{_bindir} | sed -e "s|%{_prefix}|${RPM_INSTALL_PREFIX}|"`
-  LIBDIR=`echo %{_libdir} | sed -e "s|%{_prefix}|${RPM_INSTALL_PREFIX}|"`
-  sed -i "s|%{_prefix}|${RPM_INSTALL_PREFIX}|" ${BINDIR}/ghc*-%{version} ${LIBDIR}/ghc-%{version}/package.conf
-fi
-
 /usr/bin/chcon -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/{ghc-%{version},ghc-pkg.bin,hsc2hs-bin} >/dev/null 2>&1 || :
 
 
