@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -113,9 +113,7 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --docdir=%{_docdir}/%{name}-%{version} \
-  --htmldir=%{_docdir}/%{name}-%{version}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
 
 cat <<'HADDOCK_PATH_HACK' >> mk/build.mk
 docdir  := %{_docdir}/%{name}-%{version}
