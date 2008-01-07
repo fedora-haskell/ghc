@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -113,14 +113,24 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
+  --docdir=%{_docdir}/%{name}-%{version} \
+  --htmldir=%{_docdir}/%{name}-%{version}
+
+cat <<'HADDOCK_PATH_HACK' >> mk/build.mk
+docdir  := %{_docdir}/%{name}-%{version}
+htmldir := $(docdir)
+dvidir  := $(docdir)
+pdfdir  := $(docdir)
+psdir   := $(docdir)
+HADDOCK_PATH_HACK
 
 # drop truncated copy of header (#222865)
 rm libraries/network/include/Typeable.h
 
-make %{_smp_mflags} docdir=%{_docdir}/%{name}-%{version} all
+make %{_smp_mflags} all
 %if %{build_doc}
-make %{_smp_mflags} docdir=%{_docdir}/%{name}-%{version} html
+make %{_smp_mflags} html
 make %{_smp_mflags} -C libraries HADDOCK_DOCS=YES
 ( cd libraries/Cabal && docbook2html doc/Cabal.xml --output doc/Cabal )
 %endif
@@ -131,10 +141,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} install
 
 %if %{build_doc}
-make DESTDIR=${RPM_BUILD_ROOT} docdir=%{_docdir}/%{name}-%{version} \
-  XMLDocWays="html" HADDOCK_DOCS=YES install-docs
-mv ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries \
-  ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}
+make DESTDIR=${RPM_BUILD_ROOT} XMLDocWays="html" HADDOCK_DOCS=YES install-docs
 cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 %endif
 
@@ -221,11 +228,17 @@ fi
 
 
 %changelog
+* Mon Jan 07 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-3
+- Fix haddock installation paths
+
 * Tue Dec 12 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-1
 - Update to 6.8.2
 
 * Fri Nov 23 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.1-2
 - Exclude alpha
+
+* Thu Nov  8 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.1-2
+- Drop bit-rotted attempts at making package relocatable
 
 * Sun Nov  4 2007 Michel Salim <michel.sylvan@gmail.com> - 6.8.1-1
 - Update to 6.8.1
