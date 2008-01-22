@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	4%{?dist}
+Release:	8%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -113,9 +113,11 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
+  --docdir=%{_docdir}/%{name}-%{version} \
+  --htmldir=%{_docdir}/%{name}-%{version}
 
-cat <<'HADDOCK_PATH_HACK' >> mk/build.mk
+cat <<HADDOCK_PATH_HACK >> mk/build.mk
 docdir  := %{_docdir}/%{name}-%{version}
 htmldir := $(docdir)
 dvidir  := $(docdir)
@@ -140,6 +142,10 @@ make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} install
 
 %if %{build_doc}
 make DESTDIR=${RPM_BUILD_ROOT} XMLDocWays="html" HADDOCK_DOCS=YES install-docs
+if [ -d ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries ]; then
+  mv ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries \
+    ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}
+fi
 cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 %endif
 
@@ -226,8 +232,11 @@ fi
 
 
 %changelog
-* Mon Jan 07 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-3
-- Fix haddock installation paths
+* Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-7
+- More attempts to fix docdir
+
+* Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-6
+- Fix docdir
 
 * Tue Dec 12 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-1
 - Update to 6.8.2
