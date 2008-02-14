@@ -31,7 +31,8 @@ Requires:	%{ghcver} = %{version}-%{release}, chkconfig
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, readline-devel
-BuildRequires:  libX11-devel, libXt-devel
+# X11 is no longer in ghc extralibs
+#BuildRequires:  libX11-devel, libXt-devel
 BuildRequires:  freeglut-devel, openal-devel
 %if %{build_doc}
 # haddock generates docs in libraries
@@ -113,8 +114,7 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --htmldir=%{_docdir}/%{name}-%{version}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
 
 cat <<HADDOCK_PATH_HACK >> mk/build.mk
 docdir  := %{_docdir}/%{name}-%{version}
@@ -232,7 +232,8 @@ fi
 
 %changelog
 * Thu Feb 14 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-9
-- remove unrecognized --docdir from configure
+- remove unrecognized --docdir and --htmldir from configure
+- drop old buildrequires on libX11-devel and libXt-devel
 - rebuild with gcc43
 
 * Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-7
