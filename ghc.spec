@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -232,6 +232,9 @@ fi
 
 
 %changelog
+* Thu Feb 14 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-9
+- rebuild with gcc43
+
 * Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-7
 - More attempts to fix docdir
 
