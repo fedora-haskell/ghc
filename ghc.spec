@@ -114,7 +114,6 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --docdir=%{_docdir}/%{name}-%{version} \
   --htmldir=%{_docdir}/%{name}-%{version}
 
 cat <<HADDOCK_PATH_HACK >> mk/build.mk
@@ -233,6 +232,7 @@ fi
 
 %changelog
 * Thu Feb 14 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-9
+- remove unrecognized --docdir from configure
 - rebuild with gcc43
 
 * Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-7
