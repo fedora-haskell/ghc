@@ -18,7 +18,7 @@
 
 Name:		ghc
 Version:	6.8.2
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -231,6 +231,9 @@ fi
 
 
 %changelog
+* Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 6.8.2-10
+- Autorebuild for GCC 4.3
+
 * Thu Feb 14 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-9
 - remove unrecognized --docdir and --htmldir from configure
 - drop old buildrequires on libX11-devel and libXt-devel
