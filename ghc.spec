@@ -231,8 +231,8 @@ fi
 
 
 %changelog
-* Mon Feb 18 2008 Fedora Release Engineering <rel-eng@fedoraproject.org> - 6.8.2-10
-- Autorebuild for GCC 4.3
+* Tue Apr  8 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-10
+- another rebuild attempt
 
 * Thu Feb 14 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-9
 - remove unrecognized --docdir and --htmldir from configure
