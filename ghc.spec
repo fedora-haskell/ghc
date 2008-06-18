@@ -1,5 +1,3 @@
-%define ghcver ghc683
-
 # speed up test builds by not building profiled libraries
 %define build_prof 1
 %define build_doc 1
@@ -28,8 +26,9 @@ Source0:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src-extralibs.tar.bz2
 Patch0:		ghc-6.8.3-libraries-config.patch
 URL:		http://haskell.org/ghc/
-Requires:	%{ghcver} = %{version}-%{release}, chkconfig
+Requires:	chkconfig, gcc, gmp-devel, readline-devel
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Obsoletes:      ghc682, ghc681, ghc661, ghc66
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, readline-devel
 # X11 is no longer in ghc extralibs
@@ -50,31 +49,14 @@ collection of libraries, and support for various language
 extensions, including concurrency, exceptions, and a foreign language
 interface.
 
-%package -n %{ghcver}
-Summary:	Glasgow Haskell Compilation system
-Group:		Development/Languages
-Requires:	gcc gmp-devel readline-devel
-
-%description -n %{ghcver}
-GHC is a state-of-the-art programming suite for Haskell, a purely
-functional programming language.  It includes an optimising compiler
-generating good code for a variety of platforms, together with an
-interactive system for convenient, quick development.  The
-distribution includes space and time profiling facilities, a large
-collection of libraries, and support for various language
-extensions, including concurrency, exceptions, and a foreign language
-interfaces.
-
-This package contains all the main files and libraries of version %{version}.
-
 %if %{build_prof}
-%package -n %{ghcver}-prof
+%package prof
 Summary:	Profiling libraries for GHC
 Group:		Development/Libraries
-Requires:	%{ghcver} = %{version}-%{release}
-Obsoletes:	ghc-prof
+Requires:	%{name} = %{version}-%{release}
+Obsoletes:	ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
 
-%description -n %{ghcver}-prof
+%description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System
 (GHC).  They should be installed when GHC's profiling subsystem is
 needed.
@@ -144,6 +126,10 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} \
   libexecdir=%{_libexecdir}/%{name}-%{version} install
 
+pushd ${RPM_BUILD_ROOT}/%{_libexecdir}/%{name}-%{version}
+strip cgprof ghc-%{version} ghc-pkg.bin hsc2hs-bin unlit
+popd
+
 %if %{build_doc}
 make DESTDIR=${RPM_BUILD_ROOT} XMLDocWays="html" HADDOCK_DOCS=YES install-docs
 if [ -d ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries ]; then
@@ -200,23 +186,17 @@ if test "$1" = 0; then
 fi
 
 
-%files
-%defattr(-,root,root,-)
-%{_bindir}/*
-%exclude %{_bindir}/ghc*%{version}
-%doc %{_mandir}/man1/ghc.*
-
-
-%files -n %{ghcver} -f rpm-base-filelist
+%files -f rpm-base-filelist
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
-%{_bindir}/ghc*%{version}
+%doc %{_mandir}/man1/ghc.*
+%{_bindir}/*
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 %ghost %{_libdir}/ghc-%{version}/package.conf.old
 
 
 %if %{build_prof}
-%files -n %{ghcver}-prof -f rpm-prof-filelist
+%files prof -f rpm-prof-filelist
 %defattr(-,root,root,-)
 %endif
 
@@ -229,6 +209,11 @@ fi
 
 
 %changelog
+* Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-1
+- Upgrade to 6.8.3
+- Drop the ghc682-style naming scheme, obsolete those packages
+- Manually strip binaries
+
 * Tue Apr  8 2008 Jens Petersen <petersen@redhat.com> - 6.8.2-10
 - another rebuild attempt
 
