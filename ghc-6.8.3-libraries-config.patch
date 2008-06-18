@@ -1,0 +1,12 @@
+--- ghc-6.8.3/libraries/Makefile~	2008-06-17 23:10:28.000000000 -0700
++++ ghc-6.8.3/libraries/Makefile	2008-06-17 23:21:21.000000000 -0700
+@@ -256,6 +256,9 @@
+ 	           --with-hc-pkg=../../utils/ghc-pkg/ghc-pkg-inplace \
+ 	           --with-hsc2hs=../../utils/hsc2hs/hsc2hs-inplace \
+ 	           --with-ld=$(LD) \
++	           --with-alex=$(ALEX) \
++	           --with-haddock=$(HADDOCK) \
++	           --with-happy=$(HAPPY) \
+ 	           --haddock-options="--use-contents=../index.html \
+ 	                           --use-index=../doc-index.html" \
+ 	           $(FLAGGED_CONFIGURE_ARGS) \

@@ -1,4 +1,4 @@
-%define ghcver ghc682
+%define ghcver ghc683
 
 # speed up test builds by not building profiled libraries
 %define build_prof 1
@@ -17,15 +17,16 @@
 %define package_debugging 0
 
 Name:		ghc
-Version:	6.8.2
-Release:	10%{?dist}
+Version:	6.8.3
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
 License:	BSD
 Group:		Development/Languages
-Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
-Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
+Source0:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src.tar.bz2
+Source1:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src-extralibs.tar.bz2
+Patch0:		ghc-6.8.3-libraries-config.patch
 URL:		http://haskell.org/ghc/
 Requires:	%{ghcver} = %{version}-%{release}, chkconfig
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
@@ -35,8 +36,8 @@ BuildRequires:  gmp-devel, readline-devel
 #BuildRequires:  libX11-devel, libXt-devel
 BuildRequires:  freeglut-devel, openal-devel
 %if %{build_doc}
-# haddock generates docs in libraries
-BuildRequires: libxslt, docbook-style-xsl, haddock >= 0.8
+# haddock generates docs in libraries, but haddock 2.0 is not compatible
+BuildRequires: libxslt, docbook-style-xsl, haddock09
 %endif
 
 %description
@@ -96,6 +97,8 @@ you like to have local access to the documentation in HTML format.
 %prep
 %setup -q -n %{name}-%{version} -b1
 
+%patch0 -p1 -b .hdkl
+
 %build
 %if %{package_debugging}
 cd ..
@@ -110,6 +113,7 @@ echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
+HaddockCmd=%{_bindir}/haddock-0.9 \
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
@@ -118,16 +122,16 @@ echo "GhcRTSWays=thr debug" >> mk/build.mk
 
 cat <<HADDOCK_PATH_HACK >> mk/build.mk
 docdir  := %{_docdir}/%{name}-%{version}
-htmldir := $(docdir)
-dvidir  := $(docdir)
-pdfdir  := $(docdir)
-psdir   := $(docdir)
+htmldir := \$(docdir)
+dvidir  := \$(docdir)
+pdfdir  := \$(docdir)
+psdir   := \$(docdir)
 HADDOCK_PATH_HACK
 
 # drop truncated copy of header (#222865)
 rm libraries/network/include/Typeable.h
 
-make %{_smp_mflags} all
+make %{_smp_mflags} all libexecdir=%{_libexecdir}
 %if %{build_doc}
 make %{_smp_mflags} html
 make %{_smp_mflags} -C libraries HADDOCK_DOCS=YES
@@ -137,7 +141,8 @@ make %{_smp_mflags} -C libraries HADDOCK_DOCS=YES
 %install
 rm -rf $RPM_BUILD_ROOT
 
-make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} install
+make DESTDIR=${RPM_BUILD_ROOT} libdir=%{_libdir}/%{name}-%{version} \
+  libexecdir=%{_libexecdir}/%{name}-%{version} install
 
 %if %{build_doc}
 make DESTDIR=${RPM_BUILD_ROOT} XMLDocWays="html" HADDOCK_DOCS=YES install-docs
@@ -151,7 +156,7 @@ cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
 ( cd $RPM_BUILD_ROOT
-  find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf' -fprint $SRC_TOP/rpm-lib.files \)
+  find .%{_libdir}/%{name}-%{version} .%{_libexecdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf' -fprint $SRC_TOP/rpm-lib.files \)
 )
 
 # make paths absolute (filter "./usr" to "/usr")
@@ -170,10 +175,7 @@ mv ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs-ghc
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-
 %post
-/usr/bin/chcon -t unconfined_execmem_exec_t %{_bindir}/{hasktags,runghc,runhaskell} >/dev/null 2>&1 || :
-
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
 #
@@ -190,10 +192,6 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
   %{_bindir}/runghc 500
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
-
-%post -n %{ghcver}
-/usr/bin/chcon -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/{ghc-%{version},ghc-pkg.bin,hsc2hs-bin} >/dev/null 2>&1 || :
-
 
 %preun
 if test "$1" = 0; then
