@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.8.3
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -209,6 +209,9 @@ fi
 
 
 %changelog
+* Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-2
+- Remove unnecessary dependency on alex
+
 * Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-1
 - Upgrade to 6.8.3
 - Drop the ghc682-style naming scheme, obsolete those packages
