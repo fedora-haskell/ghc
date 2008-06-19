@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.8.3
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -130,6 +130,12 @@ pushd ${RPM_BUILD_ROOT}/%{_libexecdir}/%{name}-%{version}
 strip cgprof ghc-%{version} ghc-pkg.bin hsc2hs-bin unlit
 popd
 
+pushd ${RPM_BUILD_ROOT}/%{_libdir}/%{name}-%{version}
+for i in ../../libexec/%{name}-%{version}/*; do
+  ln -s $i .
+done
+popd
+
 %if %{build_doc}
 make DESTDIR=${RPM_BUILD_ROOT} XMLDocWays="html" HADDOCK_DOCS=YES install-docs
 if [ -d ${RPM_BUILD_ROOT}/%{_docdir}/%{name}/libraries ]; then
@@ -209,6 +215,10 @@ fi
 
 
 %changelog
+* Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-3
+- Add symlinks from _libdir, where ghc looks, to _libexecdir
+- Patch libraries/gen_contents_index to use haddock-0.9
+
 * Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-2
 - Remove unnecessary dependency on alex
 

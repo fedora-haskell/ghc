@@ -9,3 +9,14 @@
  	           --haddock-options="--use-contents=../index.html \
  	                           --use-index=../doc-index.html" \
  	           $(FLAGGED_CONFIGURE_ARGS) \
+--- ghc-6.8.3/libraries/gen_contents_index~	2008-06-18 20:40:39.000000000 -0700
++++ ghc-6.8.3/libraries/gen_contents_index	2008-06-18 20:40:50.000000000 -0700
+@@ -22,7 +22,7 @@
+ done
+ 
+ # Now create the combined contents and index pages
+-haddock --gen-index --gen-contents -o . \
++haddock-0.9 --gen-index --gen-contents -o . \
+         -t "Haskell Hierarchical Libraries" \
+         $HADDOCK_ARGS
+ 
