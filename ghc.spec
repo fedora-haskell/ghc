@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.8.3
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -24,6 +24,7 @@ License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/stable/dist/ghc-%{version}-src-extralibs.tar.bz2
+Source2:	ghc-rpm-macros.ghc
 Patch0:		ghc-6.8.3-libraries-config.patch
 URL:		http://haskell.org/ghc/
 Requires:	chkconfig, gcc, gmp-devel, readline-devel
@@ -145,6 +146,10 @@ fi
 cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 %endif
 
+# install rpm macros
+mkdir -p ${RPM_BUILD_ROOT}/%{_systemconfdir}/rpm/macros.ghc
+cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_systemconfdir}/rpm/macros.ghc
+
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
 ( cd $RPM_BUILD_ROOT
@@ -197,6 +202,7 @@ fi
 %doc ANNOUNCE HACKING LICENSE README
 %doc %{_mandir}/man1/ghc.*
 %{_bindir}/*
+%{_systemconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 %ghost %{_libdir}/ghc-%{version}/package.conf.old
 
@@ -215,6 +221,9 @@ fi
 
 
 %changelog
+* Wed Sep 17 2008 Jens Petersen <petersen@redhat.com> - 6.8.3-4
+- add macros.ghc for new Haskell Packaging Guidelines (#460304)
+
 * Wed Jun 18 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.3-3
 - Add symlinks from _libdir, where ghc looks, to _libexecdir
 - Patch libraries/gen_contents_index to use haddock-0.9
