@@ -147,9 +147,9 @@ cp libraries/*.html ${RPM_BUILD_ROOT}/%{_docdir}/%{name}-%{version}/libraries
 %endif
 
 # install rpm macros
-mkdir -p ${RPM_BUILD_ROOT}/%{_systemconfdir}/rpm/macros.ghc
-cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_systemconfdir}/rpm/macros.ghc
-
+mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
+cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
+			
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
 ( cd $RPM_BUILD_ROOT
@@ -202,7 +202,7 @@ fi
 %doc ANNOUNCE HACKING LICENSE README
 %doc %{_mandir}/man1/ghc.*
 %{_bindir}/*
-%{_systemconfdir}/rpm/macros.ghc
+%{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 %ghost %{_libdir}/ghc-%{version}/package.conf.old
 
