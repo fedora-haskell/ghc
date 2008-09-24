@@ -177,7 +177,7 @@ fi
 
 %changelog
 * Wed Sep 24 2008 Jens Petersen <petersen@redhat.com> - 6.8.3-5.fc10
-- bring back haddock-generated lib docs, now under docdir/ghc
+- bring back including haddock-generated lib docs, now under docdir/ghc
 - fix macros.ghc filepath (#460304)
 - spec file cleanups:
 - fix the source urls back
