@@ -80,9 +80,12 @@ echo "HADDOCK_DOCS = YES" >> mk/build.mk
 %endif
 
 export HaddockCmd=%{_bindir}/haddock-0.9
-# workaround ghc configure script hysteria about archs
-%define _target_platform %{_build}
-%configure
+
+./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
+  --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
+  --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
+  --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
 
 make %{_smp_mflags}
 make %{_smp_mflags} -C libraries
@@ -183,7 +186,6 @@ fi
 - fix the source urls back
 - drop requires chkconfig
 - do not override __spec_install_post
-- override _target_platform so we can use %%configure
 - setup docs building in build.mk
 - no longer need to remove network/include/Typeable.h
 - install binaries under libdir not libexec
