@@ -2,6 +2,18 @@
 %define build_prof 1
 %define build_doc 1
 
+# Fixing packaging problems can be a tremendous pain because it
+# generally requires a complete rebuild, which takes hours.  To offset
+# the misery, do a complete build once using "rpmbuild -bc", then copy
+# your built tree to a directory of the same name suffixed with
+# ".built", using "cp -al".  Finally, set this variable, and it will
+# copy the already-built tree into place during build instead of
+# actually doing the build.
+#
+# Obviously, this can only work if you leave the build section
+# completely untouched between builds.
+%define package_debugging 0
+
 Name:		ghc
 Version:	6.8.3
 Release:	5%{?dist}
@@ -69,6 +81,15 @@ you like to have local access to the documentation in HTML format.
 %patch0 -p1 -b .0-haddock~
 
 %build
+# hack for building a local test package quickly from a prebuilt tree 
+%if %{package_debugging}
+pushd ..
+rm -rf %{name}-%{version}
+cp -al %{name}-%{version}.built %{name}-%{version}
+popd
+exit 0
+%endif
+
 %if !%{build_prof}
 echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
