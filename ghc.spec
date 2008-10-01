@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.8.3
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -146,7 +146,8 @@ cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
 
 # these are handled as alternatives
-rm ${RPM_BUILD_ROOT}%{_bindir}/{hsc2hs,runhaskell}
+mv ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs-ghc
+rm ${RPM_BUILD_ROOT}%{_bindir}/runhaskell
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -200,6 +201,9 @@ fi
 
 
 %changelog
+* Wed Oct  1 2008 Bryan O'Sullivan <bos@serpentine.com> 6.8.3-6.fc10
+* Rename hsc2hs to hsc2hs-ghc so the alternatives symlink to it will work
+
 * Wed Sep 24 2008 Jens Petersen <petersen@redhat.com> - 6.8.3-5.fc10
 - bring back including haddock-generated lib docs, now under docdir/ghc
 - fix macros.ghc filepath (#460304)
