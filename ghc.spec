@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -27,8 +27,11 @@ Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs
 Source2:	ghc-rpm-macros.ghc
 URL:		http://haskell.org/ghc/
 Requires:	gcc, gmp-devel, libedit-devel
+Requires(post): policycoreutils
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0
+# introduced for f11 and to be removed for f13:
+Provides:       haddock = 2.2.2
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, libedit-devel
 %if %{build_doc}
@@ -138,13 +141,16 @@ cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
 
 # these are handled as alternatives
-mv ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs-ghc
+mv ${RPM_BUILD_ROOT}%{_bindir}/hsc2hs{,-ghc}
 rm ${RPM_BUILD_ROOT}%{_bindir}/runhaskell
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post
+semanage fcontext -a -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/ghc >/dev/null 2>&1 || :
+restorecon %{_libdir}/ghc-%{version}/ghc >/dev/null
+
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
 #
@@ -193,6 +199,11 @@ fi
 
 
 %changelog
+* Mon Oct 13 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-3
+- provide haddock = 2.2.2
+- add selinux file context for unconfined_execmem following darcs package
+- post requires policycoreutils
+
 * Sun Oct 12 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-2.fc10
 - Use libedit in preference to readline, for BSD license consistency
 - With haddock bundled now, obsolete standalone versions (but not haddock09)
