@@ -20,6 +20,9 @@ make -f cabal-rpm.mk %{_smp_mflags} \
 %cabal copy --destdir=${RPM_BUILD_ROOT} \
 %{nil}
 
+%ghc_cabal_configure \
+%cabal configure --prefix=%{_prefix} --libdir=%{_libdir} --docdir=%{_docdir}/ghc/libraries/%{name} --libsubdir='$compiler/$pkgid'
+
 %ghc_gen_filelists() \
 rm -f %1.files %1-prof.files \
 echo '%defattr(-,root,root,-)' > %1-prof.files \
@@ -56,8 +59,8 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 %{nil}
 
 %ghc_haddock_reindex \
-if [ -f /usr/bin/haddock -a -d /usr/share/doc/ghc/libraries ]; then \
-cd /usr/share/doc/ghc/libraries && \
+if [ -f %{_bindir}/haddock -a -d %{_docdir}/ghc/libraries ]; then \
+cd %{_docdir}/ghc/libraries && \
 haddock --gen-index --gen-contents -o . -t 'Haskell Hierarchical Libraries' \
 $(find . \( \( -path ./ghc -o -path ./ghc-prim \) -prune \) -o \( -name '*.haddock' -print \) \
 | sed 's!.*/\([^/]*\).haddock!--read-interface=\1,\0!'); \

@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -170,7 +170,10 @@ update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
 
 
 %post doc
-%ghc_haddock_reindex
+cd %{_docdir}/ghc/libraries && \
+haddock --gen-index --gen-contents -o . -t 'Haskell Hierarchical Libraries' \
+$(find . \( \( -path ./ghc -o -path ./ghc-prim \) -prune \) -o \( -name '*.haddock' -print \) \
+| sed 's!.*/\([^/]*\).haddock!--read-interface=\1,\0!')
 
 
 %preun
@@ -211,7 +214,10 @@ fi
 
 
 %changelog
-* Sun Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-4
+* Tue Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-5
+- Don't use a macro to update the docs for the main doc package
+
+* Tue Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-4
 - Add ghc_haddock_reindex macro
 - Generate haddock index after installing ghc-doc package
 
