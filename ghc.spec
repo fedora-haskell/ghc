@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -168,6 +168,11 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
+
+%post doc
+%ghc_haddock_reindex
+
+
 %preun
 if test "$1" = 0; then
   update-alternatives --remove runhaskell %{_bindir}/runghc
@@ -195,10 +200,21 @@ fi
 %files doc
 %defattr(-,root,root,-)
 %{_docdir}/%{name}
+%ghost %{_docdir}/%{name}/libraries/doc-index.html
+%ghost %{_docdir}/%{name}/libraries/haddock.css
+%ghost %{_docdir}/%{name}/libraries/haddock-util.js
+%ghost %{_docdir}/%{name}/libraries/haskell_icon.gif
+%ghost %{_docdir}/%{name}/libraries/index.html
+%ghost %{_docdir}/%{name}/libraries/minus.gif
+%ghost %{_docdir}/%{name}/libraries/plus.gif
 %endif
 
 
 %changelog
+* Sun Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-4
+- Add ghc_haddock_reindex macro
+- Generate haddock index after installing ghc-doc package
+
 * Mon Oct 13 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-3
 - provide haddock = 2.2.2
 - add selinux file context for unconfined_execmem following darcs package

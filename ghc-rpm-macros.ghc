@@ -55,3 +55,11 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 [ "$1" = 1 ] && %{pkg_libdir}/register.sh >& /dev/null || : \
 %{nil}
 
+%ghc_haddock_reindex \
+if [ -f /usr/bin/haddock -a -d /usr/share/doc/ghc/libraries ]; then \
+cd /usr/share/doc/ghc/libraries && \
+haddock --gen-index --gen-contents -o . -t 'Haskell Hierarchical Libraries' \
+$(find . \( \( -path ./ghc -o -path ./ghc-prim \) -prune \) -o \( -name '*.haddock' -print \) \
+| sed 's!.*/\([^/]*\).haddock!--read-interface=\1,\0!'); \
+fi \
+%{nil}
