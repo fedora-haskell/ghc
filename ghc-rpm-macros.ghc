@@ -1,7 +1,7 @@
 %cabal %{_bindir}/runhaskell Setup
 
 %cabal_configure \
-%cabal configure --prefix=%{_prefix} --libdir=%{_libdir} --docdir=%{_docdir}/%{name}-%{version} --libsubdir='$compiler/$pkgid'
+%cabal configure --prefix=%{_prefix} --libdir=%{_libdir} --docdir=%{_docdir}/%{name}-%{version} --htmldir=%{_docdir}/%{hsc_name}/libraries/%{pkg_name} --haddockdir=%{_docdir}/%{hsc_name}/libraries/%{pkg_name} --libsubdir='$compiler/$pkgid'
 
 %cabal_build \
 %cabal build \
@@ -17,7 +17,7 @@ make -f cabal-rpm.mk %{_smp_mflags} \
 %{nil}
 
 %cabal_install \
-%cabal copy --destdir=${RPM_BUILD_ROOT} \
+%cabal copy --destdir=${RPM_BUILD_ROOT} -v \
 %{nil}
 
 %ghc_cabal_configure \
@@ -58,11 +58,11 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 [ "$1" = 1 ] && %{pkg_libdir}/register.sh >& /dev/null || : \
 %{nil}
 
-%ghc_haddock_reindex \
-if [ -f %{_bindir}/haddock -a -d %{_docdir}/ghc/libraries ]; then \
-cd %{_docdir}/ghc/libraries && \
-haddock --gen-index --gen-contents -o . -t 'Haskell Hierarchical Libraries' \
-$(find . \( \( -path ./ghc -o -path ./ghc-prim \) -prune \) -o \( -name '*.haddock' -print \) \
-| sed 's!.*/\([^/]*\).haddock!--read-interface=\1,\0!'); \
+%ghc_reindex_haddock \
+if [ -f %{_bindir}/haddock -a -d %{_docdir}/%{hsc_name}/libraries ]; then \
+cd %{_docdir}/%{hsc_name}/libraries && \
+haddock --gen-index --gen-contents -o . -t 'Haskell Hierarchical Libraries' \\\
+$(find . \\( \\( -path ./ghc -o -path ./ghc-prim \\) -prune \\) -o \\( -name '*.haddock' -print \\) \\\
+| sed 's!.*/\\([^/]*\\).haddock!--read-interface=\\1,\\0!'); \
 fi \
 %{nil}

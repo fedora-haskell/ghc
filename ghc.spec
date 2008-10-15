@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -214,6 +214,9 @@ fi
 
 
 %changelog
+* Tue Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-6
+- Update macros to install html and haddock bits in the right places
+
 * Tue Oct 14 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.0.20081007-5
 - Don't use a macro to update the docs for the main doc package
 
