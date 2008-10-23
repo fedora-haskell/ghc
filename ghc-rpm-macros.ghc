@@ -56,5 +56,5 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 %{nil}
 
 %ghc_reindex_haddock \
-( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || : \
+( cd %{_docdir}/ghc/libraries && [ -x "./gen_contents_index" ] && ./gen_contents_index ) || : \
 %{nil}
