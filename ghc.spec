@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	8%{?dist}
+Release:	9%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -140,9 +140,6 @@ cat rpm-dir.files rpm-lib.files > rpm-base-filelist
 cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 %endif
 
-# create package.conf.old
-touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
-
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
   if [ -x ${RPM_BUILD_ROOT}%{_bindir}/$i-ghc ]; then
@@ -176,7 +173,6 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
-
 %post doc
 ( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
 
@@ -186,7 +182,6 @@ if test "$1" = 0; then
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
 fi
 
-
 %files -f rpm-base-filelist
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
@@ -194,19 +189,17 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
-%ghost %{_libdir}/ghc-%{version}/package.conf.old
-
 
 %if %{build_prof}
 %files prof -f rpm-prof-filelist
 %defattr(-,root,root,-)
 %endif
 
-
 %if %{build_doc}
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
 %dir %{_docdir}/%{name}
+%{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/index.html
 %{_docdir}/%{name}/libraries/gen_contents_index
 %dir %{_docdir}/%{name}/libraries
@@ -219,8 +212,12 @@ fi
 %ghost %{_docdir}/%{name}/libraries/plus.gif
 %endif
 
-
 %changelog
+* Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-9
+- remove redundant --haddockdir from cabal_configure
+- actually ghc-pkg no longer seems to create package.conf.old backups
+- include LICENSE in doc
+
 * Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-8
 - need to create ghost package.conf.old for ghc-6.10
 
