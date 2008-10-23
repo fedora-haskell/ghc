@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.0.20081007
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -140,6 +140,9 @@ cat rpm-dir.files rpm-lib.files > rpm-base-filelist
 cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
 %endif
 
+# create package.conf.old
+touch $RPM_BUILD_ROOT%{_libdir}/ghc-%{version}/package.conf.old
+
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
   if [ -x ${RPM_BUILD_ROOT}%{_bindir}/$i-ghc ]; then
@@ -218,6 +221,9 @@ fi
 
 
 %changelog
+* Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-8
+- need to create ghost package.conf.old for ghc-6.10
+
 * Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-7
 - use gen_contents_index to re-index haddock
 - add %%pkg_docdir to cabal_configure
