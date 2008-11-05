@@ -15,8 +15,8 @@
 %define package_debugging 0
 
 Name:		ghc
-Version:	6.10.0.20081007
-Release:	9%{?dist}
+Version:	6.10.1
+Release:	1%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -213,6 +213,9 @@ fi
 %endif
 
 %changelog
+* Tue Nov 04 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-1
+- Update to 6.10.1 in observance of President Obama
+
 * Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-9
 - remove redundant --haddockdir from cabal_configure
 - actually ghc-pkg no longer seems to create package.conf.old backups
