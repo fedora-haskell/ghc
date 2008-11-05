@@ -202,6 +202,7 @@ fi
 %{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/index.html
 %{_docdir}/%{name}/libraries/gen_contents_index
+%{_docdir}/%{name}/libraries/prologue.txt
 %dir %{_docdir}/%{name}/libraries
 %ghost %{_docdir}/%{name}/libraries/doc-index.html
 %ghost %{_docdir}/%{name}/libraries/haddock.css
@@ -210,10 +211,12 @@ fi
 %ghost %{_docdir}/%{name}/libraries/index.html
 %ghost %{_docdir}/%{name}/libraries/minus.gif
 %ghost %{_docdir}/%{name}/libraries/plus.gif
-%ghost %{_docdir}/%{name}/libraries/prologue.txt
 %endif
 
 %changelog
+* Wed Nov 05 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-3
+- libraries/prologue.txt should not have been ghosted
+
 * Tue Nov 04 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-2
 - Fix a minor packaging glitch
 
