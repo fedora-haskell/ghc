@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	1%{?dist}
+Release:	2%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -210,9 +210,13 @@ fi
 %ghost %{_docdir}/%{name}/libraries/index.html
 %ghost %{_docdir}/%{name}/libraries/minus.gif
 %ghost %{_docdir}/%{name}/libraries/plus.gif
+%ghost %{_docdir}/%{name}/libraries/prologue.txt
 %endif
 
 %changelog
+* Tue Nov 04 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-2
+- Fix a minor packaging glitch
+
 * Tue Nov 04 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-1
 - Update to 6.10.1 in observance of President Obama
 
