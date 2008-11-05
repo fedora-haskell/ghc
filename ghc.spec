@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	2%{?dist}
+Release:	3%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
