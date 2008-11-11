@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	3%{?dist}
+Release:	4%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -37,6 +37,7 @@ BuildRequires:  gmp-devel, libedit-devel
 %if %{build_doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
+Patch1:        ghc-6.10.1-gen_contexts_index.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -78,6 +79,7 @@ you like to have local access to the documentation in HTML format.
 
 %prep
 %setup -q -n %{name}-%{version} -b1
+%patch1 -p1 -b .orig
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -173,11 +175,12 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
-%post doc
+# posttrans to make sure any old documentation has been removed first
+%posttrans doc
 ( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
 
 %preun
-if test "$1" = 0; then
+if [ "$1" = 0 ]; then
   update-alternatives --remove runhaskell %{_bindir}/runghc
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
 fi
@@ -214,6 +217,10 @@ fi
 %endif
 
 %changelog
+* Tue Nov 11 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-4
+- fix broken urls to haddock docs created by gen_contents_index script
+- avoid haddock errors when upgrading by making doc post script posttrans
+
 * Wed Nov 05 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-3
 - libraries/prologue.txt should not have been ghosted
 
