@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	4%{?dist}
+Release:	5%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -25,6 +25,8 @@ Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 Source2:	ghc-rpm-macros.ghc
+Source3:	cabal-lib-template.spec
+Source4:	cabal2spec
 URL:		http://haskell.org/ghc/
 Requires:	gcc, gmp-devel, libedit-devel
 Requires(post): policycoreutils
@@ -67,7 +69,7 @@ Summary:	Documentation for GHC
 Group:		Development/Languages
 Requires:	%{name} = %{version}-%{release}
 # for haddock
-Requires(post): %{name} = %{version}-%{release}
+Requires(posttrans): %{name} = %{version}-%{release}
 
 %description doc
 Preformatted documentation for the Glorious Glasgow Haskell
@@ -126,7 +128,14 @@ make DESTDIR=${RPM_BUILD_ROOT} install-docs
 # install rpm macros
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
-			
+
+# spec templating
+# cabal-lib-template.spec
+mkdir -p ${RPM_BUILD_ROOT}/%{_datadir}/ghc
+cp -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_datadir}/ghc/
+# cabal2spec
+install -m 0755 -p %{SOURCE4} ${RPM_BUILD_ROOT}/%{_bindir}
+
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
 ( cd $RPM_BUILD_ROOT
@@ -192,6 +201,7 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
+%{_datadir}/ghc
 
 %if %{build_prof}
 %files prof -f rpm-prof-filelist
@@ -217,6 +227,11 @@ fi
 %endif
 
 %changelog
+* Tue Nov 25 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-5
+- add cabal2spec and cabal-lib-template.spec for easy Cabal library packaging
+- simplify script macros: make ghc_preinst_script and ghc_postun_script no-ops
+  and ghc_preun_script only unregister for uninstall
+
 * Tue Nov 11 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-4
 - fix broken urls to haddock docs created by gen_contents_index script
 - avoid haddock errors when upgrading by making doc post script posttrans

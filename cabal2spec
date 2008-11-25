@@ -1,0 +1,23 @@
+#!/bin/sh
+
+[ $# -ne 1 ] && echo "Usage: $0 lib-ver[.tar.gz]" && exit 1
+
+INPUT=$1
+
+case $INPUT in
+    */*) INPUT=$(basename $INPUT) ;;
+esac
+
+INPUT=$(echo $INPUT | sed -e "s/.tar.gz//")
+
+VERSION=$(echo $INPUT | sed -e "s/[A-Za-z-]*-//")
+
+NAME=$(echo $INPUT | sed -e "s/-$VERSION//")
+
+[ -r ghc-$NAME.spec ] && echo "ghc-$NAME.spec already exists!" && exit 1
+
+cp /usr/share/ghc/cabal-lib-template.spec ghc-$NAME.spec
+
+echo "created ghc-$NAME.spec"
+
+sed -i -e "s/@PACKAGE@/$NAME/" -e "s/@GHC_VERSION@/$(ghc --numeric-version)/" -e "s/@VERSION@/$VERSION/" -e "s/@DATE@/`date +\"%a %b %e %Y\"`/" ghc-$NAME.spec

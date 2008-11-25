@@ -40,7 +40,6 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 %{nil}
 
 %ghc_preinst_script \
-[ "$1" = 2 ] && %{pkg_libdir}/unregister.sh >&/dev/null || : \
 %{nil}
 
 %ghc_postinst_script \
@@ -48,11 +47,10 @@ install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
 %{nil}
 
 %ghc_preun_script \
-%{pkg_libdir}/unregister.sh >&/dev/null \
+[ "$1" = 0 ] && %{pkg_libdir}/unregister.sh >&/dev/null \
 %{nil}
 
 %ghc_postun_script \
-[ "$1" = 1 ] && %{pkg_libdir}/register.sh >& /dev/null || : \
 %{nil}
 
 %ghc_reindex_haddock \
