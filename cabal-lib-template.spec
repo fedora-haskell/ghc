@@ -97,7 +97,7 @@ fi
 
 %files -f %{name}.files
 %defattr(-,root,root,-)
-%doc LICENSE README
+%doc LICENSE
 %if %{build_doc}
 %{pkg_docdir}
 %endif
