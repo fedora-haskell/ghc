@@ -2,7 +2,7 @@
 
 set -e
 
-[ $# -ne 1 -o ! -r $1 ] && echo "Usage: $0 hackage-version.tar.gz" && exit 1
+[ $# -ne 1 -o ! -r "$1" ] && echo "Usage: $0 hackage-version.tar.gz" && exit 1
 
 HACKAGE=$1
 
@@ -32,7 +32,7 @@ fi
 
 SPECFILE=$PREFIX$NAME.spec
 
-[ -r $SPECFILE ] && echo "$SPECFILE already exists!" && exit 1
+[ -r "$SPECFILE" ] && echo "$SPECFILE already exists!" && exit 1
 
 cp /usr/share/ghc/cabal-${HAS_BIN:+bin}${HAS_LIB:+lib}-template.spec.in $SPECFILE
 
