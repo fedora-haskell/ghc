@@ -1,23 +1,43 @@
 #!/bin/sh
 
-[ $# -ne 1 ] && echo "Usage: $0 lib-ver[.tar.gz]" && exit 1
+set -e
 
-INPUT=$1
+[ $# -ne 1 -o ! -r $1 ] && echo "Usage: $0 hackage-version.tar.gz" && exit 1
 
-case $INPUT in
-    */*) INPUT=$(basename $INPUT) ;;
-esac
+HACKAGE=$1
 
-INPUT=$(echo $INPUT | sed -e "s/.tar.gz//")
+INPUT=$(basename $HACKAGE .tar.gz)
 
-VERSION=$(echo $INPUT | sed -e "s/[A-Za-z-]*-//")
-
+VERSION=$(echo $INPUT | sed -e "s/.*-//")
 NAME=$(echo $INPUT | sed -e "s/-$VERSION//")
 
-[ -r ghc-$NAME.spec ] && echo "ghc-$NAME.spec already exists!" && exit 1
+TMPDIR=$(mktemp -d)
+CURRENT_DIR=$PWD
+cd $TMPDIR
+tar zxf $HACKAGE "*.cabal"
 
-cp /usr/share/ghc/cabal-lib-template.spec ghc-$NAME.spec
+if grep -qi exposed-modules: */*.cabal; then
+  HAS_LIB=yes
+fi
 
-echo "created ghc-$NAME.spec"
+if grep -qi executable */*.cabal; then
+  HAS_BIN=yes
+fi
+cd -
+rm -rf $TMPDIR
 
-sed -i -e "s/@PACKAGE@/$NAME/" -e "s/@GHC_VERSION@/$(ghc --numeric-version)/" -e "s/@VERSION@/$VERSION/" -e "s/@DATE@/`date +\"%a %b %e %Y\"`/" ghc-$NAME.spec
+if [ "$HAS_LIB" -a ! "$HAS_BIN" ]; then
+  PREFIX=ghc-
+fi
+
+SPECFILE=$PREFIX$NAME.spec
+
+[ -r $SPECFILE ] && echo "$SPECFILE already exists!" && exit 1
+
+cp /usr/share/ghc/cabal-${HAS_BIN:+bin}${HAS_LIB:+lib}-template.spec.in $SPECFILE
+
+echo "created $SPECFILE (${HAS_BIN:+bin}${HAS_LIB:+lib})"
+
+DATE=$(env LANG=C date +"%a %b %e %Y")
+
+sed -i -e "s/@PACKAGE@/$NAME/" -e "s/@GHC_VERSION@/$(ghc --numeric-version)/" -e "s/@VERSION@/$VERSION/" -e "s/@DATE@/$DATE/" $SPECFILE

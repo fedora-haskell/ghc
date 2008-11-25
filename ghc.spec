@@ -25,8 +25,10 @@ Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 Source2:	ghc-rpm-macros.ghc
-Source3:	cabal-lib-template.spec
-Source4:	cabal2spec
+Source3:	cabal2spec
+Source4:	cabal-bin-template.spec.in
+Source5:	cabal-lib-template.spec.in
+Source6:	cabal-binlib-template.spec.in
 URL:		http://haskell.org/ghc/
 Requires:	gcc, gmp-devel, libedit-devel
 Requires(post): policycoreutils
@@ -130,11 +132,11 @@ mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
 
 # spec templating
-# cabal-lib-template.spec
-mkdir -p ${RPM_BUILD_ROOT}/%{_datadir}/ghc
-cp -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_datadir}/ghc/
 # cabal2spec
-install -m 0755 -p %{SOURCE4} ${RPM_BUILD_ROOT}/%{_bindir}
+install -m 0755 -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_bindir}
+# templates for bin, lib and binlib cabal hackages
+mkdir -p ${RPM_BUILD_ROOT}/%{_datadir}/ghc
+cp -p %{SOURCE4} %{SOURCE5} %{SOURCE6} ${RPM_BUILD_ROOT}/%{_datadir}/ghc/
 
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
@@ -228,7 +230,7 @@ fi
 
 %changelog
 * Tue Nov 25 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-5
-- add cabal2spec and cabal-lib-template.spec for easy Cabal library packaging
+- add cabal2spec and template files for easy cabal hackage packaging
 - simplify script macros: make ghc_preinst_script and ghc_postun_script no-ops
   and ghc_preun_script only unregister for uninstall
 

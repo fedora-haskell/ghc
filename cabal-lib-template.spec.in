@@ -10,25 +10,25 @@
 # ghc does not emit debug information
 %define debug_package %{nil}
 
-Name:		ghc-%{pkg_name}
-Version:	@VERSION@
-Release:	1%{?dist}
-Summary:	Haskell %{pkg_name} library *FIXME*
+Name:           ghc-%{pkg_name}
+Version:        @VERSION@
+Release:        1%{?dist}
+Summary:        Haskell %{pkg_name} library *FIXME*
 
-Group:		Development/Libraries
-License:	BSD
-URL:		http://hackage.haskell.org/cgi-bin/hackage-scripts/package/%{pkg_name}
-Source0:	http://hackage.haskell.org/packages/archive/%{pkg_name}/%{version}/%{pkg_name}-%{version}.tar.gz
-Provides:	%{name}-devel = %{version}-%{release}
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Group:          Development/Libraries
+License:        BSD?
+URL:            http://hackage.haskell.org/cgi-bin/hackage-scripts/package/%{pkg_name}
+Source0:        http://hackage.haskell.org/packages/archive/%{pkg_name}/%{version}/%{pkg_name}-%{version}.tar.gz
+Provides:       %{name}-devel = %{version}-%{release}
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # ghc has only been bootstrapped on the following archs:
-ExclusiveArch:	i386 x86_64 ppc
-BuildRequires:	ghc = %{ghc_version}
+ExclusiveArch:  i386 x86_64 ppc
+BuildRequires:  ghc = %{ghc_version}
 %if %{build_prof}
-BuildRequires:	ghc-prof = %{ghc_version}
+BuildRequires:  ghc-prof = %{ghc_version}
 %endif
-Requires:	ghc = %{ghc_version}
-Requires(post):	ghc = %{ghc_version}
+Requires:       ghc = %{ghc_version}
+Requires(post): ghc = %{ghc_version}
 Requires(preun): ghc = %{ghc_version}
 Requires(postun): ghc = %{ghc_version}
 
@@ -106,10 +106,9 @@ fi
 %if %{build_prof}
 %files prof -f %{name}-prof.files
 %defattr(-,root,root,-)
-%doc LICENSE
 %endif
 
 
 %changelog
 * @DATE@ @PACKAGER@ <@EMAIL@> - @VERSION@-1
-- initial packaging for Fedora
+- initial packaging for Fedora created by cabal2spec
