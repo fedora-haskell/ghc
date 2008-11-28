@@ -229,6 +229,10 @@ fi
 %endif
 
 %changelog
+* Fri Nov 28 2008 Jens Petersen <petersen@redhat.com>
+- make cabal2spec work on .cabal files too, and
+  read and check name and version from .cabal
+
 * Tue Nov 25 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-5
 - add cabal2spec and template files for easy cabal hackage packaging
 - simplify script macros: make ghc_preinst_script and ghc_postun_script no-ops

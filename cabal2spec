@@ -2,29 +2,47 @@
 
 set -e
 
-[ $# -ne 1 -o ! -r "$1" ] && echo "Usage: $0 hackage-version.tar.gz" && exit 1
+[ $# -ne 1 -o ! -r "$1" ] && echo "Usage: $(basename $0) [hackage.tar.gz|hackage.cabal]" && exit 1
 
-HACKAGE=$1
+FILE=$1
 
-INPUT=$(basename $HACKAGE .tar.gz)
+case $FILE in
+    *.tar.gz)
+	TARNAME_VER=$(basename $FILE .tar.gz)
+	TARVERSION=$(echo $TARNAME_VER | sed -e "s/.*-//")
+	TARNAME=$(echo $TARNAME_VER | sed -e "s/-$TARVERSION//")
+	WORKDIR=$(mktemp -d)
+	tar zxf $FILE -C $WORKDIR "*.cabal" 
+	CABAL="$WORKDIR/*/*.cabal" ;;
+    *.cabal)
+	CABAL=$FILE ;;
+esac
 
-VERSION=$(echo $INPUT | sed -e "s/.*-//")
-NAME=$(echo $INPUT | sed -e "s/-$VERSION//")
+NAME=$(grep -i ^name: $CABAL | sed -e "s/[Nn]ame:[ \t]*//")
+if [ -n "$TARNAME" -a "$TARNAME" != "$NAME" ]; then
+  echo "Warning: tarball name ($TARNAME) and cabal name ($NAME) differ!"
+fi
 
-TMPDIR=$(mktemp -d)
-CURRENT_DIR=$PWD
-cd $TMPDIR
-tar zxf $HACKAGE "*.cabal"
+VERSION=$(grep -i ^version: $CABAL | sed -e "s/[Vv]ersion:[ \t]*//")
+if [ -n "$TARVERSION" -a "$TARVERSION" != "$VERSION" ]; then
+  echo "Warning: tarball version ($TARVERSION) and cabal version ($VERSION) differ!"
+fi
 
-if grep -qi exposed-modules: */*.cabal; then
+CABALFILENAME=$(basename $CABAL .cabal)
+if [ "$CABALFILENAME" != "$NAME" ]; then
+  echo "Warning: .cabal filename ($CABALFILENAME) and cabal Name field ($NAME) differ!"
+fi
+
+
+if grep -qi exposed-modules: $CABAL; then
   HAS_LIB=yes
 fi
 
-if grep -qi executable */*.cabal; then
+if grep -qi executable $CABAL; then
   HAS_BIN=yes
 fi
-cd -
-rm -rf $TMPDIR
+
+[ -d "$WORKDIR" ] && rm -r $WORKDIR
 
 if [ "$HAS_LIB" -a ! "$HAS_BIN" ]; then
   PREFIX=ghc-
@@ -36,7 +54,7 @@ SPECFILE=$PREFIX$NAME.spec
 
 cp /usr/share/ghc/cabal-${HAS_BIN:+bin}${HAS_LIB:+lib}-template.spec.in $SPECFILE
 
-echo "created $SPECFILE (${HAS_BIN:+bin}${HAS_LIB:+lib})"
+echo "created $SPECFILE (${HAS_BIN:+bin}${HAS_LIB:+lib}) for $NAME-$VERSION"
 
 DATE=$(env LANG=C date +"%a %b %e %Y")
 
