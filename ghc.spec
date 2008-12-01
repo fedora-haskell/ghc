@@ -232,7 +232,7 @@ fi
 * Mon Dec  1 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-6
 - update macros.ghc to latest proposed revised packaging guidelines:
   - use runghc
-  - drop trivial cabal_build and cabal_haddock
+  - drop trivial cabal_build and cabal_haddock macros
   - ghc_register_pkg and ghc_unregister_pkg replace ghc_preinst_script,
     ghc_postinst_script, ghc_preun_script, and ghc_postun_script
 - library templates prof subpackage requires main library again
