@@ -48,6 +48,7 @@ Haskell %{name} library for ghc-%{ghc_version}. *FIXME*
 %package prof
 Summary: Profiling libraries for ghc-%{name}
 Group: Development/Libraries
+Requires: ghc-%{name} = %{version}-%{release}
 Requires: ghc-prof = %{ghc_version}
 
 %description prof
@@ -66,9 +67,9 @@ This package contains profiling libraries for ghc %{ghc_version}.
 %else
 %{nil}
 %endif
-%cabal_build
+%cabal build
 %if %{build_doc}
-%cabal_haddock
+%cabal haddock
 %endif
 %ghc_gen_scripts
 
@@ -85,14 +86,16 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %post 
-%ghc_postinst_script
+%ghc_register_pkg
 %if %{build_doc}
 %ghc_reindex_haddock
 %endif
 
 
 %preun 
-%ghc_preun_script
+if [ "$1" -eq 0 ] ; then
+  %ghc_unregister_pkg
+fi
 
 
 %postun

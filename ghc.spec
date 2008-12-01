@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	5%{?dist}
+Release:	6%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -150,7 +150,7 @@ sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
 
 cat rpm-dir.files rpm-lib.files > rpm-base-filelist
 %if %{build_prof}
-cat rpm-dir.files rpm-prof.files > rpm-prof-filelist
+cat rpm-prof.files > rpm-prof-filelist
 %endif
 
 # these are handled as alternatives
@@ -229,9 +229,16 @@ fi
 %endif
 
 %changelog
-* Fri Nov 28 2008 Jens Petersen <petersen@redhat.com>
+* Mon Dec  1 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-6
+- update macros.ghc to latest proposed revised packaging guidelines:
+  - use runghc
+  - drop trivial cabal_build and cabal_haddock
+  - ghc_register_pkg and ghc_unregister_pkg replace ghc_preinst_script,
+    ghc_postinst_script, ghc_preun_script, and ghc_postun_script
+- library templates prof subpackage requires main library again
 - make cabal2spec work on .cabal files too, and
-  read and check name and version from .cabal
+  read and check name and version directly from .cabal file
+- ghc-prof does not need to own libraries dirs owned by main package
 
 * Tue Nov 25 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-5
 - add cabal2spec and template files for easy cabal hackage packaging

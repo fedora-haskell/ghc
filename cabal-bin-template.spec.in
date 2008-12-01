@@ -25,7 +25,7 @@ BuildRequires:  ghc
 
 %build
 %cabal_configure
-%cabal_build
+%cabal build
 
 
 %install

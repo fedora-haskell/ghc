@@ -1,58 +1,31 @@
-%cabal %{_bindir}/runhaskell Setup
+%cabal %{_bindir}/runghc Setup
 
 %cabal_configure \
 %cabal configure --prefix=%{_prefix} --libdir=%{_libdir} --docdir=%{_docdir}/%{name}-%{version} --htmldir=%{pkg_docdir} --libsubdir='$compiler/$pkgid'
-
-%cabal_build \
-%cabal build \
-%{nil}
 
 %cabal_makefile \
 %cabal makefile -f cabal-rpm.mk \
 make -f cabal-rpm.mk %{_smp_mflags} \
 %{nil}
 
-%cabal_haddock \
-%cabal haddock \
-%{nil}
-
-%cabal_install \
-%cabal copy --destdir=${RPM_BUILD_ROOT} -v \
-%{nil}
+%cabal_install %cabal copy --destdir=${RPM_BUILD_ROOT} -v
 
 %ghc_gen_filelists() \
 rm -f %1.files %1-prof.files \
-echo '%defattr(-,root,root,-)' > %1-prof.files \
-find ${RPM_BUILD_ROOT}%{pkg_libdir} \\( -name '*_p.a' -o -name '*.p_hi' \\) >> %1-prof.files \
 echo '%defattr(-,root,root,-)' > %1.files \
 find ${RPM_BUILD_ROOT}%{pkg_libdir} -type d | sed 's/^/%dir /' >> %1.files \
 find ${RPM_BUILD_ROOT}%{pkg_libdir} ! \\( -type d -o -name '*_p.a' -o -name '*.p_hi' \\) >> %1.files \
+echo '%defattr(-,root,root,-)' > %1-prof.files \
+find ${RPM_BUILD_ROOT}%{pkg_libdir} \\( -name '*_p.a' -o -name '*.p_hi' \\) >> %1-prof.files \
 sed -i -e "s!${RPM_BUILD_ROOT}!!g" %1.files %1-prof.files \
 %{nil}
 
-%ghc_gen_scripts \
-%cabal register --gen-script \
-%cabal unregister --gen-script \
-%{nil}
+%ghc_gen_scripts %cabal register --gen-script ; %cabal unregister --gen-script
 
-%ghc_install_scripts \
-install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir} \
-%{nil}
+%ghc_install_scripts install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir}
 
-%ghc_preinst_script \
-%{nil}
+%ghc_register_pkg %{pkg_libdir}/register.sh >/dev/null
 
-%ghc_postinst_script \
-%{pkg_libdir}/register.sh >&/dev/null \
-%{nil}
+%ghc_unregister_pkg %{pkg_libdir}/unregister.sh >/dev/null
 
-%ghc_preun_script \
-[ "$1" = 0 ] && %{pkg_libdir}/unregister.sh >&/dev/null \
-%{nil}
-
-%ghc_postun_script \
-%{nil}
-
-%ghc_reindex_haddock \
-( cd %{_docdir}/ghc/libraries && [ -x "./gen_contents_index" ] && ./gen_contents_index ) || : \
-%{nil}
+%ghc_reindex_haddock ( cd %{_docdir}/ghc/libraries && [ -x "./gen_contents_index" ] && ./gen_contents_index ) || :
