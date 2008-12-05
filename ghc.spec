@@ -229,6 +229,12 @@ fi
 %endif
 
 %changelog
+* Fri Dec  5 2008 Jens Petersen <petersen@redhat.com>
+- more template fixes:
+  - version pkg_docdir
+  - put provides in lib subsubpackage
+  - binlib scripts are for lib subpackage
+
 * Mon Dec  1 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-6
 - update macros.ghc to latest proposed revised packaging guidelines:
   - use runghc

@@ -1,7 +1,7 @@
 %define ghc_version @GHC_VERSION@
 
 %define pkg_libdir %{_libdir}/ghc-%{ghc_version}/%{name}-%{version}
-%define pkg_docdir %{_docdir}/ghc/libraries/%{name}
+%define pkg_docdir %{_docdir}/ghc/libraries/%{name}-%{version}
 
 %define build_prof 1
 %define build_doc 1
@@ -18,7 +18,6 @@ Group:          *FIXME*
 License:        BSD?
 URL:            http://hackage.haskell.org/cgi-bin/hackage-scripts/package/%{name}
 Source0:        http://hackage.haskell.org/packages/archive/%{name}/%{version}/%{name}-%{version}.tar.gz
-Provides:       %{name}-devel = %{version}-%{release}
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # ghc has only been bootstrapped on the following archs:
 ExclusiveArch:  i386 x86_64 ppc
@@ -41,23 +40,23 @@ Requires(preun): ghc = %{ghc_version}
 Requires(postun): ghc = %{ghc_version}
 
 %description -n ghc-%{name}
-Haskell %{name} library for ghc-%{ghc_version}. *FIXME*
+Haskell %{name} library. *FIXME*
 
 
 %if %{build_prof}
-%package prof
-Summary: Profiling libraries for ghc-%{name}
+%package -n ghc-%{name}-prof
+Summary: Profiling libraries for %{name}
 Group: Development/Libraries
 Requires: ghc-%{name} = %{version}-%{release}
 Requires: ghc-prof = %{ghc_version}
 
-%description prof
-This package contains profiling libraries for ghc %{ghc_version}.
+%description -n ghc-%{name}-prof
+This package contains profiling libraries for %{name}.
 %endif
 
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q
 
 
 %build
@@ -78,44 +77,47 @@ This package contains profiling libraries for ghc %{ghc_version}.
 rm -rf $RPM_BUILD_ROOT
 %cabal_install
 %ghc_install_scripts
-%ghc_gen_filelists %{name}
+%ghc_gen_filelists ghc-%{name}
 
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 
-%post 
+%post -n ghc-%{name}
 %ghc_register_pkg
 %if %{build_doc}
 %ghc_reindex_haddock
 %endif
 
 
-%preun 
+%preun -n ghc-%{name}
 if [ "$1" -eq 0 ] ; then
   %ghc_unregister_pkg
 fi
 
 
-%postun
+%postun -n ghc-%{name}
 if [ "$1" -eq 0 ] ; then
 %if %{build_doc}
   %ghc_reindex_haddock
 %endif
 fi
 
-
-%files -f %{name}.files
+%files
 %defattr(-,root,root,-)
 %doc LICENSE
+%{_bindir}/%{name}
+
+%files -n ghc-%{name} -f ghc-%{name}.files
+%defattr(-,root,root,-)
 %if %{build_doc}
 %{pkg_docdir}
 %endif
 
 
 %if %{build_prof}
-%files prof -f %{name}-prof.files
+%files -n ghc-%{name}-prof -f ghc-%{name}-prof.files
 %defattr(-,root,root,-)
 %endif
 

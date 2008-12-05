@@ -2,7 +2,7 @@
 %define ghc_version @GHC_VERSION@
 
 %define pkg_libdir %{_libdir}/ghc-%{ghc_version}/%{pkg_name}-%{version}
-%define pkg_docdir %{_docdir}/ghc/libraries/%{pkg_name}
+%define pkg_docdir %{_docdir}/ghc/libraries/%{pkg_name}-%{version}
 
 %define build_prof 1
 %define build_doc 1
@@ -44,7 +44,7 @@ Requires: %{name} = %{version}-%{release}
 Requires: ghc-prof = %{ghc_version}
 
 %description prof
-This package contains profiling libraries for ghc %{ghc_version}.
+This package contains profiling libraries for %{name}.
 %endif
 
 
