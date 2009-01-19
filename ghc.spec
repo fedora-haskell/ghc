@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	6%{?dist}
+Release:	7%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -217,7 +217,7 @@ fi
 %endif
 
 %changelog
-* Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-6
+* Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-7
 - move spec templates to a haskell-packaging for easy updating
 - provide correct haddock version
 
