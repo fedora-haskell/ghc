@@ -34,6 +34,8 @@ Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0
 Provides:       haddock = 2.3.0
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, libedit-devel
+# editline package requires ncurses to configure
+BuildRequires:  ncurses-devel
 %if %{build_doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
@@ -218,6 +220,8 @@ fi
 
 %changelog
 * Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-7
+- buildrequire ncurses-devel to fix build of missing editline package needed
+  for ghci line-editing (#478466)
 - move spec templates to a haskell-packaging for easy updating
 - provide correct haddock version
 
