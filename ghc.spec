@@ -25,17 +25,13 @@ Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 Source2:	ghc-rpm-macros.ghc
-Source3:	cabal2spec
-Source4:	cabal-bin-template.spec.in
-Source5:	cabal-lib-template.spec.in
-Source6:	cabal-binlib-template.spec.in
 URL:		http://haskell.org/ghc/
 Requires:	gcc, gmp-devel, libedit-devel
 Requires(post): policycoreutils
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0
 # introduced for f11 and to be removed for f13:
-Provides:       haddock = 2.2.2
+Provides:       haddock = 2.3.0
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, libedit-devel
 %if %{build_doc}
@@ -131,13 +127,6 @@ make DESTDIR=${RPM_BUILD_ROOT} install-docs
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
 
-# spec templating
-# cabal2spec
-install -m 0755 -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_bindir}
-# templates for bin, lib and binlib cabal hackages
-mkdir -p ${RPM_BUILD_ROOT}/%{_datadir}/ghc
-cp -p %{SOURCE4} %{SOURCE5} %{SOURCE6} ${RPM_BUILD_ROOT}/%{_datadir}/ghc/
-
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
 ( cd $RPM_BUILD_ROOT
@@ -203,7 +192,6 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
-%{_datadir}/ghc
 
 %if %{build_prof}
 %files prof -f rpm-prof-filelist
@@ -229,11 +217,9 @@ fi
 %endif
 
 %changelog
-* Fri Dec  5 2008 Jens Petersen <petersen@redhat.com>
-- more template fixes:
-  - version pkg_docdir
-  - put provides in lib subsubpackage
-  - binlib scripts are for lib subpackage
+* Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-6
+- move spec templates to a haskell-packaging for easy updating
+- provide correct haddock version
 
 * Mon Dec  1 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-6
 - update macros.ghc to latest proposed revised packaging guidelines:
