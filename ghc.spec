@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	7%{?dist}
+Release:	8%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
 ExcludeArch:	alpha ppc64
@@ -34,8 +34,6 @@ Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0
 Provides:       haddock = 2.3.0
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, libedit-devel
-# editline package requires ncurses to configure
-BuildRequires:  ncurses-devel
 %if %{build_doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
@@ -219,6 +217,9 @@ fi
 %endif
 
 %changelog
+* Fri Jan 23 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-8
+- fix to libedit means can drop ncurses-devel BR workaround (#481252)
+
 * Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-7
 - buildrequire ncurses-devel to fix build of missing editline package needed
   for ghci line-editing (#478466)
@@ -252,7 +253,7 @@ fi
 - Fix a minor packaging glitch
 
 * Tue Nov 04 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.10.1-1
-- Update to 6.10.1 in observance of President Obama
+- Update to 6.10.1
 
 * Thu Oct 23 2008 Jens Petersen <petersen@redhat.com> - 6.10.0.20081007-9
 - remove redundant --haddockdir from cabal_configure
