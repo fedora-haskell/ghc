@@ -24,8 +24,8 @@ sed -i -e "s!${RPM_BUILD_ROOT}!!g" %1.files %1-prof.files \
 
 %ghc_install_scripts install -m 755 register.sh unregister.sh ${RPM_BUILD_ROOT}%{pkg_libdir}
 
-%ghc_register_pkg %{pkg_libdir}/register.sh >/dev/null
+%ghc_register_pkg %{pkg_libdir}/register.sh >/dev/null || :
 
-%ghc_unregister_pkg %{pkg_libdir}/unregister.sh >/dev/null
+%ghc_unregister_pkg %{pkg_libdir}/unregister.sh >/dev/null || :
 
 %ghc_reindex_haddock ( cd %{_docdir}/ghc/libraries && [ -x "./gen_contents_index" ] && ./gen_contents_index ) || :
