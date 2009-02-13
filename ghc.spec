@@ -18,8 +18,8 @@ Name:		ghc
 Version:	6.10.1
 Release:	9%{?dist}
 Summary:	Glasgow Haskell Compilation system
-# See https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=239713
-ExcludeArch:	alpha ppc64
+# ghc has only been bootstrapped on the following archs for fedora:
+ExclusiveArch:  i386 x86_64 ppc
 License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -193,17 +193,6 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
-%dir %{_docdir}/%{name}
-%{_docdir}/%{name}/LICENSE
-%dir %{_docdir}/%{name}/libraries
-%{_docdir}/%{name}/libraries/gen_contents_index
-%ghost %{_docdir}/%{name}/libraries/doc-index.html
-%ghost %{_docdir}/%{name}/libraries/haddock.css
-%ghost %{_docdir}/%{name}/libraries/haddock-util.js
-%ghost %{_docdir}/%{name}/libraries/haskell_icon.gif
-%ghost %{_docdir}/%{name}/libraries/index.html
-%ghost %{_docdir}/%{name}/libraries/minus.gif
-%ghost %{_docdir}/%{name}/libraries/plus.gif
 
 %if %{build_prof}
 %files prof -f rpm-prof-filelist
@@ -213,15 +202,24 @@ fi
 %if %{build_doc}
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
+%dir %{_docdir}/%{name}
+%{_docdir}/%{name}/LICENSE
 %{_docdir}/%{name}/index.html
+%{_docdir}/%{name}/libraries/gen_contents_index
 %{_docdir}/%{name}/libraries/prologue.txt
+%dir %{_docdir}/%{name}/libraries
+%ghost %{_docdir}/%{name}/libraries/doc-index.html
+%ghost %{_docdir}/%{name}/libraries/haddock.css
+%ghost %{_docdir}/%{name}/libraries/haddock-util.js
+%ghost %{_docdir}/%{name}/libraries/haskell_icon.gif
+%ghost %{_docdir}/%{name}/libraries/index.html
+%ghost %{_docdir}/%{name}/libraries/minus.gif
+%ghost %{_docdir}/%{name}/libraries/plus.gif
 %endif
 
 %changelog
 * Tue Feb 10 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-9
 - require and buildrequire libedit-devel > 2.11-2
-- move top doc dirs to main package for better sharing
-- move gen_contents_index and ghost index files to main package
 - protect ghc_register_pkg and ghc_unregister_pkg
 
 * Fri Jan 23 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-8
