@@ -218,7 +218,7 @@ fi
 %endif
 
 %changelog
-* Tue Feb 10 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-9
+* Fri Feb 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-9
 - require and buildrequire libedit-devel > 2.11-2
 - protect ghc_register_pkg and ghc_unregister_pkg
 
