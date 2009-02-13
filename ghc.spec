@@ -26,7 +26,7 @@ Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 Source2:	ghc-rpm-macros.ghc
 URL:		http://haskell.org/ghc/
-#  libedit-devel > 2.11-2 correctly requires ncurses-devel
+# libedit-devel > 2.11-2 correctly requires ncurses-devel
 Requires:	gcc, gmp-devel, libedit-devel > 2.11-2
 Requires(post): policycoreutils
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
