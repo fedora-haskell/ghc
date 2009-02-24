@@ -16,7 +16,7 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	9%{?dist}
+Release:	10%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # ghc has only been bootstrapped on the following archs for fedora:
 ExclusiveArch:  i386 x86_64 ppc
@@ -218,6 +218,9 @@ fi
 %endif
 
 %changelog
+* Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.10.1-10
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
+
 * Fri Feb 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-9
 - require and buildrequire libedit-devel > 2.11-2
 - protect ghc_register_pkg and ghc_unregister_pkg
