@@ -1,3 +1,5 @@
+%ghc_archs %{ix86} x86_64 ppc
+
 %cabal %{_bindir}/runghc Setup
 
 %cabal_configure \
@@ -11,10 +13,10 @@ make -f cabal-rpm.mk %{_smp_mflags} \
 %cabal_install %cabal copy --destdir=${RPM_BUILD_ROOT} -v
 
 %ghc_gen_filelists() \
-rm -f %1.files %1-prof.files \
-echo '%defattr(-,root,root,-)' > %1.files \
-find ${RPM_BUILD_ROOT}%{pkg_libdir} -type d | sed 's/^/%dir /' >> %1.files \
-find ${RPM_BUILD_ROOT}%{pkg_libdir} ! \\( -type d -o -name '*_p.a' -o -name '*.p_hi' \\) >> %1.files \
+rm -f %1-devel.files %1-prof.files \
+echo '%defattr(-,root,root,-)' > %1-devel.files \
+find ${RPM_BUILD_ROOT}%{pkg_libdir} -type d | sed 's/^/%dir /' >> %1-devel.files \
+find ${RPM_BUILD_ROOT}%{pkg_libdir} ! \\( -type d -o -name '*_p.a' -o -name '*.p_hi' \\) >> %1-devel.files \
 echo '%defattr(-,root,root,-)' > %1-prof.files \
 find ${RPM_BUILD_ROOT}%{pkg_libdir} \\( -name '*_p.a' -o -name '*.p_hi' \\) >> %1-prof.files \
 sed -i -e "s!${RPM_BUILD_ROOT}!!g" %1.files %1-prof.files \

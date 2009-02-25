@@ -1,6 +1,6 @@
-# speed up test builds by not building profiled libraries
-%define build_prof 1
-%define build_doc 1
+# test builds can made faster by disabling profiled libraries
+%bcond_without prof
+%bcond_without doc
 
 # Fixing packaging problems can be a tremendous pain because it
 # generally requires a complete rebuild, which takes hours.  To offset
@@ -12,14 +12,14 @@
 #
 # Obviously, this can only work if you leave the build section
 # completely untouched between builds.
-%define package_debugging 0
+%global package_debugging 0
 
 Name:		ghc
 Version:	6.10.1
-Release:	10%{?dist}
+Release:	11%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # ghc has only been bootstrapped on the following archs for fedora:
-ExclusiveArch:  i386 x86_64 ppc
+ExclusiveArch:  %{ix86} x86_64 ppc
 License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -30,12 +30,12 @@ URL:		http://haskell.org/ghc/
 Requires:	gcc, gmp-devel, libedit-devel > 2.11-2
 Requires(post): policycoreutils
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0
+Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
 # introduced for f11 and to be removed for f13:
 Provides:       haddock = 2.3.0
 BuildRequires:  ghc, happy, sed
 BuildRequires:  gmp-devel, libedit-devel > 2.11-2
-%if %{build_doc}
+%if %{with doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
 Patch1:        ghc-6.10.1-gen_contexts_index.patch
@@ -50,7 +50,7 @@ collection of libraries, and support for various language
 extensions, including concurrency, exceptions, and a foreign language
 interface.
 
-%if %{build_prof}
+%if %{with prof}
 %package prof
 Summary:	Profiling libraries for GHC
 Group:		Development/Libraries
@@ -76,7 +76,7 @@ Compilation System (GHC) and its libraries.  It should be installed if
 you like to have local access to the documentation in HTML format.
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
-%define debug_package %{nil}
+%global debug_package %{nil}
 
 %prep
 %setup -q -n %{name}-%{version} -b1
@@ -92,12 +92,12 @@ popd
 exit 0
 %endif
 
-%if !%{build_prof}
+%if !%{with prof}
 echo "GhcLibWays=" >> mk/build.mk
 echo "GhcRTSWays=thr debug" >> mk/build.mk
 %endif
 
-%if %{build_doc}
+%if %{with doc}
 echo "XMLDocWays   = html" >> mk/build.mk
 echo "HADDOCK_DOCS = YES" >> mk/build.mk
 %endif
@@ -111,7 +111,7 @@ echo "HADDOCK_DOCS = YES" >> mk/build.mk
 make %{_smp_mflags}
 make %{_smp_mflags} -C libraries
 
-%if %{build_doc}
+%if %{with doc}
 make %{_smp_mflags} html
 %endif
 
@@ -120,7 +120,7 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-%if %{build_doc}
+%if %{with doc}
 make DESTDIR=${RPM_BUILD_ROOT} install-docs
 %endif
 
@@ -139,7 +139,7 @@ rm -f rpm-*-filelist rpm-*.files
 sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
 
 cat rpm-dir.files rpm-lib.files > rpm-base-filelist
-%if %{build_prof}
+%if %{with prof}
 cat rpm-prof.files > rpm-prof-filelist
 %endif
 
@@ -194,12 +194,12 @@ fi
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
-%if %{build_prof}
+%if %{with prof}
 %files prof -f rpm-prof-filelist
 %defattr(-,root,root,-)
 %endif
 
-%if %{build_doc}
+%if %{with doc}
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
 %dir %{_docdir}/%{name}
@@ -218,6 +218,14 @@ fi
 %endif
 
 %changelog
+* Wed Feb 25 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-11
+- use %%ix86 for change from i386 to i586 in rawhide
+- add ghc_archs macro in macros.ghc for other packages
+- obsolete haddock09
+- use %%global instead of %%define
+- use bcond for doc and prof
+- rename ghc_gen_filelists lib filelist to -devel.files
+
 * Tue Feb 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.10.1-10
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_11_Mass_Rebuild
 
