@@ -19,7 +19,7 @@ Version:	6.10.1
 Release:	11%{?dist}
 Summary:	Glasgow Haskell Compilation system
 # ghc has only been bootstrapped on the following archs for fedora:
-ExclusiveArch:  %{ix86} x86_64 ppc
+ExclusiveArch:  %{ix86} x86_64 ppc alpha
 License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
