@@ -14,31 +14,31 @@
 # completely untouched between builds.
 %global package_debugging 0
 
-Name:		ghc
-Version:	6.10.1
-Release:	12%{?dist}
-Summary:	Glasgow Haskell Compilation system
-# fedora ghc has only been bootstrapped on ix86, x86_64, ppc, alpha:
-ExcludeArch:	ppc64
-License:	BSD
-Group:		Development/Languages
-Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
-Source1:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
-Source2:	ghc-rpm-macros.ghc
-URL:		http://haskell.org/ghc/
+Name: ghc
+Version: 6.10.1
+Release: 13%{?dist}
+Summary: Glasgow Haskell Compilation system
+# fedora ghc has only been bootstrapped on the following archs:
+ExclusiveArch: %{ix86} x86_64 ppc alpha
+License: BSD
+Group: Development/Languages
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
+Source2: ghc-rpm-macros.ghc
+URL: http://haskell.org/ghc/
 # libedit-devel > 2.11-2 correctly requires ncurses-devel
-Requires:	gcc, gmp-devel, libedit-devel > 2.11-2
+Requires: gcc, gmp-devel, libedit-devel > 2.11-2
 Requires(post): policycoreutils
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Obsoletes:      ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
+BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
 # introduced for f11 and to be removed for f13:
-Provides:       haddock = 2.3.0
-BuildRequires:  ghc, happy, sed
-BuildRequires:  gmp-devel, libedit-devel > 2.11-2
+Provides: haddock = 2.3.0
+BuildRequires: ghc, happy, sed
+BuildRequires: gmp-devel, libedit-devel > 2.11-2
 %if %{with doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
-Patch1:        ghc-6.10.1-gen_contexts_index.patch
+Patch1: ghc-6.10.1-gen_contexts_index.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -52,10 +52,10 @@ interface.
 
 %if %{with prof}
 %package prof
-Summary:	Profiling libraries for GHC
-Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
-Obsoletes:	ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
+Summary: Profiling libraries for GHC
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+Obsoletes: ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
 
 %description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System
@@ -64,9 +64,9 @@ needed.
 %endif
 
 %package doc
-Summary:	Documentation for GHC
-Group:		Development/Languages
-Requires:	%{name} = %{version}-%{release}
+Summary: Documentation for GHC
+Group: Development/Languages
+Requires: %{name} = %{version}-%{release}
 # for haddock
 Requires(posttrans): %{name} = %{version}-%{release}
 
@@ -218,6 +218,9 @@ fi
 %endif
 
 %changelog
+* Fri Feb 27 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-13
+- ok let's stick with ExclusiveArch for brevity
+
 * Fri Feb 27 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-12
 - drop ghc_archs since it breaks koji
 - fix missing -devel in ghc_gen_filelists
