@@ -16,10 +16,10 @@
 
 Name:		ghc
 Version:	6.10.1
-Release:	11%{?dist}
+Release:	12%{?dist}
 Summary:	Glasgow Haskell Compilation system
-# ghc has only been bootstrapped on the following archs for fedora:
-ExclusiveArch:  %{ix86} x86_64 ppc alpha
+# fedora ghc has only been bootstrapped on ix86, x86_64, ppc, alpha:
+ExcludeArch:	ppc64
 License:	BSD
 Group:		Development/Languages
 Source0:	http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -218,6 +218,12 @@ fi
 %endif
 
 %changelog
+* Fri Feb 27 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-12
+- drop ghc_archs since it breaks koji
+- fix missing -devel in ghc_gen_filelists
+- change from ExclusiveArch to ExcludeArch ppc64 since alpha was bootstrapped
+  by oliver
+
 * Wed Feb 25 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-11
 - use %%ix86 for change from i386 to i586 in rawhide
 - add ghc_archs macro in macros.ghc for other packages
@@ -239,7 +245,7 @@ fi
 * Mon Jan 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-7
 - buildrequire ncurses-devel to fix build of missing editline package needed
   for ghci line-editing (#478466)
-- move spec templates to a haskell-packaging for easy updating
+- move spec templates to cabal2spec package for easy updating
 - provide correct haddock version
 
 * Mon Dec  1 2008 Jens Petersen <petersen@redhat.com> - 6.10.1-6

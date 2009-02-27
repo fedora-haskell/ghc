@@ -1,5 +1,3 @@
-%ghc_archs %{ix86} x86_64 ppc
-
 %cabal %{_bindir}/runghc Setup
 
 %cabal_configure \
@@ -19,7 +17,7 @@ find ${RPM_BUILD_ROOT}%{pkg_libdir} -type d | sed 's/^/%dir /' >> %1-devel.files
 find ${RPM_BUILD_ROOT}%{pkg_libdir} ! \\( -type d -o -name '*_p.a' -o -name '*.p_hi' \\) >> %1-devel.files \
 echo '%defattr(-,root,root,-)' > %1-prof.files \
 find ${RPM_BUILD_ROOT}%{pkg_libdir} \\( -name '*_p.a' -o -name '*.p_hi' \\) >> %1-prof.files \
-sed -i -e "s!${RPM_BUILD_ROOT}!!g" %1.files %1-prof.files \
+sed -i -e "s!${RPM_BUILD_ROOT}!!g" %1-devel.files %1-prof.files \
 %{nil}
 
 %ghc_gen_scripts %cabal register --gen-script ; %cabal unregister --gen-script
