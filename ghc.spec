@@ -15,8 +15,8 @@
 %global package_debugging 0
 
 Name: ghc
-Version: 6.10.1
-Release: 13%{?dist}
+Version: 6.10.2
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -38,7 +38,6 @@ BuildRequires: gmp-devel, libedit-devel > 2.11-2
 %if %{with doc}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
-Patch1: ghc-6.10.1-gen_contexts_index.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -80,7 +79,6 @@ you like to have local access to the documentation in HTML format.
 
 %prep
 %setup -q -n %{name}-%{version} -b1
-%patch1 -p1 -b .orig
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -218,6 +216,9 @@ fi
 %endif
 
 %changelog
+* Wed Apr 08 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.10.2-1
+- Update to 6.10.2
+
 * Fri Feb 27 2009 Jens Petersen <petersen@redhat.com> - 6.10.1-13
 - ok let's stick with ExclusiveArch for brevity
 
