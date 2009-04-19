@@ -16,7 +16,7 @@
 
 Name: ghc
 Version: 6.10.2
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -24,7 +24,10 @@ License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
+# /etc/rpm/macros.ghc
 Source2: ghc-rpm-macros.ghc
+# /usr/lib/rpm/ghc-requires
+Source3: ghc-rpm-requires
 URL: http://haskell.org/ghc/
 # libedit-devel > 2.11-2 correctly requires ncurses-devel
 Requires: gcc, gmp-devel, libedit-devel > 2.11-2
@@ -125,6 +128,9 @@ make DESTDIR=${RPM_BUILD_ROOT} install-docs
 # install rpm macros
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
+# rpm script for ghc version deps
+mkdir -p ${RPM_BUILD_ROOT}/%{_prefix}/lib/rpm
+cp -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_prefix}/lib/rpm/ghc-requires
 
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
@@ -191,6 +197,7 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
+%attr(755,root,root) %{_prefix}/lib/rpm/ghc-requires
 
 %if %{with prof}
 %files prof -f rpm-prof-filelist
@@ -216,6 +223,15 @@ fi
 %endif
 
 %changelog
+* Sun Apr 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-2
+- add ghc-requires rpm script to generate ghc version dependencies
+  (thanks to Till Maas)
+- update macros.ghc:
+  - add %%ghcrequires to call above script
+  - pkg_libdir and pkg_docdir obsoleted in packages and replaced
+    by ghcpkgdir and ghcdocdir inside macros.ghc
+  - make filelist also for docs
+
 * Wed Apr 08 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.10.2-1
 - Update to 6.10.2
 
