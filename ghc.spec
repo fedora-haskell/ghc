@@ -126,9 +126,6 @@ make DESTDIR=${RPM_BUILD_ROOT} install-docs
 # install rpm macros
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
-# rpm script for ghc version deps
-mkdir -p ${RPM_BUILD_ROOT}/%{_prefix}/lib/rpm
-cp -p %{SOURCE3} ${RPM_BUILD_ROOT}/%{_prefix}/lib/rpm/ghc-requires
 
 SRC_TOP=$PWD
 rm -f rpm-*-filelist rpm-*.files
@@ -195,7 +192,6 @@ fi
 %{_bindir}/*
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
-%attr(755,root,root) %{_prefix}/lib/rpm/ghc-requires
 
 %if %{with prof}
 %files prof -f rpm-prof-filelist
