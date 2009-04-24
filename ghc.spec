@@ -16,7 +16,7 @@
 
 Name: ghc
 Version: 6.10.2
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -26,8 +26,6 @@ Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 # /etc/rpm/macros.ghc
 Source2: ghc-rpm-macros.ghc
-# /usr/lib/rpm/ghc-requires
-Source3: ghc-rpm-requires
 URL: http://haskell.org/ghc/
 # libedit-devel > 2.11-2 correctly requires ncurses-devel
 Requires: gcc, gmp-devel, libedit-devel > 2.11-2
@@ -223,6 +221,10 @@ fi
 %endif
 
 %changelog
+* Fri Apr 24 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-3
+- define ghc_version in macros.ghc in place of ghcrequires
+- drop ghc-requires script for now
+
 * Sun Apr 19 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-2
 - add ghc-requires rpm script to generate ghc version dependencies
   (thanks to Till Maas)
