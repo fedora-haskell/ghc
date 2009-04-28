@@ -42,7 +42,9 @@ Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
 Provides: haddock = 2.3.0
 BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel, libedit-devel > 2.11-2
+%if %{with shared}
 BuildRequires: libffi-devel
+%endif
 %if %{with doc}
 BuildRequires: libxslt, docbook-style-xsl
 %if %{with hscolour}
@@ -276,10 +278,10 @@ fi
 %changelog
 * Tue Apr 28 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-4
 - add experimental bcond hscolour
-- BR libffi-devel
 - add experimental support for building shared libraries (for ghc-6.11)
   - add libs subpackage for shared libraries
   - create a ld.conf.d file for libghc*.so
+  - BR libffi-devel
 - drop redundant setting of GhcLibWays in build.mk for no prof
 - drop redundant setting of HADDOCK_DOCS
 - simplify filelist names
