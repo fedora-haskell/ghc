@@ -1,0 +1,24 @@
+diff -up ghc-6.11.20090421/mk/cabal-flags.mk~ ghc-6.11.20090421/mk/cabal-flags.mk
+--- ghc-6.11.20090421/mk/cabal-flags.mk~	2009-04-22 03:15:57.000000000 +1000
++++ ghc-6.11.20090421/mk/cabal-flags.mk	2009-04-26 12:06:06.000000000 +1000
+@@ -3,7 +3,7 @@ nothing=
+ space=$(nothing) $(nothing)
+ comma=,
+ 
+-GHC_PKG_INSTALL_PROG = $(FPTOOLS_TOP_ABS)/utils/ghc-pkg/dist-install/build/ghc-pkg/ghc-pkg
++GHC_PKG_INSTALL_PROG = $(FPTOOLS_TOP_ABS)/utils/ghc-pkg/dist-inplace/build/ghc-pkg/ghc-pkg
+ 
+ LIBRARIES_ABS = $(FPTOOLS_TOP_ABS)/libraries
+ UTILS_ABS     = $(FPTOOLS_TOP_ABS)/utils
+diff -up ghc-6.11.20090421/mk/package.mk~ ghc-6.11.20090421/mk/package.mk
+--- ghc-6.11.20090421/mk/package.mk~	2009-04-22 03:15:55.000000000 +1000
++++ ghc-6.11.20090421/mk/package.mk	2009-04-26 10:52:55.000000000 +1000
+@@ -86,7 +86,7 @@ install::
+ 	    | sed -e 's/""//g' -e 's/:[   ]*,/: /g' \
+ 	    | $(GHC_PKG_INSTALL_PROG) --global-conf $(DESTDIR)$(datadir)/package.conf update - --force
+ 
+-GHC_PKG_INSTALL_PROG = $(FPTOOLS_TOP_ABS)/utils/ghc-pkg/dist-install/build/ghc-pkg/ghc-pkg
++GHC_PKG_INSTALL_PROG = $(FPTOOLS_TOP_ABS)/utils/ghc-pkg/dist-inplace/build/ghc-pkg/ghc-pkg
+ 
+ # we could be more accurate here and add a dependency on
+ # driver/package.conf, but that doesn't work too well because of
