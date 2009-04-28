@@ -1,6 +1,12 @@
-# test builds can made faster by disabling profiled libraries
+# test builds can made faster and smaller by disabling profiled libraries
 %bcond_without prof
+# build users_guide, etc
 %bcond_without doc
+
+# experimental
+## shared libraries support available in ghc >= 6.11
+%bcond_without shared
+%bcond_with hscolour
 
 # Fixing packaging problems can be a tremendous pain because it
 # generally requires a complete rebuild, which takes hours.  To offset
@@ -16,7 +22,7 @@
 
 Name: ghc
 Version: 6.10.2
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -32,13 +38,18 @@ Requires: gcc, gmp-devel, libedit-devel > 2.11-2
 Requires(post): policycoreutils
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
-# introduced for f11 and to be removed for f13:
+# introduced for f11 and can be removed for f13:
 Provides: haddock = 2.3.0
 BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel, libedit-devel > 2.11-2
+BuildRequires: libffi-devel
 %if %{with doc}
 BuildRequires: libxslt, docbook-style-xsl
+%if %{with hscolour}
+BuildRequires: hscolour
 %endif
+%endif
+Patch1: ghc-mk-pkg-install-inplace.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -75,11 +86,25 @@ Preformatted documentation for the Glorious Glasgow Haskell
 Compilation System (GHC) and its libraries.  It should be installed if
 you like to have local access to the documentation in HTML format.
 
+%if %{with shared}
+%package libs
+Summary: Shared libraries for GHC
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+
+%description libs
+Shared libraries for Glorious Glasgow Haskell Compilation System
+(GHC).  They should be installed to build standalone programs.
+%endif
+
 # the debuginfo subpackage is currently empty anyway, so don't generate it
 %global debug_package %{nil}
 
 %prep
 %setup -q -n %{name}-%{version} -b1
+%if %{with shared}
+%patch1 -p1 -b .orig-dist-install
+%endif
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -91,24 +116,23 @@ popd
 exit 0
 %endif
 
-%if !%{with prof}
-echo "GhcLibWays=" >> mk/build.mk
-echo "GhcRTSWays=thr debug" >> mk/build.mk
+%if %{without prof}
+echo "GhcLibWays=%{?with_shared:dyn}" >> mk/build.mk
 %endif
 
 %if %{with doc}
 echo "XMLDocWays   = html" >> mk/build.mk
-echo "HADDOCK_DOCS = YES" >> mk/build.mk
 %endif
 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
+  %{?with_shared:--enable-shared}
 
 make %{_smp_mflags}
-make %{_smp_mflags} -C libraries
+#make %{_smp_mflags} -C libraries
 
 %if %{with doc}
 make %{_smp_mflags} html
@@ -123,24 +147,26 @@ make DESTDIR=${RPM_BUILD_ROOT} install
 make DESTDIR=${RPM_BUILD_ROOT} install-docs
 %endif
 
+%if %{with shared}
+mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d
+echo %{_libdir}/%{name}-%{version} > ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d/ghc-%{_arch}.conf
+%endif
+
 # install rpm macros
 mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
 cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
 
 SRC_TOP=$PWD
-rm -f rpm-*-filelist rpm-*.files
+rm -f rpm-*.files
 ( cd $RPM_BUILD_ROOT
   find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf*' -fprint $SRC_TOP/rpm-lib.files \)
-  find .%{_docdir}/%{name}/* -type d ! -name libraries > $SRC_TOP/rpm-doc-dir.files
+  find .%{_docdir}/%{name}/* -type d ! -name libraries %{?with_hscolour:! -name src} > $SRC_TOP/rpm-doc-dir.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
 sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
 
-cat rpm-dir.files rpm-lib.files > rpm-base-filelist
-%if %{with prof}
-cat rpm-prof.files > rpm-prof-filelist
-%endif
+cat rpm-dir.files rpm-lib.files > rpm-base.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -150,6 +176,20 @@ for i in hsc2hs runhaskell; do
     mv ${RPM_BUILD_ROOT}%{_bindir}/$i{,-ghc}
   fi
 done
+
+%check
+# stolen from ghc6/debian/rules:
+# Do some very simple tests that the compiler actually works
+rm -rf testghc
+mkdir testghc
+echo 'main = putStrLn "Foo"' > testghc/foo.hs
+ghc/stage2-inplace/ghc testghc/foo.hs -o testghc/foo
+[ "$(testghc/foo)" = "Foo" ]
+rm testghc/*
+echo 'main = putStrLn "Foo"' > testghc/foo.hs
+ghc/stage2-inplace/ghc testghc/foo.hs -o testghc/foo -O2
+[ "$(testghc/foo)" = "Foo" ]
+rm testghc/*
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -175,9 +215,9 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
-# posttrans to make sure any old documentation has been removed first
-%posttrans doc
-( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
+%if %{with shared}
+%post libs -p /sbin/ldconfig
+%endif
 
 %preun
 if [ "$1" = 0 ]; then
@@ -185,25 +225,31 @@ if [ "$1" = 0 ]; then
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
 fi
 
-%files -f rpm-base-filelist
+%if %{with shared}
+%postun libs -p /sbin/ldconfig
+%endif
+
+%posttrans doc
+# (posttrans to make sure any old documentation has been removed first)
+( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
+
+%files -f rpm-base.files
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
-%doc %{_mandir}/man1/ghc.*
 %{_bindir}/*
+%if %{with doc}
+%{_mandir}/man1/ghc.*
+%endif
 %{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
-%if %{with prof}
-%files prof -f rpm-prof-filelist
-%defattr(-,root,root,-)
-%endif
-
-%if %{with doc}
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
 %dir %{_docdir}/%{name}
 %{_docdir}/%{name}/LICENSE
+%if %{with doc}
 %{_docdir}/%{name}/index.html
+%endif
 %{_docdir}/%{name}/libraries/gen_contents_index
 %{_docdir}/%{name}/libraries/prologue.txt
 %dir %{_docdir}/%{name}/libraries
@@ -214,9 +260,32 @@ fi
 %ghost %{_docdir}/%{name}/libraries/index.html
 %ghost %{_docdir}/%{name}/libraries/minus.gif
 %ghost %{_docdir}/%{name}/libraries/plus.gif
+
+%if %{with shared}
+%files libs
+%defattr(-,root,root,-)
+%{_sysconfdir}/ld.so.conf.d/ghc-%{_arch}.conf
+%{_libdir}/libHS*-ghc%{version}.so
+%endif
+
+%if %{with prof}
+%files prof -f rpm-prof.files
+%defattr(-,root,root,-)
 %endif
 
 %changelog
+* Tue Apr 28 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-4
+- add experimental bcond hscolour
+- BR libffi-devel
+- add experimental support for building shared libraries (for ghc-6.11)
+  - add libs subpackage for shared libraries
+  - create a ld.conf.d file for libghc*.so
+- drop redundant setting of GhcLibWays in build.mk for no prof
+- drop redundant setting of HADDOCK_DOCS
+- simplify filelist names
+- add a check section based on tests from debian's package
+- be more careful about doc files in filelist
+
 * Fri Apr 24 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-3
 - define ghc_version in macros.ghc in place of ghcrequires
 - drop ghc-requires script for now
