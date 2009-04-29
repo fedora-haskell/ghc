@@ -5,7 +5,7 @@
 
 # experimental
 ## shared libraries support available in ghc >= 6.11
-%bcond_without shared
+%bcond_with shared
 %bcond_with hscolour
 
 # Fixing packaging problems can be a tremendous pain because it
@@ -43,6 +43,7 @@ Provides: haddock = 2.3.0
 BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel, libedit-devel > 2.11-2
 %if %{with shared}
+# not sure if this is actually needed
 BuildRequires: libffi-devel
 %endif
 %if %{with doc}
