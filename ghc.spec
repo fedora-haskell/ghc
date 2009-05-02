@@ -22,7 +22,7 @@
 
 Name: ghc
 Version: 6.10.2
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -117,6 +117,12 @@ rm -rf %{name}-%{version}
 cp -al %{name}-%{version}.built %{name}-%{version}
 popd
 exit 0
+%endif
+
+%ifarch ppc
+echo "GhcUnregisterised=YES" >> mk/build.mk
+echo "GhcWithNativeCodeGen=NO" >> mk/build.mk
+echo "SplitObjs=NO" >> mk/build.mk
 %endif
 
 %if %{without prof}
@@ -277,6 +283,9 @@ fi
 %endif
 
 %changelog
+* Sat May  2 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-5
+- try unregisterised ppc to see if that stops the segfaulting with runghc
+
 * Tue Apr 28 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-4
 - add experimental bcond hscolour
 - add experimental support for building shared libraries (for ghc-6.11)
