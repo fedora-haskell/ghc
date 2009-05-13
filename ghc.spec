@@ -21,8 +21,8 @@
 %global package_debugging 0
 
 Name: ghc
-Version: 6.10.2
-Release: 5%{?dist}
+Version: 6.10.3
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -30,8 +30,6 @@ License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
-# /etc/rpm/macros.ghc
-Source2: ghc-rpm-macros.ghc
 URL: http://haskell.org/ghc/
 # libedit-devel > 2.11-2 correctly requires ncurses-devel
 Requires: gcc, gmp-devel, libedit-devel > 2.11-2
@@ -119,12 +117,6 @@ popd
 exit 0
 %endif
 
-%ifarch ppc
-echo "GhcUnregisterised=YES" >> mk/build.mk
-echo "GhcWithNativeCodeGen=NO" >> mk/build.mk
-echo "SplitObjs=NO" >> mk/build.mk
-%endif
-
 %if %{without prof}
 echo "GhcLibWays=%{?with_shared:dyn}" >> mk/build.mk
 %endif
@@ -161,15 +153,11 @@ mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d
 echo %{_libdir}/%{name}-%{version} > ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d/ghc-%{_arch}.conf
 %endif
 
-# install rpm macros
-mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm
-cp -p %{SOURCE2} ${RPM_BUILD_ROOT}/%{_sysconfdir}/rpm/macros.ghc
-
 SRC_TOP=$PWD
 rm -f rpm-*.files
 ( cd $RPM_BUILD_ROOT
   find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf*' -fprint $SRC_TOP/rpm-lib.files \)
-  find .%{_docdir}/%{name}/* -type d ! -name libraries %{?with_hscolour:! -name src} > $SRC_TOP/rpm-doc-dir.files
+  find .%{_docdir}/%{name}/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
@@ -249,7 +237,6 @@ fi
 %if %{with doc}
 %{_mandir}/man1/ghc.*
 %endif
-%{_sysconfdir}/rpm/macros.ghc
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
 %files doc -f rpm-doc-dir.files
@@ -283,8 +270,10 @@ fi
 %endif
 
 %changelog
-* Sat May  2 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-5
-- try unregisterised ppc to see if that stops the segfaulting with runghc
+* Wed May 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-1
+- update to 6.10.3
+- macros.ghc moved to ghc-rpm-macros package
+- fix handling of hscolor files in filelist generation
 
 * Tue Apr 28 2009 Jens Petersen <petersen@redhat.com> - 6.10.2-4
 - add experimental bcond hscolour
