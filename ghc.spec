@@ -31,15 +31,14 @@ Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 URL: http://haskell.org/ghc/
-# libedit-devel > 2.11-2 correctly requires ncurses-devel
-Requires: gcc, gmp-devel, libedit-devel > 2.11-2
+Requires: gcc, gmp-devel
 Requires(post): policycoreutils
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
 # introduced for f11 and can be removed for f13:
 Provides: haddock = 2.3.0
 BuildRequires: ghc, happy, sed
-BuildRequires: gmp-devel, libedit-devel > 2.11-2
+BuildRequires: gmp-devel
 %if %{with shared}
 # not sure if this is actually needed
 BuildRequires: libffi-devel
@@ -272,6 +271,7 @@ fi
 %changelog
 * Wed May 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-1
 - update to 6.10.3
+- haskline replaces editline, so it is no longer needed to build
 - macros.ghc moved to ghc-rpm-macros package
 - fix handling of hscolor files in filelist generation
 
