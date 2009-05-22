@@ -1,11 +1,15 @@
 # test builds can made faster and smaller by disabling profiled libraries
+# (currently libHSrts_thr_p.a breaks no prof build)
 %bcond_without prof
 # build users_guide, etc
-%bcond_without doc
+%bcond_without manual
+# include extralibs
+%bcond_without extralibs
 
 # experimental
 ## shared libraries support available in ghc >= 6.11
 %bcond_with shared
+## include colored html src
 %bcond_with hscolour
 
 # Fixing packaging problems can be a tremendous pain because it
@@ -30,7 +34,9 @@ ExclusiveArch: %{ix86} x86_64 ppc alpha
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+%if %{with extralibs}
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
+%endif
 URL: http://haskell.org/ghc/
 Requires: gcc, gmp-devel
 Requires(post): policycoreutils
@@ -45,13 +51,12 @@ BuildRequires: gmp-devel
 # not sure if this is actually needed
 BuildRequires: libffi-devel
 %endif
-%if %{with doc}
+%if %{with manual}
 BuildRequires: libxslt, docbook-style-xsl
+%endif
 %if %{with hscolour}
 BuildRequires: hscolour
 %endif
-%endif
-Patch1: ghc-mk-pkg-install-inplace.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -103,10 +108,7 @@ Shared libraries for Glorious Glasgow Haskell Compilation System
 %global debug_package %{nil}
 
 %prep
-%setup -q -n %{name}-%{version} -b1
-%if %{with shared}
-%patch1 -p1 -b .orig-dist-install
-%endif
+%setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -122,7 +124,7 @@ exit 0
 echo "GhcLibWays=%{?with_shared:dyn}" >> mk/build.mk
 %endif
 
-%if %{with doc}
+%if %{with manual}
 echo "XMLDocWays   = html" >> mk/build.mk
 %endif
 
@@ -134,9 +136,8 @@ echo "XMLDocWays   = html" >> mk/build.mk
   %{?with_shared:--enable-shared}
 
 make %{_smp_mflags}
-#make %{_smp_mflags} -C libraries
 
-%if %{with doc}
+%if %{with manual}
 make %{_smp_mflags} html
 %endif
 
@@ -145,7 +146,7 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-%if %{with doc}
+%if %{with manual}
 make DESTDIR=${RPM_BUILD_ROOT} install-docs
 %endif
 
@@ -235,7 +236,7 @@ fi
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
-%if %{with doc}
+%if %{with manual}
 %{_mandir}/man1/ghc.*
 %endif
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
@@ -244,7 +245,7 @@ fi
 %defattr(-,root,root,-)
 %dir %{_docdir}/%{name}
 %{_docdir}/%{name}/LICENSE
-%if %{with doc}
+%if %{with manual}
 %{_docdir}/%{name}/index.html
 %endif
 %{_docdir}/%{name}/libraries/gen_contents_index
@@ -273,6 +274,9 @@ fi
 %changelog
 * Fri May 22 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-2
 - update haddock provides
+- drop ghc-mk-pkg-install-inplace.patch: no longer needed with new 6.11 buildsys
+- add bcond for extralibs
+- rename doc bcond to manual
 
 * Wed May 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-1
 - update to 6.10.3
