@@ -21,8 +21,9 @@
 %global package_debugging 0
 
 Name: ghc
+# part of haskell-platform
 Version: 6.10.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -34,9 +35,10 @@ URL: http://haskell.org/ghc/
 Requires: gcc, gmp-devel
 Requires(post): policycoreutils
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock <= 2.0.0.0, haddock09
+Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock09
 # introduced for f11 and can be removed for f13:
-Provides: haddock = 2.3.0
+Obsoletes: haddock < 2.4.2
+Provides: haddock = 2.4.2
 BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel
 %if %{with shared}
@@ -269,6 +271,9 @@ fi
 %endif
 
 %changelog
+* Fri May 22 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-2
+- update haddock provides
+
 * Wed May 13 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-1
 - update to 6.10.3
 - haskline replaces editline, so it is no longer needed to build
