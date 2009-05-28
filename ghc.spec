@@ -273,7 +273,7 @@ fi
 
 %changelog
 * Fri May 22 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-2
-- update haddock provides
+- update haddock provides and obsoletes
 - drop ghc-mk-pkg-install-inplace.patch: no longer needed with new 6.11 buildsys
 - add bcond for extralibs
 - rename doc bcond to manual
