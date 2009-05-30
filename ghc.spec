@@ -12,6 +12,8 @@
 ## include colored html src
 %bcond_with hscolour
 
+%global haddock_version 2.4.2
+
 # Fixing packaging problems can be a tremendous pain because it
 # generally requires a complete rebuild, which takes hours.  To offset
 # the misery, do a complete build once using "rpmbuild -bc", then copy
@@ -27,7 +29,7 @@
 Name: ghc
 # part of haskell-platform
 Version: 6.10.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -43,8 +45,8 @@ Requires(post): policycoreutils
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock09
 # introduced for f11 and can be removed for f13:
-Obsoletes: haddock < 2.4.2
-Provides: haddock = 2.4.2
+Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
+Provides: haddock = %{haddock_version}, ghc-haddock-devel = %{haddock_version}
 BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel
 %if %{with shared}
@@ -68,25 +70,14 @@ collection of libraries, and support for various language
 extensions, including concurrency, exceptions, and a foreign language
 interface.
 
-%if %{with prof}
-%package prof
-Summary: Profiling libraries for GHC
-Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
-Obsoletes: ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
-
-%description prof
-Profiling libraries for Glorious Glasgow Haskell Compilation System
-(GHC).  They should be installed when GHC's profiling subsystem is
-needed.
-%endif
-
 %package doc
 Summary: Documentation for GHC
 Group: Development/Languages
 Requires: %{name} = %{version}-%{release}
 # for haddock
 Requires(posttrans): %{name} = %{version}-%{release}
+Obsoletes: ghc-haddock-doc < %{haddock_version}
+Provides: ghc-haddock-doc = %{haddock_version}
 
 %description doc
 Preformatted documentation for the Glorious Glasgow Haskell
@@ -102,6 +93,21 @@ Requires: %{name} = %{version}-%{release}
 %description libs
 Shared libraries for Glorious Glasgow Haskell Compilation System
 (GHC).  They should be installed to build standalone programs.
+%endif
+
+%if %{with prof}
+%package prof
+Summary: Profiling libraries for GHC
+Group: Development/Libraries
+Requires: %{name} = %{version}-%{release}
+Obsoletes: ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
+Obsoletes: ghc-haddock-prof < %{haddock_version}
+Provides: ghc-haddock-prof = %{haddock_version}
+
+%description prof
+Profiling libraries for Glorious Glasgow Haskell Compilation System
+(GHC).  They should be installed when GHC's profiling subsystem is
+needed.
 %endif
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
@@ -272,6 +278,9 @@ fi
 %endif
 
 %changelog
+* Sat May 30 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-3
+- add haddock_version and use it to obsolete haddock and ghc-haddock-*
+
 * Fri May 22 2009 Jens Petersen <petersen@redhat.com> - 6.10.3-2
 - update haddock provides and obsoletes
 - drop ghc-mk-pkg-install-inplace.patch: no longer needed with new 6.11 buildsys
