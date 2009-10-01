@@ -127,11 +127,11 @@ exit 0
 %endif
 
 %if %{without prof}
-echo "GhcLibWays=%{?with_shared:dyn}" >> mk/build.mk
+echo "GhcLibWays = %{?with_shared:dyn}" >> mk/build.mk
 %endif
 
 %if %{with manual}
-echo "XMLDocWays   = html" >> mk/build.mk
+echo "XMLDocWays = html" >> mk/build.mk
 %endif
 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
@@ -154,11 +154,6 @@ make DESTDIR=${RPM_BUILD_ROOT} install
 
 %if %{with manual}
 make DESTDIR=${RPM_BUILD_ROOT} install-docs
-%endif
-
-%if %{with shared}
-mkdir -p ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d
-echo %{_libdir}/%{name}-%{version} > ${RPM_BUILD_ROOT}/%{_sysconfdir}/ld.so.conf.d/ghc-%{_arch}.conf
 %endif
 
 SRC_TOP=$PWD
@@ -200,9 +195,6 @@ rm testghc/*
 rm -rf $RPM_BUILD_ROOT
 
 %post
-semanage fcontext -a -t unconfined_execmem_exec_t %{_libdir}/ghc-%{version}/ghc >/dev/null 2>&1 || :
-restorecon %{_libdir}/ghc-%{version}/ghc
-
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
 #
@@ -265,19 +257,16 @@ fi
 %ghost %{_docdir}/%{name}/libraries/minus.gif
 %ghost %{_docdir}/%{name}/libraries/plus.gif
 
-%if %{with shared}
-%files libs
-%defattr(-,root,root,-)
-%{_sysconfdir}/ld.so.conf.d/ghc-%{_arch}.conf
-%{_libdir}/libHS*-ghc%{version}.so
-%endif
-
 %if %{with prof}
 %files prof -f rpm-prof.files
 %defattr(-,root,root,-)
 %endif
 
 %changelog
+* Thu Oct  1 2009 Jens Petersen <petersen@redhat.com>
+- selinux file context no longer needed in post script
+- (for ghc-6.12-shared) drop ld.so.conf.d files
+
 * Fri Jul 24 2009 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 6.10.4-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_12_Mass_Rebuild
 
