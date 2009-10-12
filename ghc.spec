@@ -10,7 +10,7 @@
 ## include colored html src
 %bcond_with hscolour
 
-%global haddock_version 2.4.2
+%global haddock_version 2.5.0
 
 # Fixing packaging problems can be a tremendous pain because it
 # generally requires a complete rebuild, which takes hours.  To offset
