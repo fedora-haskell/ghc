@@ -139,7 +139,7 @@ echo "XMLDocWays = html" >> mk/build.mk
 make %{_smp_mflags}
 
 %if %{with manual}
-make %{_smp_mflags} html
+echo XXX no longer supported - make %{_smp_mflags} html
 %endif
 
 %install
@@ -148,7 +148,7 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
 
 %if %{with manual}
-make DESTDIR=${RPM_BUILD_ROOT} install-docs
+echo XXX unnecessary make DESTDIR=${RPM_BUILD_ROOT} install-docs
 %endif
 
 SRC_TOP=$PWD
