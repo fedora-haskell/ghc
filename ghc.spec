@@ -27,10 +27,10 @@
 Name: ghc
 # part of haskell-platform-2009.2.0.2
 Version: 6.12.0.20091010
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
-ExclusiveArch: %{ix86} x86_64 ppc alpha
+ExclusiveArch: %{ix86} x86_64 alpha
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -42,7 +42,7 @@ Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}, ghc-haddock-devel = %{haddock_version}
-BuildRequires: ghc, happy, sed
+BuildRequires: ghc, happy, sed, ncurses-devel
 BuildRequires: gmp-devel
 %if %{with shared}
 # not sure if this is actually needed
@@ -258,6 +258,10 @@ fi
 %endif
 
 %changelog
+* Sun Oct 11 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-2
+- disable ppc for now (seems unsupported)
+- buildreq ncurses-devel
+
 * Sun Oct 11 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-1
 - Update to 6.12 RC 1
 
