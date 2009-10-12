@@ -3,8 +3,6 @@
 %bcond_without prof
 # build users_guide, etc
 %bcond_without manual
-# include extralibs
-%bcond_without extralibs
 
 # experimental
 ## shared libraries support available in ghc >= 6.11
@@ -28,17 +26,14 @@
 
 Name: ghc
 # part of haskell-platform-2009.2.0.2
-Version: 6.10.4
-Release: 2%{?dist}
+Version: 6.12.0.20091010
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
-%if %{with extralibs}
-Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
-%endif
 URL: http://haskell.org/ghc/
 Requires: gcc, gmp-devel
 Requires(post): policycoreutils
@@ -114,7 +109,7 @@ needed.
 %global debug_package %{nil}
 
 %prep
-%setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
+%setup -q -n %{name}-%{version}
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -263,6 +258,9 @@ fi
 %endif
 
 %changelog
+* Sun Oct 11 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-1
+- Update to 6.12 RC 1
+
 * Thu Oct  1 2009 Jens Petersen <petersen@redhat.com>
 - selinux file context no longer needed in post script
 - (for ghc-6.12-shared) drop ld.so.conf.d files
