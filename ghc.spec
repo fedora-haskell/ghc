@@ -27,7 +27,7 @@
 Name: ghc
 # part of haskell-platform-2009.2.0.2
 Version: 6.12.0.20091010
-Release: 5%{?dist}
+Release: 7%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 alpha
@@ -233,7 +233,8 @@ fi
 %if %{with manual}
 %{_mandir}/man1/ghc.*
 %endif
-%config(noreplace) %{_libdir}/ghc-%{version}/package.conf
+%dir %{_libdir}/ghc-%{version}/package.conf.d
+%config(noreplace) %{_libdir}/ghc-%{version}/package.conf.d/*
 
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
@@ -259,6 +260,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-7
+- fix package.conf stuff
+
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-6
 - give up trying to install man pages
 
