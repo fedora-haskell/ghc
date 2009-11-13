@@ -148,8 +148,9 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
 
 %if %{with manual}
-echo XXX unnecessary make DESTDIR=${RPM_BUILD_ROOT} install-docs
+make -C docs DESTDIR=${RPM_BUILD_ROOT} install-docs
 %endif
+make -C docs/man DESTDIR=${RPM_BUILD_ROOT} install-docs
 
 SRC_TOP=$PWD
 rm -f rpm-*.files
@@ -229,9 +230,7 @@ fi
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
-%if %{with manual}
 %{_mandir}/man1/ghc.*
-%endif
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
 %files doc -f rpm-doc-dir.files
@@ -258,6 +257,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-5
+- try to install man pages
+
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-3
 - fix %check
 
