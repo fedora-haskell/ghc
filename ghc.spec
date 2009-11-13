@@ -1,8 +1,6 @@
 # test builds can made faster and smaller by disabling profiled libraries
 # (currently libHSrts_thr_p.a breaks no prof build)
 %bcond_without prof
-# build users_guide, etc
-%bcond_with manual
 
 # experimental
 ## shared libraries support available in ghc >= 6.11
@@ -27,7 +25,7 @@
 Name: ghc
 # part of haskell-platform-2009.2.0.2
 Version: 6.12.0.20091010
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 alpha
@@ -42,14 +40,11 @@ Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}, ghc-haddock-devel = %{haddock_version}
-BuildRequires: ghc, happy, sed, ncurses-devel
+BuildRequires: ghc, happy, sed, ncurses-devel, libxslt, docbook-style-xsl
 BuildRequires: gmp-devel
 %if %{with shared}
 # not sure if this is actually needed
 BuildRequires: libffi-devel
-%endif
-%if %{with manual}
-BuildRequires: libxslt, docbook-style-xsl
 %endif
 %if %{with hscolour}
 BuildRequires: hscolour
@@ -125,9 +120,7 @@ exit 0
 echo "GhcLibWays = %{?with_shared:dyn}" >> mk/build.mk
 %endif
 
-%if %{with manual}
 echo "XMLDocWays = html" >> mk/build.mk
-%endif
 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
@@ -138,25 +131,18 @@ echo "XMLDocWays = html" >> mk/build.mk
 
 make %{_smp_mflags}
 
-%if %{with manual}
-echo XXX no longer supported - make %{_smp_mflags} html
-%endif
-
 %install
 rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-%if %{with manual}
-make -C docs DESTDIR=${RPM_BUILD_ROOT} install-docs
-make -C docs/man DESTDIR=${RPM_BUILD_ROOT} install-docs
-%endif
+cp libraries/gen_contents_index ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html/libraries
 
 SRC_TOP=$PWD
 rm -f rpm-*.files
 ( cd $RPM_BUILD_ROOT
-  find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf*' -fprint $SRC_TOP/rpm-lib.files \)
-  find .%{_docdir}/%{name}/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
+  find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf.d' -fprint $SRC_TOP/rpm-lib.files \)
+  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
@@ -224,35 +210,30 @@ fi
 
 %posttrans doc
 # (posttrans to make sure any old documentation has been removed first)
-( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
+( cd %{_docdir}/ghc/html/libraries && ./gen_contents_index ) || :
 
 %files -f rpm-base.files
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
-%if %{with manual}
-%{_mandir}/man1/ghc.*
-%endif
 %dir %{_libdir}/ghc-%{version}/package.conf.d
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf.d/*
 
 %files doc -f rpm-doc-dir.files
 %defattr(-,root,root,-)
-%dir %{_docdir}/%{name}
-%{_docdir}/%{name}/LICENSE
-%if %{with manual}
-%{_docdir}/%{name}/index.html
-%endif
-%{_docdir}/%{name}/libraries/gen_contents_index
-%{_docdir}/%{name}/libraries/prologue.txt
-%dir %{_docdir}/%{name}/libraries
-%ghost %{_docdir}/%{name}/libraries/doc-index.html
-%ghost %{_docdir}/%{name}/libraries/haddock.css
-%ghost %{_docdir}/%{name}/libraries/haddock-util.js
-%ghost %{_docdir}/%{name}/libraries/haskell_icon.gif
-%ghost %{_docdir}/%{name}/libraries/index.html
-%ghost %{_docdir}/%{name}/libraries/minus.gif
-%ghost %{_docdir}/%{name}/libraries/plus.gif
+%{_docdir}/%{name}/html/index.html
+%{_docdir}/%{name}/html/libraries/gen_contents_index
+%dir %{_docdir}/%{name}/html/libraries
+%doc %{_docdir}/%{name}/html/libraries/hscolour.css
+%ghost %{_docdir}/%{name}/html/libraries/doc-index*.html
+%ghost %{_docdir}/%{name}/html/libraries/haddock.css
+%ghost %{_docdir}/%{name}/html/libraries/haddock-util.js
+%ghost %{_docdir}/%{name}/html/libraries/haskell_icon.gif
+%ghost %{_docdir}/%{name}/html/libraries/frames.html
+%ghost %{_docdir}/%{name}/html/libraries/index.html
+%ghost %{_docdir}/%{name}/html/libraries/index-frames.html
+%ghost %{_docdir}/%{name}/html/libraries/minus.gif
+%ghost %{_docdir}/%{name}/html/libraries/plus.gif
 
 %if %{with prof}
 %files prof -f rpm-prof.files
@@ -260,6 +241,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-8
+- comprehensive attempts at packaging fixes
+
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-7
 - fix package.conf stuff
 
