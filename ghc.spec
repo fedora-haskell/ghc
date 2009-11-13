@@ -2,7 +2,7 @@
 # (currently libHSrts_thr_p.a breaks no prof build)
 %bcond_without prof
 # build users_guide, etc
-%bcond_without manual
+%bcond_with manual
 
 # experimental
 ## shared libraries support available in ghc >= 6.11
@@ -27,7 +27,7 @@
 Name: ghc
 # part of haskell-platform-2009.2.0.2
 Version: 6.12.0.20091010
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 alpha
@@ -149,8 +149,8 @@ make DESTDIR=${RPM_BUILD_ROOT} install
 
 %if %{with manual}
 make -C docs DESTDIR=${RPM_BUILD_ROOT} install-docs
-%endif
 make -C docs/man DESTDIR=${RPM_BUILD_ROOT} install-docs
+%endif
 
 SRC_TOP=$PWD
 rm -f rpm-*.files
@@ -230,7 +230,9 @@ fi
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
+%if %{with manual}
 %{_mandir}/man1/ghc.*
+%endif
 %config(noreplace) %{_libdir}/ghc-%{version}/package.conf
 
 %files doc -f rpm-doc-dir.files
@@ -257,6 +259,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-6
+- give up trying to install man pages
+
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-5
 - try to install man pages
 
