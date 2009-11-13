@@ -178,11 +178,11 @@ done
 rm -rf testghc
 mkdir testghc
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
-ghc/stage2-inplace/ghc testghc/foo.hs -o testghc/foo
+inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
-ghc/stage2-inplace/ghc testghc/foo.hs -o testghc/foo -O2
+inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 
@@ -258,6 +258,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-3
+- fix %check
+
 * Sun Oct 11 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-2
 - disable ppc for now (seems unsupported)
 - buildreq ncurses-devel
