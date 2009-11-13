@@ -27,7 +27,7 @@
 Name: ghc
 # part of haskell-platform-2009.2.0.2
 Version: 6.12.0.20091010
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 alpha
