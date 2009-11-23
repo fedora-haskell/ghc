@@ -1,11 +1,14 @@
 # test builds can made faster and smaller by disabling profiled libraries
 # (currently libHSrts_thr_p.a breaks no prof build)
 %bcond_without prof
+# build users_guide, etc
+%bcond_without manual
+# include extralibs
+%bcond_with extralibs
 
-# experimental
-## shared libraries support available in ghc >= 6.11
-%bcond_with shared
-## include colored html src
+# experimental shared libraries support available in ghc-6.12
+%bcond_without shared
+# include colored html src
 %bcond_with hscolour
 
 %global haddock_version 2.5.0
@@ -23,28 +26,34 @@
 %global package_debugging 0
 
 Name: ghc
-# part of haskell-platform-2009.2.0.2
-Version: 6.12.0.20091010
-Release: 8%{?dist}
+# break of haskell-platform-2009.2.0.2
+Version: 6.12.0.20091121
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
-ExclusiveArch: %{ix86} x86_64 alpha
+ExclusiveArch: %{ix86} x86_64 ppc alpha
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+%if %{with extralibs}
+Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
+%endif
 URL: http://haskell.org/ghc/
-Requires: gcc, gmp-devel
-Requires(post): policycoreutils
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: ghc682, ghc681, ghc661, ghc66, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
-Provides: haddock = %{haddock_version}, ghc-haddock-devel = %{haddock_version}
-BuildRequires: ghc, happy, sed, ncurses-devel, libxslt, docbook-style-xsl
+Provides: haddock = %{haddock_version}
+Requires: gcc, gmp-devel
+BuildRequires: ghc, happy, sed
 BuildRequires: gmp-devel
 %if %{with shared}
-# not sure if this is actually needed
+# not sure if this is actually needed:
 BuildRequires: libffi-devel
+Requires: %{name}-libs = %{version}-%{release}
+%endif
+%if %{with manual}
+BuildRequires: libxslt, docbook-style-xsl
 %endif
 %if %{with hscolour}
 BuildRequires: hscolour
@@ -67,22 +76,19 @@ Requires: %{name} = %{version}-%{release}
 # for haddock
 Requires(posttrans): %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-doc < %{haddock_version}
-Provides: ghc-haddock-doc = %{haddock_version}
 
 %description doc
-Preformatted documentation for the Glorious Glasgow Haskell
-Compilation System (GHC) and its libraries.  It should be installed if
-you like to have local access to the documentation in HTML format.
+Preformatted documentation for the Glorious Glasgow Haskell Compilation System
+(GHC) and its libraries.  It should be installed if you like to have local
+access to the documentation in HTML format.
 
 %if %{with shared}
 %package libs
 Summary: Shared libraries for GHC
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
 
 %description libs
-Shared libraries for Glorious Glasgow Haskell Compilation System
-(GHC).  They should be installed to build standalone programs.
+Shared libraries for Glorious Glasgow Haskell Compilation System (GHC).
 %endif
 
 %if %{with prof}
@@ -92,19 +98,17 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: ghc682-prof, ghc681-prof, ghc661-prof, ghc66-prof
 Obsoletes: ghc-haddock-prof < %{haddock_version}
-Provides: ghc-haddock-prof = %{haddock_version}
 
 %description prof
-Profiling libraries for Glorious Glasgow Haskell Compilation System
-(GHC).  They should be installed when GHC's profiling subsystem is
-needed.
+Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
+They should be installed when GHC's profiling subsystem is needed.
 %endif
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
 %global debug_package %{nil}
 
 %prep
-%setup -q -n %{name}-%{version}
+%setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
 
 %build
 # hack for building a local test package quickly from a prebuilt tree 
@@ -117,10 +121,17 @@ exit 0
 %endif
 
 %if %{without prof}
-echo "GhcLibWays = %{?with_shared:dyn}" >> mk/build.mk
+echo "GhcLibWays = v %{?with_shared:dyn}" >> mk/build.mk
 %endif
 
-echo "XMLDocWays = html" >> mk/build.mk
+# so where is the switch?
+%if %{with manual}
+#echo "XMLDocWays = html" >> mk/build.mk
+%endif
+
+%if %{without hscolour}
+echo "HSCOLOUR_SRCS = NO" >> mk/build.mk
+%endif
 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
@@ -136,19 +147,20 @@ rm -rf $RPM_BUILD_ROOT
 
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-cp libraries/gen_contents_index ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html/libraries
-
 SRC_TOP=$PWD
 rm -f rpm-*.files
 ( cd $RPM_BUILD_ROOT
-  find .%{_libdir}/%{name}-%{version} \( -type d -fprintf $SRC_TOP/rpm-dir.files "%%%%dir %%p\n" \) -o \( -type f \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( -not -name 'package.conf.d' -fprint $SRC_TOP/rpm-lib.files \)
-  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
+  find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
+  find .%{_libdir}/%{name}-%{version} -type d -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n"
+  find .%{_libdir}/%{name}-%{version} \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
+  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
 sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
 
-cat rpm-dir.files rpm-lib.files > rpm-base.files
+cat rpm-lib-dir.files rpm-lib.files > rpm-libs.files
+cat rpm-dev-dir.files rpm-base.files > rpm-ghc.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -194,46 +206,48 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
-%if %{with shared}
-%post libs -p /sbin/ldconfig
-%endif
-
 %preun
 if [ "$1" = 0 ]; then
   update-alternatives --remove runhaskell %{_bindir}/runghc
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
 fi
 
-%if %{with shared}
-%postun libs -p /sbin/ldconfig
-%endif
+%posttrans
+ghc-pkg recache
 
 %posttrans doc
 # (posttrans to make sure any old documentation has been removed first)
 ( cd %{_docdir}/ghc/html/libraries && ./gen_contents_index ) || :
 
-%files -f rpm-base.files
+%files -f rpm-ghc.files
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
-%dir %{_libdir}/ghc-%{version}/package.conf.d
-%config(noreplace) %{_libdir}/ghc-%{version}/package.conf.d/*
+%config(noreplace) %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
+%if %{with manual}
+#%{_mandir}/man1/ghc.*
+%endif
 
-%files doc -f rpm-doc-dir.files
+%files doc -f rpm-doc.files
 %defattr(-,root,root,-)
-%{_docdir}/%{name}/html/index.html
-%{_docdir}/%{name}/html/libraries/gen_contents_index
 %dir %{_docdir}/%{name}/html/libraries
-%doc %{_docdir}/%{name}/html/libraries/hscolour.css
+%{_docdir}/%{name}/html/libraries/frames.html
+%{_docdir}/%{name}/html/libraries/gen_contents_index
+%{_docdir}/%{name}/html/libraries/hscolour.css
+%{_docdir}/%{name}/html/libraries/prologue.txt
+%{_docdir}/%{name}/html/index.html
 %ghost %{_docdir}/%{name}/html/libraries/doc-index*.html
 %ghost %{_docdir}/%{name}/html/libraries/haddock.css
 %ghost %{_docdir}/%{name}/html/libraries/haddock-util.js
 %ghost %{_docdir}/%{name}/html/libraries/haskell_icon.gif
-%ghost %{_docdir}/%{name}/html/libraries/frames.html
-%ghost %{_docdir}/%{name}/html/libraries/index.html
-%ghost %{_docdir}/%{name}/html/libraries/index-frames.html
+%ghost %{_docdir}/%{name}/html/libraries/index*.html
 %ghost %{_docdir}/%{name}/html/libraries/minus.gif
 %ghost %{_docdir}/%{name}/html/libraries/plus.gif
+
+%if %{with shared}
+%files libs -f rpm-libs.files
+%defattr(-,root,root,-)
+%endif
 
 %if %{with prof}
 %files prof -f rpm-prof.files
@@ -241,6 +255,20 @@ fi
 %endif
 
 %changelog
+* Wed Nov 18 2009 Jens Petersen <petersen@redhat.com> - 6.12.0.20091121-1
+- update to 6.12.1 rc2
+- build shared libs, yay! and package in standalone libs subpackage
+- add bcond for manual and extralibs
+- reenable ppc secondary arch
+- don't provide ghc-haddock-*
+- no longer need BR ncurses-devel or post policycoreutils requires
+- add vanilla v to GhcLibWays when building without prof
+- handle without hscolour
+- can't smp make currently
+- lots of filelist fixes for handling shared libs
+- run ghc-pkg recache posttrans
+- no need to install gen_contents_index by hand
+
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-8
 - comprehensive attempts at packaging fixes
 
