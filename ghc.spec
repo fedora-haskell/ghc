@@ -46,7 +46,7 @@ Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}
 Requires: gcc, gmp-devel
 BuildRequires: ghc, happy, sed
-BuildRequires: gmp-devel
+BuildRequires: gmp-devel, ncurses-devel
 %if %{with shared}
 # not sure if this is actually needed:
 BuildRequires: libffi-devel
@@ -261,7 +261,7 @@ ghc-pkg recache
 - add bcond for manual and extralibs
 - reenable ppc secondary arch
 - don't provide ghc-haddock-*
-- no longer need BR ncurses-devel or post policycoreutils requires
+- remove obsoltete post requires policycoreutils
 - add vanilla v to GhcLibWays when building without prof
 - handle without hscolour
 - can't smp make currently
