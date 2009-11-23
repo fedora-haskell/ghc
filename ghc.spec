@@ -225,7 +225,7 @@ ghc-pkg recache
 %{_bindir}/*
 %config(noreplace) %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
 %if %{with manual}
-#%{_mandir}/man1/ghc.*
+%{_mandir}/man1/ghc.*
 %endif
 
 %files doc -f rpm-doc.files
@@ -268,6 +268,7 @@ ghc-pkg recache
 - lots of filelist fixes for handling shared libs
 - run ghc-pkg recache posttrans
 - no need to install gen_contents_index by hand
+- manpage is back
 
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-8
 - comprehensive attempts at packaging fixes
