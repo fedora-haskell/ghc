@@ -168,7 +168,9 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   %{?with_shared:--enable-shared}
 
-make %{_smp_mflags}
+# 8 cpus seems to break build
+#make %{_smp_mflags}
+make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -323,6 +325,7 @@ ghc-pkg recache
 - subpackage huge ghc internals library (thanks Lorenzo Villani)
   - BR ghc-rpm-macros >= 0.3.0
 - move html docs to docdir/ghc from html subdir (Lorenzo Villani)
+- disable smp build for now: broken for 8 cpus at least
 
 * Wed Nov 18 2009 Jens Petersen <petersen@redhat.com> - 6.12.0.20091121-1
 - update to 6.12.1 rc2
