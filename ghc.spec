@@ -23,7 +23,7 @@
 Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -139,6 +139,9 @@ Profiling libraries for the ghc internals library.
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
 
+# make sure we don't use these
+rm -r ghc-tarballs/{mingw,perl}
+
 %build
 cat > mk/build.mk << EOF
 %if %{without prof}
@@ -182,19 +185,20 @@ mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html-tmp/* ${RPM_BUILD_ROOT}%{_docdir}/%{
 rmdir ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html-tmp
 
 SRC_TOP=$PWD
-rm -f rpm-*.files
+#rm -f rpm-*.files
+# exclude ghc library since it is subpackaged separately
 ( cd $RPM_BUILD_ROOT
   find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' ! -name 'ghc-%{version}' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
-  find .%{_libdir}/%{name}-%{version} -type d \( -path 'ghc-%{version}' -prune -o -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
-  find .%{_libdir}/%{name}-%{version} \( -path 'ghc-%{version}' -prune \) -o \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/rpm-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
-  find .%{_docdir}/%{name}/* -type d ! -name libraries ! -name 'ghc-%{version}' ! -name src > $SRC_TOP/rpm-doc.files
+  find .%{_libdir}/%{name}-%{version} -mindepth 1 -type d \( -name 'ghc-%{version}' -prune -o -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
+  find .%{_libdir}/%{name}-%{version} -mindepth 1 \( -name 'ghc-%{version}' -prune \) -o \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/ghc-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
+  find .%{_docdir}/%{name}/* -type d ! -name libraries ! -name 'ghc-%{version}' ! -name src > $SRC_TOP/ghc-doc.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
-sed -i -e "s|\.%{_prefix}|%{_prefix}|" rpm-*.files
+sed -i -e "s|\.%{_prefix}|%{_prefix}|" *.files
 
-cat rpm-lib-dir.files rpm-lib.files > rpm-libs.files
-cat rpm-dev-dir.files rpm-base.files > rpm-ghc.files
+cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
+cat rpm-dev-dir.files rpm-base.files > ghc.files
 
 # subpackage ghc library
 %define ghc_version %{version}
@@ -263,16 +267,17 @@ ghc-pkg recache
 # (posttrans to make sure any old documentation has been removed first)
 ( cd %{_docdir}/ghc/libraries && ./gen_contents_index ) || :
 
-%files -f rpm-ghc.files
+%files -f ghc.files
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
+%dir %{_libdir}/%{name}-%{version}
 %config(noreplace) %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
 %if %{with manual}
 %{_mandir}/man1/ghc.*
 %endif
 
-%files doc -f rpm-doc.files
+%files doc -f ghc-doc.files
 %defattr(-,root,root,-)
 %dir %{_docdir}/%{name}/libraries
 %{_docdir}/%{name}/libraries/frames.html
@@ -289,7 +294,7 @@ ghc-pkg recache
 %ghost %{_docdir}/%{name}/libraries/plus.gif
 
 %if %{with shared}
-%files libs -f rpm-libs.files
+%files libs -f ghc-libs.files
 %defattr(-,root,root,-)
 
 %files ghc -f ghc-ghc.files
@@ -303,7 +308,7 @@ ghc-pkg recache
 %defattr(-,root,root,-)
 
 %if %{with prof}
-%files prof -f rpm-prof.files
+%files prof -f ghc-prof.files
 %defattr(-,root,root,-)
 
 %files ghc-prof -f ghc-ghc-prof.files
@@ -311,6 +316,11 @@ ghc-pkg recache
 %endif
 
 %changelog
+* Sat Dec 12 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.2
+- remove redundant mingw and perl from ghc-tarballs/
+- fix exclusion of ghc internals lib from base packages with -mindepth
+- rename the final file lists to PKGNAME.files for clarity
+
 * Fri Dec 11 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.1
 - update to ghc-6.12.1-pre
 - separate bcond options into enabled and disabled for clarity
