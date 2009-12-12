@@ -54,6 +54,7 @@ BuildRequires: libxslt, docbook-style-xsl
 %if %{with hscolour}
 BuildRequires: hscolour
 %endif
+Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -143,6 +144,8 @@ Profiling libraries for the ghc internals library.
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
+# tweak haddock path for html/libraries -> libraries
+%patch1 -p1 -b .orig
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -349,6 +352,8 @@ fi
 - use ghc_reindex_haddock
 - add scripts for ghc-ghc-devel and ghc-ghc-doc
 - add doc bcond
+- add ghc-6.12.1-gen_contents_index-haddock-path.patch to adjust haddock path
+  since we removed html/ from libraries path
 
 * Sat Dec 12 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.2
 - remove redundant mingw and perl from ghc-tarballs/
