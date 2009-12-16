@@ -40,7 +40,7 @@ Obsoletes: ghc682, ghc681, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.3.0
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.3.1
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -211,7 +211,7 @@ cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
 cat rpm-dev-dir.files rpm-base.files > ghc.files
 
 # subpackage ghc library
-%define ghc_version %{version}
+%define ghc_version_override %{version}
 %ghc_gen_filelists ghc-ghc %{version}
 
 # these are handled as alternatives
@@ -347,13 +347,14 @@ fi
 %endif
 
 %changelog
-* Sat Dec 12 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.3
+* Wed Dec 16 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.3
 - exclude ghc .conf file from package.conf.d in base package
 - use ghc_reindex_haddock
 - add scripts for ghc-ghc-devel and ghc-ghc-doc
 - add doc bcond
 - add ghc-6.12.1-gen_contents_index-haddock-path.patch to adjust haddock path
   since we removed html/ from libraries path
+- require ghc-rpm-macros-0.3.1 and use ghc_version_override
 
 * Sat Dec 12 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-0.2
 - remove redundant mingw and perl from ghc-tarballs/
