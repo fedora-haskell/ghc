@@ -24,7 +24,7 @@
 Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -152,9 +152,7 @@ rm -r ghc-tarballs/{mingw,perl}
 
 %build
 cat > mk/build.mk << EOF
-%if %{without prof}
-GhcLibWays = v %{?with_shared:dyn}
-%endif
+GhcLibWays = v %{?with_prof:p} %{?with_shared:dyn %{?with_prof:p_dyn}} 
 %if %{without doc}
 HADDOCK_DOCS       = NO
 %endif
@@ -347,6 +345,9 @@ fi
 %endif
 
 %changelog
+* Tue Dec 22 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-2
+- add p_dyn (dynamic profiling libs) for binlib packages
+
 * Wed Dec 16 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-1
 - pre promoted to 6.12.1 final
 - exclude ghc .conf file from package.conf.d in base package
