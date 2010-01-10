@@ -20,6 +20,8 @@
 
 %global haddock_version 2.5.0
 
+# the debuginfo subpackage is currently empty anyway, so don't generate it
+%global debug_package %{nil}
 
 Name: ghc
 # break of haskell-platform-2009.2.0.2
@@ -40,7 +42,7 @@ Obsoletes: ghc682, ghc681, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.3.1
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.1
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -55,6 +57,7 @@ BuildRequires: libxslt, docbook-style-xsl
 BuildRequires: hscolour
 %endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
+Patch2: ghc-6.12.1-no-filter-libs.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -79,36 +82,7 @@ Preformatted documentation for the Glorious Glasgow Haskell Compilation System
 (GHC) and its libraries.  It should be installed if you like to have local
 access to the documentation in HTML format.
 
-%if %{with doc}
-%package ghc-doc
-Summary: Documentation for the ghc internals library
-Group: Development/Languages
-Requires: %{name}-doc = %{version}
-Requires(post): %{name}-doc = %{version}
-Requires(postun): %{name}-doc = %{version}
-
-%description ghc-doc
-Documentation for the ghc internals library.
-%endif
-
-%package ghc-devel
-Summary: Development files for ghc internals
-Group: Development/Libraries
 %if %{with shared}
-Requires: %{name}-ghc = %{version}-%{release}
-%endif
-
-%description ghc-devel
-Development files for the ghc internals library.
-
-%if %{with shared}
-%package ghc
-Summary: GHC internals library
-Group: Development/Libraries
-
-%description ghc
-Library to access internals of the Glasgow Haskell Compilation System.
-
 %package libs
 Summary: Shared libraries for GHC
 Group: Development/Libraries
@@ -128,31 +102,33 @@ Obsoletes: ghc-haddock-prof < %{haddock_version}
 %description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
 They should be installed when GHC's profiling subsystem is needed.
-
-%package ghc-prof
-Summary: Profiling libraries for the ghc internals library
-Group: Development/Libraries
-Requires: %{name}-ghc-devel = %{version}-%{release}
-Requires: %{name}-prof = %{version}-%{release}
-
-%description ghc-prof
-Profiling libraries for the ghc internals library.
 %endif
 
-# the debuginfo subpackage is currently empty anyway, so don't generate it
-%global debug_package %{nil}
+%global ghc_version_override %{version}
+
+%ghc_binlib_package -n ghc
+
+%ghc_binlib_package -n haskeline -v 0.6.2.1
+
+%ghc_binlib_package -n mtl -v 1.1.0.2
+
+%ghc_binlib_package -n terminfo -v 0.3.1.1
+
+%global version %{ghc_version_override}
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
-# tweak haddock path for html/libraries -> libraries
+# absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
+# install more libs
+%patch2 -p1 -b .orig
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
 
 %build
 cat > mk/build.mk << EOF
-GhcLibWays = v %{?with_prof:p} %{?with_shared:dyn %{?with_prof:p_dyn}} 
+GhcLibWays = v %{?with_prof:p} %{?with_shared:dyn} 
 %if %{without doc}
 HADDOCK_DOCS       = NO
 %endif
@@ -187,19 +163,13 @@ make
 rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-# hack around apparent html/ hardcoding
-mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html{,-tmp}
-mv ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html-tmp/* ${RPM_BUILD_ROOT}%{_docdir}/%{name}
-rmdir ${RPM_BUILD_ROOT}%{_docdir}/%{name}/html-tmp
-
 SRC_TOP=$PWD
 #rm -f rpm-*.files
-# exclude ghc library since it is subpackaged separately
 ( cd $RPM_BUILD_ROOT
-  find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' ! -name 'ghc-%{version}' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
-  find .%{_libdir}/%{name}-%{version} -mindepth 1 -type d \( -name 'ghc-%{version}' -prune -o -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
-  find .%{_libdir}/%{name}-%{version} -mindepth 1 \( -name 'ghc-%{version}*' -prune \) -o \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/ghc-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
-  find .%{_docdir}/%{name}/* -type d ! -name libraries ! -name 'ghc-%{version}' ! -name src > $SRC_TOP/ghc-doc.files
+  find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
+  find .%{_libdir}/%{name}-%{version} -mindepth 1 -type d \( -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
+  find .%{_libdir}/%{name}-%{version} -mindepth 1 \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/ghc-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
+  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/ghc-doc.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
@@ -208,9 +178,20 @@ sed -i -e "s|\.%{_prefix}|%{_prefix}|" *.files
 cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
 cat rpm-dev-dir.files rpm-base.files > ghc.files
 
-# subpackage ghc library
-%define ghc_version_override %{version}
-%ghc_gen_filelists ghc-ghc %{version}
+# subpackage ghc and extra libraries
+sed -i -e "/ghc-%{version}\/ghc-%{version}/d" ghc.files ghc-libs.files 
+sed -i -e "/ghc-%{version}-.*.conf\$/d" ghc.files
+sed -i -e "/ghc-%{version}\$/d" ghc-doc.files
+%ghc_gen_filelists ghc
+
+for pkg in haskeline-0.6.2.1 mtl-1.1.0.2 terminfo-0.3.1.1; do
+  sed -i -e "/ghc-%{version}\/$pkg/d" ghc.files ghc-libs.files 
+  sed -i -e "/$pkg-.*.conf\$/d" ghc.files
+  sed -i -e "/$pkg\$/d" ghc-doc.files
+  name=$(echo $pkg | sed -e "s/\(.*\)-.*/\1/")
+  version=$(echo $pkg | sed -e "s/.*-\(.*\)/\1/")
+  %ghc_gen_filelists ${name} ${version}
+done
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -272,25 +253,9 @@ fi
 # (posttrans to make sure any old libs have been removed first)
 ghc-pkg recache
 
-%post ghc-devel
-ghc-pkg recache
-
-%postun ghc-devel
-ghc-pkg recache
-
 %posttrans doc
 # (posttrans to make sure any old docs have been removed first)
 %ghc_reindex_haddock
-
-%if %{with doc}
-%post ghc-doc
-%ghc_reindex_haddock
-
-%postun ghc-doc
-if [ "$1" -eq 0 ] ; then
-  %ghc_reindex_haddock
-fi
-%endif
 
 %files -f ghc.files
 %defattr(-,root,root,-)
@@ -305,51 +270,41 @@ fi
 %files doc -f ghc-doc.files
 %defattr(-,root,root,-)
 %if %{with doc}
-%dir %{_docdir}/%{name}/libraries
-%{_docdir}/%{name}/libraries/frames.html
-%{_docdir}/%{name}/libraries/gen_contents_index
-%{_docdir}/%{name}/libraries/hscolour.css
-%{_docdir}/%{name}/libraries/prologue.txt
-%{_docdir}/%{name}/index.html
-%ghost %{_docdir}/%{name}/libraries/doc-index*.html
-%ghost %{_docdir}/%{name}/libraries/haddock.css
-%ghost %{_docdir}/%{name}/libraries/haddock-util.js
-%ghost %{_docdir}/%{name}/libraries/haskell_icon.gif
-%ghost %{_docdir}/%{name}/libraries/index*.html
-%ghost %{_docdir}/%{name}/libraries/minus.gif
-%ghost %{_docdir}/%{name}/libraries/plus.gif
+%dir %{ghcdocbasedir}/libraries
+%{ghcdocbasedir}/libraries/frames.html
+%{ghcdocbasedir}/libraries/gen_contents_index
+%{ghcdocbasedir}/libraries/hscolour.css
+%{ghcdocbasedir}/libraries/prologue.txt
+%{ghcdocbasedir}/index.html
+%ghost %{ghcdocbasedir}/libraries/doc-index*.html
+%ghost %{ghcdocbasedir}/libraries/haddock.css
+%ghost %{ghcdocbasedir}/libraries/haddock-util.js
+%ghost %{ghcdocbasedir}/libraries/haskell_icon.gif
+%ghost %{ghcdocbasedir}/libraries/index*.html
+%ghost %{ghcdocbasedir}/libraries/minus.gif
+%ghost %{ghcdocbasedir}/libraries/plus.gif
 %endif
 
 %if %{with shared}
 %files libs -f ghc-libs.files
-%defattr(-,root,root,-)
-
-%files ghc -f ghc-ghc.files
-%defattr(-,root,root,-)
-%endif
-
-%files ghc-devel -f ghc-ghc-devel.files
-%defattr(-,root,root,-)
-
-%if %{with doc}
-%files ghc-doc -f ghc-ghc-doc.files
 %defattr(-,root,root,-)
 %endif
 
 %if %{with prof}
 %files prof -f ghc-prof.files
 %defattr(-,root,root,-)
-
-%files ghc-prof -f ghc-ghc-prof.files
-%defattr(-,root,root,-)
 %endif
 
 %changelog
 * Tue Dec 22 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-2
-- add p_dyn (dynamic profiling libs) for binlib packages
+- add subpackages for haskeline, mtl, and terminfo for now with
+  ghc-6.12.1-no-filter-libs.patch: use ghc_binlibpackage, grep -v and
+  ghc_gen_filelists to generate the library subpackages (ghc-rpm-macros-0.5.1)
+- always set GhcLibWays (Lorenzo Villani)
+- use ghcdocbasedir to revert html doc path to upstream's html/ for consistency
 
 * Wed Dec 16 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-1
-- pre promoted to 6.12.1 final
+- pre became 6.12.1 final
 - exclude ghc .conf file from package.conf.d in base package
 - use ghc_reindex_haddock
 - add scripts for ghc-ghc-devel and ghc-ghc-doc
