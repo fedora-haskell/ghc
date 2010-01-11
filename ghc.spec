@@ -108,10 +108,6 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %ghc_binlib_package -n ghc
 
-%ghc_binlib_package -n haskeline -v 0.6.2.1
-
-%ghc_binlib_package -n terminfo -v 0.3.1.1
-
 %global version %{ghc_version_override}
 
 %prep
