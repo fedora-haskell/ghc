@@ -298,7 +298,7 @@ ghc-pkg recache
 
 %changelog
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-3
-- ghc-rpm-macros-0.5.2 fixes broken pkg_name requires for lib packages
+- ghc-rpm-macros-0.5.2 fixes broken pkg_name requires for lib subpackages
 
 * Tue Dec 22 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-2
 - include haskeline, mtl, and terminfo for now with
