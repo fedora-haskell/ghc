@@ -26,7 +26,8 @@
 Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
-Release: 2%{?dist}
+# can't be reset as long as there are versioned subpackages
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -42,7 +43,7 @@ Obsoletes: ghc682, ghc681, haddock09
 # introduced for f11 and can be removed for f13:
 Obsoletes: haddock < %{haddock_version}, ghc-haddock-devel < %{haddock_version}
 Provides: haddock = %{haddock_version}
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.1
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.2
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -296,10 +297,14 @@ ghc-pkg recache
 %endif
 
 %changelog
+* Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-3
+- ghc-rpm-macros-0.5.2 fixes broken pkg_name requires for lib packages
+
 * Tue Dec 22 2009 Jens Petersen <petersen@redhat.com> - 6.12.1-2
-- add subpackages for haskeline, mtl, and terminfo for now with
-  ghc-6.12.1-no-filter-libs.patch: use ghc_binlibpackage, grep -v and
-  ghc_gen_filelists to generate the library subpackages (ghc-rpm-macros-0.5.1)
+- include haskeline, mtl, and terminfo for now with
+  ghc-6.12.1-no-filter-libs.patch
+- use ghc_binlibpackage, grep -v and ghc_gen_filelists to generate
+  the library subpackages (ghc-rpm-macros-0.5.1)
 - always set GhcLibWays (Lorenzo Villani)
 - use ghcdocbasedir to revert html doc path to upstream's html/ for consistency
 
