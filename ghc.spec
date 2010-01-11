@@ -27,7 +27,7 @@ Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
 # can't be reset as long as there are versioned subpackages
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -297,6 +297,9 @@ ghc-pkg recache
 %endif
 
 %changelog
+* Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-4
+- ghc-rpm-macros-0.5.4 fixes wrong version requires between lib subpackages
+
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-3
 - ghc-rpm-macros-0.5.2 fixes broken pkg_name requires for lib subpackages
 
