@@ -58,7 +58,6 @@ BuildRequires: libxslt, docbook-style-xsl
 BuildRequires: hscolour
 %endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
-Patch2: ghc-6.12.1-no-filter-libs.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -119,8 +118,6 @@ They should be installed when GHC's profiling subsystem is needed.
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
-# install more libs
-#%%patch2 -p1 -b .orig
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -178,19 +175,10 @@ cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
 cat rpm-dev-dir.files rpm-base.files > ghc.files
 
 # subpackage ghc libraries
-sed -i -e "/ghc-%{version}\/ghc-%{version}/d" ghc.files ghc-libs.files 
+sed -i -e "/ghc-%{version}\/ghc-%{version}/d" ghc.files ghc-libs.files ghc-prof.files
 sed -i -e "/ghc-%{version}-.*.conf\$/d" ghc.files
 sed -i -e "/ghc-%{version}\$/d" ghc-doc.files
 %ghc_gen_filelists ghc
-
-#for pkg in haskeline-0.6.2.1 terminfo-0.3.1.1; do
-#  sed -i -e "/ghc-%{version}\/$pkg/d" ghc.files ghc-libs.files 
-#  sed -i -e "/$pkg-.*.conf\$/d" ghc.files
-#  sed -i -e "/$pkg\$/d" ghc-doc.files
-#  name=$(echo $pkg | sed -e "s/\(.*\)-.*/\1/")
-#  version=$(echo $pkg | sed -e "s/.*-\(.*\)/\1/")
-# %%ghc_gen_filelists ${name} ${version}
-#done
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -296,7 +284,8 @@ ghc-pkg recache
 
 %changelog
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-5
-- drop extras packages again (haskeline, mtl, and terminfo)
+- drop ghc-6.12.1-no-filter-libs.patch and extras packages again
+- filter ghc-ghc-prof files from ghc-prof
 - ghc-mtl package was added to fedora
 
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-4
