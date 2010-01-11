@@ -27,7 +27,7 @@ Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
 # can't be reset as long as there are versioned subpackages
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -111,8 +111,6 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %ghc_binlib_package -n haskeline -v 0.6.2.1
 
-%ghc_binlib_package -n mtl -v 1.1.0.2
-
 %ghc_binlib_package -n terminfo -v 0.3.1.1
 
 %global version %{ghc_version_override}
@@ -185,7 +183,7 @@ sed -i -e "/ghc-%{version}-.*.conf\$/d" ghc.files
 sed -i -e "/ghc-%{version}\$/d" ghc-doc.files
 %ghc_gen_filelists ghc
 
-for pkg in haskeline-0.6.2.1 mtl-1.1.0.2 terminfo-0.3.1.1; do
+for pkg in haskeline-0.6.2.1 terminfo-0.3.1.1; do
   sed -i -e "/ghc-%{version}\/$pkg/d" ghc.files ghc-libs.files 
   sed -i -e "/$pkg-.*.conf\$/d" ghc.files
   sed -i -e "/$pkg\$/d" ghc-doc.files
@@ -297,6 +295,9 @@ ghc-pkg recache
 %endif
 
 %changelog
+* Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-5
+- ghc-mtl package was added to fedora so dropping it from here
+
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-4
 - ghc-rpm-macros-0.5.4 fixes wrong version requires between lib subpackages
 

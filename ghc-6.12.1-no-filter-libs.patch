@@ -6,7 +6,7 @@ diff -u ghc-6.12.1/ghc.mk\~ ghc-6.12.1/ghc.mk
  endif
  
 -INSTALLED_PACKAGES = $(filter-out haskeline mtl terminfo,$(PACKAGES))
-+INSTALLED_PACKAGES = $(PACKAGES)
++INSTALLED_PACKAGES = $(filter-out mtl,$(PACKAGES))
  HIDDEN_PACKAGES = ghc-binary
  
  define set_INSTALL_DISTDIR
