@@ -26,7 +26,6 @@
 Name: ghc
 # break of haskell-platform-2009.2.0.2
 Version: 6.12.1
-# can't be reset as long as there are versioned subpackages
 Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
@@ -107,8 +106,6 @@ They should be installed when GHC's profiling subsystem is needed.
 %global ghc_version_override %{version}
 
 %ghc_binlib_package -n ghc
-
-%global version %{ghc_version_override}
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
