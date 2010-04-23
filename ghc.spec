@@ -9,6 +9,8 @@
 %bcond_without prof
 # build xml manuals (users_guide, etc)
 %bcond_without manual
+# run testsuite
+%bcond_without testsuite
 
 ## default disabled options ##
 # include extralibs
@@ -24,9 +26,9 @@
 %global debug_package %{nil}
 
 Name: ghc
-# break of haskell-platform-2009.2.0.2
-Version: 6.12.1
-Release: 5%{?dist}
+# break of haskell-platform-2010.1.0.0
+Version: 6.12.2
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -36,6 +38,7 @@ Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{with extralibs}
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 %endif
+Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 Obsoletes: ghc682, ghc681, haddock09
@@ -108,7 +111,7 @@ They should be installed when GHC's profiling subsystem is needed.
 %ghc_binlib_package -n ghc
 
 %prep
-%setup -q -n %{name}-%{version} %{?with_extralibs:-b1}
+%setup -q -n %{name}-%{version} %{?with_extralibs:-b1} -b2
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
 
@@ -201,6 +204,10 @@ inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %endif
+%if %{with testsuite}
+cd testsuite
+make
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -276,6 +283,10 @@ ghc-pkg recache
 %endif
 
 %changelog
+* Fri Apr 23 2010 Jens Petersen <petersen@redhat.com> - 6.12.2-1
+- update to 6.12.2
+- add testsuite with bcond and run it in check section
+
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-5
 - drop ghc-6.12.1-no-filter-libs.patch and extras packages again
 - filter ghc-ghc-prof files from ghc-prof
