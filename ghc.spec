@@ -41,8 +41,6 @@ URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
-# added for f13
-Obsoletes: ghc-utf8-string-devel < 0.3.6-3
 BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.6
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
@@ -79,8 +77,6 @@ Requires: %{name} = %{version}-%{release}
 # for haddock
 Requires(posttrans): %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-doc < 2.4.2-3
-# added for f13
-Obsoletes: ghc-utf8-string-doc < 0.3.6-3
 
 %description doc
 Preformatted documentation for the Glorious Glasgow Haskell Compilation System
@@ -91,8 +87,6 @@ access to the documentation in HTML format.
 %package libs
 Summary: Shared libraries for GHC
 Group: Development/Libraries
-# added for f13
-Obsoletes: ghc-utf8-string < 0.3.6-3
 
 %description libs
 Shared libraries for Glorious Glasgow Haskell Compilation System (GHC).
@@ -104,8 +98,6 @@ Summary: Profiling libraries for GHC
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-prof < 2.4.2-3
-# added for f13
-Obsoletes: ghc-utf8-string-prof < 0.3.6-3
 
 %description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
@@ -211,7 +203,7 @@ inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 rm testghc/*
 %endif
 %if %{with testsuite}
-make -C testsuite
+make -C testsuite/tests/ghc-regress fast
 %endif
 
 %clean
@@ -288,6 +280,10 @@ fi
 %endif
 
 %changelog
+* Tue May 25 2010 Jens Petersen <petersen@redhat.com>
+- drop ghc-utf8-string obsoletes since it is no longer provided
+- run testsuite fast
+
 * Fri Apr 23 2010 Jens Petersen <petersen@redhat.com> - 6.12.2-1
 - update to 6.12.2
 - add testsuite with bcond, run it in check section, and BR python
@@ -296,7 +292,6 @@ fi
 - ghc-6.12.1 is part of haskell-platform-2010.1.0.0
 - drop old ghc682, ghc681, haddock09 obsoletes
 - drop haddock_version and no longer provide haddock explicitly
-- add obsoletes for ghc-utf8-string (#571478, reported by Jochen Schmitt)
 - update ghc-rpm-macros BR to 0.5.6 for ghc_pkg_recache
 
 * Mon Jan 11 2010 Jens Petersen <petersen@redhat.com> - 6.12.1-5
