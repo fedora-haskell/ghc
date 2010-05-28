@@ -25,7 +25,7 @@
 
 Name: ghc
 # break of haskell-platform-2010.1.0.0
-Version: 6.12.2
+Version: 6.12.2.20100521
 Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
@@ -36,7 +36,9 @@ Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{with extralibs}
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
 %endif
+%if %{with testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
+%endif
 URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
@@ -106,10 +108,12 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %global ghc_version_override %{version}
 
-%ghc_binlib_package -n ghc
+%ghc_binlib_package -n ghc -s "GHC internals library" -d \
+"The API for GHC internals can be used for example to analyse, transform, and\
+dynamically load Haskell code."
 
 %prep
-%setup -q -n %{name}-%{version} %{?with_extralibs:-b1} -b2
+%setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
 
@@ -246,7 +250,7 @@ fi
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
 %dir %{_libdir}/%{name}-%{version}
-%config(noreplace) %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
+%ghost %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
 %if %{with manual}
 %{_mandir}/man1/ghc.*
 %endif
@@ -280,9 +284,12 @@ fi
 %endif
 
 %changelog
-* Tue May 25 2010 Jens Petersen <petersen@redhat.com>
+* Fri May 28 2010 Jens Petersen <petersen@redhat.com> - 6.12.2.20100521-1
+- 6.12.3 rc1
+- ghost package.cache
 - drop ghc-utf8-string obsoletes since it is no longer provided
 - run testsuite fast
+- fix description and summary of ghc internal library (John Obbele)
 
 * Fri Apr 23 2010 Jens Petersen <petersen@redhat.com> - 6.12.2-1
 - update to 6.12.2
