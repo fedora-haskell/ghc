@@ -13,7 +13,7 @@ cd .pkg-deps
 ghc-pkg dot --global | sed '$d' > pkgs.dot
 
 # check for binary deps too
-for i in alex cabal-install cpphs darcs happy hedgewars hscolour kaya xmonad; do
+for i in alex cabal-install cpphs darcs happy haskell-platform hedgewars hscolour kaya xmonad; do
   PKG=`rpm -q --qf "%{name}-%{version}" $i` || echo $i is not installed
   rpm -q --requires $i | grep ghc6 | sed -e "s/libHS/\"$PKG\" -> \"/g" -e "s/-ghc6.*/\"/" >> pkgs.dot
 done
