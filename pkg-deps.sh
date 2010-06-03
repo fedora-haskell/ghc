@@ -29,4 +29,6 @@ for i in $GHC_PKGS; do sed -i -e /$i/d pkgs.dot; done
 
 cat pkgs.dot | tred | dot -Nfontsize=8 -Tsvg >pkgs.svg
 
-xdg-open pkgs.svg
+if [ -n "$DISPLAY"]; then
+  xdg-open pkgs.svg
+fi
