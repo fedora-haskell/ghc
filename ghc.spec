@@ -108,7 +108,7 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %global ghc_version_override %{version}
 
-%ghc_binlib_package -n ghc -s "GHC internals library" -d "The API for GHC internals can be used for example to analyse, transform, and\ndynamically load Haskell code." -o 6.12.3-1
+%ghc_binlib_package -n ghc -s "GHC internals library" -d "The API for GHC internals can be used for example to analyse, transform, and\ndynamically load Haskell code."
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
