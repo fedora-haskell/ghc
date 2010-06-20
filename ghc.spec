@@ -11,21 +11,21 @@
 %bcond_without manual
 # run testsuite
 %bcond_without testsuite
+# include colored html src
+%bcond_without hscolour
 
 ## default disabled options ##
 # include extralibs
 %bcond_with extralibs
 # quick build profile
 %bcond_with quick
-# include colored html src
-%bcond_with hscolour
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
 %global debug_package %{nil}
 
 Name: ghc
 # break of haskell-platform-2010.1.0.0
-Version: 6.12.2.20100521
+Version: 6.12.3
 Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
@@ -43,7 +43,7 @@ URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.6
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.8
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -187,6 +187,9 @@ for i in hsc2hs runhaskell; do
   fi
 done
 
+%ghc_strip_shared
+
+
 %check
 # stolen from ghc6/debian/rules:
 # Do some very simple tests that the compiler actually works
@@ -284,6 +287,11 @@ fi
 %endif
 
 %changelog
+* Mon Jun 14 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-1
+- 6.12.3
+- build with hscolour
+- use ghc-rpm-macro-0.5.8 for ghc_strip_shared macro
+
 * Fri May 28 2010 Jens Petersen <petersen@redhat.com> - 6.12.2.20100521-1
 - 6.12.3 rc1
 - ghost package.cache
