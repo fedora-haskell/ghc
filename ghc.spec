@@ -26,7 +26,7 @@
 Name: ghc
 # break of haskell-platform-2010.1.0.0
 Version: 6.12.3
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -43,7 +43,7 @@ URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.8
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.9
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -185,7 +185,7 @@ for i in hsc2hs runhaskell; do
   fi
 done
 
-%ghc_strip_shared
+%ghc_strip_dynlinked
 
 
 %check
@@ -285,6 +285,9 @@ fi
 %endif
 
 %changelog
+* Wed Jun 23 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-2
+- strip all dynlinked files not just shared objects (ghc-rpm-macros-0.5.9)
+
 * Mon Jun 14 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-1
 - 6.12.3
 - build with hscolour
