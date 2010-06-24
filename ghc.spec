@@ -26,7 +26,7 @@
 Name: ghc
 # break of haskell-platform-2010.1.0.0
 Version: 6.12.3
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -43,7 +43,7 @@ URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.5.9
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.6.1
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -108,7 +108,7 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %global ghc_version_override %{version}
 
-%ghc_binlib_package -n ghc -s "GHC internals library" -d "The API for GHC internals can be used for example to analyse, transform, and\ndynamically load Haskell code."
+%ghc_binlib_package -n ghc
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
@@ -285,11 +285,16 @@ fi
 %endif
 
 %changelog
+* Thu Jun 24 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-3
+- drop the broken summary and description args to the ghc-ghc package
+  and use ghc-rpm-macros-0.6.1
+
 * Wed Jun 23 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-2
 - strip all dynlinked files not just shared objects (ghc-rpm-macros-0.5.9)
 
 * Mon Jun 14 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-1
-- 6.12.3
+- 6.12.3 release:
+  http://darcs.haskell.org/download/docs/6.12.3/html/users_guide/release-6-12-3.html
 - build with hscolour
 - use ghc-rpm-macro-0.5.8 for ghc_strip_shared macro
 
