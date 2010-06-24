@@ -13,7 +13,7 @@ cd .pkg-deps
 ghc-pkg dot --global | sed '$d' > pkgs.dot
 
 # check for binary deps too (but not binlib)
-for i in alex cabal-install happy haskell-platform hedgewars kaya; do
+for i in alex cabal-install happy haskell-platform hedgewars hlint kaya; do
   PKG_THERE=yes
   PKG=`rpm -q --qf "%{name}-%{version}" $i` || PKG_THERE=no
   if [ "$PKG_THERE" = "yes" ]; then
