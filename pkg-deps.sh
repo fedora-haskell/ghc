@@ -12,11 +12,12 @@ cd .pkg-deps
 # remove the closing line
 ghc-pkg dot --global | sed '$d' > pkgs.dot
 
-# check for binary deps too (but not binlib)
-for i in alex cabal-install happy haskell-platform hedgewars hlint kaya; do
+# check for binary deps too
+for i in alex cabal-install cpphs darcs ghc happy haskell-platform hedgewars hscolour kaya xmonad; do
   PKG_THERE=yes
   PKG=`rpm -q --qf "%{name}-%{version}" $i` || PKG_THERE=no
   if [ "$PKG_THERE" = "yes" ]; then
+    echo \"$PKG\" >> pkgs.dot
     case $i in
       haskell-platform)
         rpm -q --requires $i | grep -v rpmlib | grep -v ghc | sed -e "s/^/\"$PKG\" -> \"/g" -e "s/ = \(.*\)/-\1\"/" >> pkgs.dot
@@ -27,6 +28,9 @@ for i in alex cabal-install happy haskell-platform hedgewars hlint kaya; do
     esac
   fi
 done
+
+# make sure all libs there
+rpm -qa --qf "\"%{name}-%{version}\"\n" ghc-\* | egrep -v -- "(ghc-libs|-prof|-devel|-doc)-" | sed -e s/^\"ghc-/\"/g >> pkgs.dot
 
 # and add it back
 echo "}" >> pkgs.dot
@@ -41,4 +45,6 @@ cat pkgs.dot | tred | dot -Nfontsize=8 -Tsvg >pkgs.svg
 
 if [ -n "$DISPLAY" ]; then
   xdg-open pkgs.svg
+else
+  echo open ".pkg-deps/pkgs.svg" to display pkg graph
 fi
