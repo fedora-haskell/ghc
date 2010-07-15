@@ -50,7 +50,7 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f14
 Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.6.1
+BuildRequires: ghc, happy, ghc-rpm-macros >= 0.8.0
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -104,7 +104,7 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %global ghc_version_override %{version}
 
-%ghc_binlib_package -n ghc
+%ghc_binlib_package -n ghc -o 6.12.3-4
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
@@ -280,7 +280,7 @@ fi
 %changelog
 * Thu Jul 15 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-4
 - merge ghc-doc into base package
-- obsolete ghc-time
+- obsolete ghc-time and ghc-ghc-doc (ghc-rpm-macros-0.8.0)
 - note that ghc-6.12.3 is part of haskell-platform-2010.2.0.0
 
 * Thu Jun 24 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-3
