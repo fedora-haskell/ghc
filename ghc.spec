@@ -24,7 +24,7 @@
 %global debug_package %{nil}
 
 Name: ghc
-# break of haskell-platform-2010.1.0.0
+# part of haskell-platform-2010.2.0.0
 Version: 6.12.3
 Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
@@ -41,10 +41,15 @@ Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 %endif
 URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+# introduced for f14
+Obsoletes: ghc-doc < 6.12.3-4
+Provides: ghc-doc = %{version}-%{release}
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
+Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f14
 Obsoletes: ghc-time-devel < 1.1.2.4-5
+Obsoletes: ghc-time-doc < 1.1.2.4-5
 BuildRequires: ghc, happy, ghc-rpm-macros >= 0.6.1
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
@@ -73,20 +78,6 @@ distribution includes space and time profiling facilities, a large
 collection of libraries, and support for various language
 extensions, including concurrency, exceptions, and a foreign language
 interface.
-
-%package doc
-Summary: Documentation for GHC
-Group: Development/Languages
-Requires: %{name} = %{version}-%{release}
-# for haddock
-Requires(posttrans): %{name} = %{version}-%{release}
-Obsoletes: ghc-haddock-doc < 2.4.2-3
-Obsoletes: ghc-time-doc < 1.1.2.4-5
-
-%description doc
-Preformatted documentation for the Glorious Glasgow Haskell Compilation System
-(GHC) and its libraries.  It should be installed if you like to have local
-access to the documentation in HTML format.
 
 %if %{with shared}
 %package libs
@@ -161,24 +152,27 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
 
 SRC_TOP=$PWD
-#rm -f rpm-*.files
 ( cd $RPM_BUILD_ROOT
+  # library directories
   find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
+  # library devel subdirs
   find .%{_libdir}/%{name}-%{version} -mindepth 1 -type d \( -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
+  # split dyn, devel, conf and prof files
   find .%{_libdir}/%{name}-%{version} -mindepth 1 \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/ghc-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
-  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/ghc-doc.files
+  # manuals (src dir are subdirs so dont duplicate them)
+  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
 )
 
 # make paths absolute (filter "./usr" to "/usr")
 sed -i -e "s|\.%{_prefix}|%{_prefix}|" *.files
 
 cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
-cat rpm-dev-dir.files rpm-base.files > ghc.files
+cat rpm-dev-dir.files rpm-base.files rpm-doc-dir.files > ghc.files
 
 # subpackage ghc libraries
 sed -i -e "/ghc-%{version}\/ghc-%{version}/d" ghc.files ghc-libs.files ghc-prof.files
-sed -i -e "/ghc-%{version}-.*.conf\$/d" ghc.files
-sed -i -e "/ghc-%{version}\$/d" ghc-doc.files
+sed -i -e "/ghc-%{version}\/package.conf.d\/ghc-%{version}-.*.conf\$/d" ghc.files
+sed -i -e "/html\/libraries\/ghc-%{version}\$/d" ghc.files
 %ghc_gen_filelists ghc
 
 # these are handled as alternatives
@@ -244,11 +238,8 @@ if [ "$1" = 0 ]; then
 fi
 
 %posttrans
-# (posttrans to make sure any old libs have been removed first)
+# (posttrans to make sure any old libs and docs have been removed first)
 %ghc_pkg_recache
-
-%posttrans doc
-# (posttrans to make sure any old docs have been removed first)
 %ghc_reindex_haddock
 
 %files -f ghc.files
@@ -260,9 +251,6 @@ fi
 %if %{with manual}
 %{_mandir}/man1/ghc.*
 %endif
-
-%files doc -f ghc-doc.files
-%defattr(-,root,root,-)
 %if %{with doc}
 %dir %{ghcdocbasedir}/libraries
 %{ghcdocbasedir}/libraries/frames.html
@@ -291,7 +279,9 @@ fi
 
 %changelog
 * Thu Jul 15 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-4
+- merge ghc-doc into base package
 - obsolete ghc-time
+- note that ghc-6.12.3 is part of haskell-platform-2010.2.0.0
 
 * Thu Jun 24 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-3
 - drop the broken summary and description args to the ghc-ghc package
