@@ -26,7 +26,7 @@
 Name: ghc
 # break of haskell-platform-2010.1.0.0
 Version: 6.12.3
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -43,6 +43,8 @@ URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
+# introduced for f14
+Obsoletes: ghc-time-devel < 1.1.2.4-5
 BuildRequires: ghc, happy, ghc-rpm-macros >= 0.6.1
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
@@ -79,6 +81,7 @@ Requires: %{name} = %{version}-%{release}
 # for haddock
 Requires(posttrans): %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-doc < 2.4.2-3
+Obsoletes: ghc-time-doc < 1.1.2.4-5
 
 %description doc
 Preformatted documentation for the Glorious Glasgow Haskell Compilation System
@@ -89,6 +92,7 @@ access to the documentation in HTML format.
 %package libs
 Summary: Shared libraries for GHC
 Group: Development/Libraries
+Obsoletes: ghc-time < 1.1.2.4-5
 
 %description libs
 Shared libraries for Glorious Glasgow Haskell Compilation System (GHC).
@@ -100,6 +104,7 @@ Summary: Profiling libraries for GHC
 Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-prof < 2.4.2-3
+Obsoletes: ghc-time-prof < 1.1.2.4-5
 
 %description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
@@ -285,6 +290,9 @@ fi
 %endif
 
 %changelog
+* Thu Jul 15 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-4
+- obsolete ghc-time
+
 * Thu Jun 24 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-3
 - drop the broken summary and description args to the ghc-ghc package
   and use ghc-rpm-macros-0.6.1
