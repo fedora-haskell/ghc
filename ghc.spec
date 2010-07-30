@@ -26,7 +26,7 @@
 Name: ghc
 # part of haskell-platform-2010.2.0.0
 Version: 6.12.3
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -50,6 +50,19 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f14
 Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
+# until new cabalized gtk2hs packages in f14+
+Obsoletes: ghc-cairo-devel < 0.11-1, ghc-cairo-doc < 0.11-1
+Obsoletes: ghc-gconf-devel < 0.11-1, ghc-gconf-doc < 0.11-1
+Obsoletes: ghc-gio-devel < 0.11-1, ghc-gio-doc < 0.11-1
+Obsoletes: ghc-glade-devel < 0.11-1, ghc-glade-doc < 0.11-1
+Obsoletes: ghc-glib-devel < 0.11-1, ghc-glib-doc < 0.11-1
+Obsoletes: ghc-gstreamer-devel < 0.11-1, ghc-gstreamer-doc < 0.11-1
+Obsoletes: ghc-gtk-devel < 0.11-1, ghc-gtk-doc < 0.11-1
+Obsoletes: ghc-gtkglext-devel < 0.11-1, ghc-gtkglext-doc < 0.11-1
+Obsoletes: ghc-gtksourceview2-devel < 0.11-1, ghc-gtksourceview2-doc < 0.11-1
+Obsoletes: ghc-soegtk-devel < 0.11-1, ghc-soegtk-doc < 0.11-1
+Obsoletes: ghc-svgcairo-devel < 0.11-1, ghc-svgcairo-doc < 0.11-1
+Obsoletes: ghc-vte-devel < 0.11-1, ghc-vte-doc < 0.11-1
 BuildRequires: ghc, happy, ghc-rpm-macros >= 0.8.0
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
@@ -96,6 +109,19 @@ Group: Development/Libraries
 Requires: %{name} = %{version}-%{release}
 Obsoletes: ghc-haddock-prof < 2.4.2-3
 Obsoletes: ghc-time-prof < 1.1.2.4-5
+# gtk2hs
+Obsoletes: ghc-cairo-prof < 0.11-1
+Obsoletes: ghc-gconf-prof < 0.11-1
+Obsoletes: ghc-gio-prof < 0.11-1
+Obsoletes: ghc-glade-prof < 0.11-1
+Obsoletes: ghc-glib-prof < 0.11-1
+Obsoletes: ghc-gstreamer-prof < 0.11-1
+Obsoletes: ghc-gtk-prof < 0.11-1
+Obsoletes: ghc-gtkglext-prof < 0.11-1
+Obsoletes: ghc-gtksourceview2-prof < 0.11-1
+Obsoletes: ghc-soegtk-prof < 0.11-1
+Obsoletes: ghc-svgcairo-prof < 0.11-1
+Obsoletes: ghc-vte-prof < 0.11-1
 
 %description prof
 Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
@@ -278,6 +304,9 @@ fi
 %endif
 
 %changelog
+* Fri Jul 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-5
+- obsolete old gtk2hs packages for smooth upgrades
+
 * Thu Jul 15 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-4
 - merge ghc-doc into base package
 - obsolete ghc-time and ghc-ghc-doc (ghc-rpm-macros-0.8.0)
