@@ -13,7 +13,7 @@ cd .pkg-deps
 ghc-pkg dot --global | sed '$d' > pkgs.dot
 
 # check for binary deps too
-for i in alex cabal-install cpphs darcs ghc happy gtk2hs-buildtools haskell-platform hedgewars hscolour kaya xmonad; do
+for i in alex cabal-install cpphs darcs ghc happy gtk2hs-buildtools haskell-platform hedgewars hscolour kaya xmobar xmonad; do
   PKG_THERE=yes
   PKG=`rpm -q --qf "%{name}-%{version}" $i` || PKG_THERE=no
   if [ "$PKG_THERE" = "yes" ]; then
@@ -30,7 +30,7 @@ for i in alex cabal-install cpphs darcs ghc happy gtk2hs-buildtools haskell-plat
 done
 
 # make sure all libs there
-rpm -qa --qf "\"%{name}-%{version}\"\n" ghc-\* | egrep -v -- "(ghc-libs|-prof|-devel|-doc)-" | sed -e s/^\"ghc-/\"/g >> pkgs.dot
+rpm -qa --qf "\"%{name}-%{version}\"\n" ghc-\* | egrep -v -- "(ghc-libs|-prof|-devel|-doc|rpm-macros)-" | sed -e s/^\"ghc-/\"/g >> pkgs.dot
 
 # and add it back
 echo "}" >> pkgs.dot
