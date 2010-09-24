@@ -41,6 +41,7 @@ cp -p pkgs.dot pkgs.dot.orig
 GHC_PKGS="array base-4 base-3 bin-package-db bytestring Cabal containers directory dph extensible-exceptions filepath ffi ghc-binary ghc-prim haskell98 hpc integer-gmp old-locale old-time pretty process random rts syb template-haskell time unix Win32"
 for i in $GHC_PKGS; do sed -i -e /$i/d pkgs.dot; done
 
+which tred >/dev/null
 cat pkgs.dot | tred | dot -Nfontsize=8 -Tsvg >pkgs.svg
 
 if [ -n "$DISPLAY" ]; then
