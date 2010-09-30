@@ -50,7 +50,7 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f14
 Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
-BuildRequires: ghc, happy, ghc-rpm-macros >= 0.8.2
+BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
 BuildRequires: gmp-devel, ncurses-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
@@ -280,6 +280,7 @@ fi
 %changelog
 * Thu Sep 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-6
 - move gtk2hs obsoletes to ghc-glib and ghc-gtk
+- drop happy buildrequires
 
 * Fri Jul 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-5
 - obsolete old gtk2hs packages for smooth upgrades
