@@ -146,6 +146,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
 # 4 cpus or more sometimes breaks build
 RPM_BUILD_NCPUS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 [ "$RPM_BUILD_NCPUS" -gt 2 ] && RPM_BUILD_NCPUS=2
+export RPM_BUILD_NCPUS
 make %{_smp_mflags}
 
 %install
