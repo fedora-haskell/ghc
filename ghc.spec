@@ -144,8 +144,9 @@ export CFLAGS="${CFLAGS:-%optflags}"
   %{?with_shared:--enable-shared}
 
 # 8 cpus seems to break build
+RPM_BUILD_NCPUS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
+[ "$RPM_BUILD_NCPUS" -gt 4 ] && RPM_BUILD_NCPUS=4
 make %{_smp_mflags}
-#make
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -281,7 +282,7 @@ fi
 * Thu Sep 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-6
 - move gtk2hs obsoletes to ghc-glib and ghc-gtk
 - drop happy buildrequires
-- try smp build again
+- smp build with max 4 cpus
 
 * Fri Jul 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-5
 - obsolete old gtk2hs packages for smooth upgrades
