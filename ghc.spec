@@ -70,7 +70,7 @@ BuildRequires: python
 %endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
-Patch3: ghc-gen_contents_cron-batch.patch
+Patch3: ghc-gen_contents_index-cron-batch.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
