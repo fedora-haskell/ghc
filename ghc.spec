@@ -26,7 +26,7 @@
 Name: ghc
 # part of haskell-platform-2010.2.0.0
 Version: 6.12.3
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -68,6 +68,7 @@ BuildRequires: hscolour
 BuildRequires: python
 %endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
+Patch2: ghc-gen_contents_index-type-level.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -110,6 +111,8 @@ They should be installed when GHC's profiling subsystem is needed.
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
+# type-level too big so skip it in gen_contents_index
+%patch2 -p1
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -279,6 +282,9 @@ fi
 %endif
 
 %changelog
+* Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-7
+- skip huge type-level docs from haddock re-indexing (#649228)
+
 * Thu Sep 30 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-6
 - move gtk2hs obsoletes to ghc-glib and ghc-gtk
 - drop happy buildrequires
