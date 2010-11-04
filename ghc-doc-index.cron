@@ -1,0 +1,39 @@
+#! /bin/bash
+
+if [ -e /etc/sysconfig/ghc-doc-index ]; then
+    . /etc/sysconfig/ghc-doc-index
+fi
+
+if [ "$CRON" = "no" ]; then
+   exit 0
+fi
+
+
+LOCKFILE=/var/lock/ghc-doc-index.lock
+
+# the lockfile is not meant to be perfect, it's just in case the
+# two man-db cron scripts get run close to each other to keep
+# them from stepping on each other's toes.  The worst that will
+# happen is that they will temporarily corrupt the database
+[ -f $LOCKFILE ] && exit 0
+
+trap "{ rm -f $LOCKFILE ; exit 255; }" EXIT
+touch $LOCKFILE
+
+# only re-index ghc docs when there are changes
+cd /usr/share/doc/ghc/html/libraries
+if [ -r .pkg-dir.cache ]; then
+  ls -d */ > .pkg-dir.cache.new
+  DIR_DIFF=$(diff .pkg-dir.cache .pkg-dir.cache.new)
+else
+  ls -d */ > .pkg-dir.cache
+fi
+if [ -x "gen_contents_index" -a ! -r ".pkg-dir.cache.new" -o -n "$DIR_DIFF" ]; then
+  ./gen_contents_index --batch
+fi
+
+if [ -f .pkg-dir.cache.new ]; then
+  mv -f .pkg-dir.cache{.new,}
+fi
+
+exit 0

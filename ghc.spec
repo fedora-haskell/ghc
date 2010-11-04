@@ -26,7 +26,7 @@
 Name: ghc
 # part of haskell-platform-2010.2.0.0
 Version: 6.12.3
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -39,6 +39,7 @@ Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs
 %if %{with testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 %endif
+Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f14
@@ -69,6 +70,7 @@ BuildRequires: python
 %endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
+Patch3: ghc-gen_contents_cron-batch.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -113,6 +115,8 @@ They should be installed when GHC's profiling subsystem is needed.
 %patch1 -p1 -b .orig
 # type-level too big so skip it in gen_contents_index
 %patch2 -p1
+# disable gen_contents_index when not --batch for cron
+%patch3 -p1
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -190,6 +194,10 @@ done
 
 %ghc_strip_dynlinked
 
+%if %{with doc}
+mkdir -p %{_sysconfdir}/cron.hourly
+install -p --mode=755 %SOURCE3 %{_sysconfdir}/cron.hourly/ghc-doc-index
+%endif
 
 %check
 # stolen from ghc6/debian/rules:
@@ -269,6 +277,7 @@ fi
 %ghost %{ghcdocbasedir}/libraries/index*.html
 %ghost %{ghcdocbasedir}/libraries/minus.gif
 %ghost %{ghcdocbasedir}/libraries/plus.gif
+%{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %if %{with shared}
@@ -282,6 +291,10 @@ fi
 %endif
 
 %changelog
+* Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-8
+- add a cronjob for doc indexing
+- disable gen_contents_index when not run with --batch for cron
+
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-7
 - skip huge type-level docs from haddock re-indexing (#649228)
 
