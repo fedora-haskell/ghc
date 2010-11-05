@@ -13,6 +13,8 @@
 %bcond_without testsuite
 # include colored html src
 %bcond_without hscolour
+# use system libffi
+%bcond_without libffi
 
 ## default disabled options ##
 # include extralibs
@@ -53,7 +55,9 @@ Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
 BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
 BuildRequires: gmp-devel, ncurses-devel
+%if %{with libffi}
 BuildRequires: libffi-devel
+%endif
 Requires: gcc, gmp-devel
 %if %{with shared}
 Requires: %{name}-libs = %{version}-%{release}
@@ -70,7 +74,7 @@ BuildRequires: python
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
-Patch4: ghc-use-system-libffi-debian.patch
+Patch4: ghc-use-system-libffi.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -118,9 +122,11 @@ They should be installed when GHC's profiling subsystem is needed.
 # disable gen_contents_index when not --batch for cron
 %patch3 -p1
 # use system libffi
+%if %{with libffi}
 %patch4 -p1 -b .libffi
+%endif
 
-# prefer system libraries
+# use system libraries
 rm -r ghc-tarballs
 
 %build
@@ -141,6 +147,9 @@ SplitObjs          = NO
 %endif
 %if %{without hscolour}
 HSCOLOUR_SRCS = NO
+%endif
+%if %{with libffi}
+SRC_HC_OPTS += -lffi
 %endif
 EOF
 
@@ -296,7 +305,8 @@ fi
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-8
 - add a cronjob for doc indexing
 - disable gen_contents_index when not run with --batch for cron
-- use system libffi with ghc-use-system-libffi-debian.patch
+- use system libffi with ghc-use-system-libffi.patch from debian
+- add bcond for system libffi
 
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-7
 - skip huge type-level docs from haddock re-indexing (#649228)

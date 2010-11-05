@@ -108,3 +108,15 @@ Index: ghc6-6.12.3/rts/package.conf.in
  hugs-options:
  cc-options:
  
+diff -u ghc-6.12.3/compiler/ghc.cabal.in\~ ghc-6.12.3/compiler/ghc.cabal.in
+--- ghc-6.12.3/compiler/ghc.cabal.in~	2010-06-10 04:10:09.000000000 +1000
++++ ghc-6.12.3/compiler/ghc.cabal.in	2010-11-05 18:08:11.000000000 +1000
+@@ -83,7 +83,7 @@
+     if flag(ghci)
+         Build-Depends: template-haskell
+         CPP-Options: -DGHCI
+-        Include-Dirs: ../libffi/build/include
++        pkgconfig-depends: libffi
+ 
+     if !flag(ncg)
+         CPP-Options: -DOMIT_NATIVE_CODEGEN
