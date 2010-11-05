@@ -53,10 +53,9 @@ Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
 BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
 BuildRequires: gmp-devel, ncurses-devel
+BuildRequires: libffi-devel
 Requires: gcc, gmp-devel
 %if %{with shared}
-# not sure if this is actually needed:
-BuildRequires: libffi-devel
 Requires: %{name}-libs = %{version}-%{release}
 %endif
 %if %{with manual}
@@ -71,6 +70,7 @@ BuildRequires: python
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
+Patch4: ghc-use-system-libffi-debian.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -117,9 +117,11 @@ They should be installed when GHC's profiling subsystem is needed.
 %patch2 -p1
 # disable gen_contents_index when not --batch for cron
 %patch3 -p1
+# use system libffi
+%patch4 -p1 -b .libffi
 
-# make sure we don't use these
-rm -r ghc-tarballs/{mingw,perl}
+# prefer system libraries
+rm -r ghc-tarballs
 
 %build
 cat > mk/build.mk << EOF
@@ -294,6 +296,7 @@ fi
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-8
 - add a cronjob for doc indexing
 - disable gen_contents_index when not run with --batch for cron
+- use system libffi with ghc-use-system-libffi-debian.patch
 
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-7
 - skip huge type-level docs from haddock re-indexing (#649228)
