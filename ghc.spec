@@ -206,8 +206,8 @@ done
 %ghc_strip_dynlinked
 
 %if %{with doc}
-mkdir -p %{_sysconfdir}/cron.hourly
-install -p --mode=755 %SOURCE3 %{_sysconfdir}/cron.hourly/ghc-doc-index
+mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly
+install -p --mode=755 %SOURCE3 ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %check
