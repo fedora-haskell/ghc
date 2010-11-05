@@ -1,7 +1,7 @@
-diff -u ghc-6.12.3/libraries/gen_contents_index\~ ghc-6.12.3/libraries/gen_contents_index
---- ghc-6.12.3/libraries/gen_contents_index~	2010-09-14 13:03:12.000000000 +1000
-+++ ghc-6.12.3/libraries/gen_contents_index	2010-11-04 18:26:00.000000000 +1000
-@@ -21,6 +21,6 @@
+diff -u ghc-6.12.3/libraries/gen_contents_index gen_contents_index
+--- ghc-6.12.3/libraries/gen_contents_index	2010-11-05 10:28:02.000000000 +1000
++++ gen_contents_index	2010-11-05 10:20:37.000000000 +1000
+@@ -21,7 +21,7 @@
          HADDOCK_ARGS="$HADDOCK_ARGS $HADDOCK_ARG"
      done
      ;;
@@ -9,15 +9,14 @@ diff -u ghc-6.12.3/libraries/gen_contents_index\~ ghc-6.12.3/libraries/gen_conte
 +--batch)
      HADDOCK=/usr/bin/haddock
      # We don't want the GHC API to swamp the index
+     HADDOCK_FILES=`ls -1 */*.haddock | grep -v '/ghc\.haddock' | grep -v '/type-level\.haddock' | sort`
 @@ -32,6 +32,9 @@
          HADDOCK_ARGS="$HADDOCK_ARGS $HADDOCK_ARG"
      done
      ;;
-+    *)
++*)
 +    HADDOCK=/bin/true
 +    tty -s && echo Run with '--batch' to index package haddock docs.
  esac
  
  # Now create the combined contents and index pages
-
-Diff finished.  Thu Nov  4 18:26:04 2010
