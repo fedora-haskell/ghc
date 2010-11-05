@@ -1,15 +1,13 @@
 diff -u ghc-6.12.3/libraries/gen_contents_index gen_contents_index
 --- ghc-6.12.3/libraries/gen_contents_index	2010-11-05 10:28:02.000000000 +1000
 +++ gen_contents_index	2010-11-05 10:20:37.000000000 +1000
-@@ -21,7 +21,7 @@
-         HADDOCK_ARGS="$HADDOCK_ARGS $HADDOCK_ARG"
+@@ -22,5 +22,5 @@
      done
      ;;
 -*)
 +--batch)
      HADDOCK=/usr/bin/haddock
      # We don't want the GHC API to swamp the index
-     HADDOCK_FILES=`ls -1 */*.haddock | grep -v '/ghc\.haddock' | grep -v '/type-level\.haddock' | sort`
 @@ -32,6 +32,9 @@
          HADDOCK_ARGS="$HADDOCK_ARGS $HADDOCK_ARG"
      done
