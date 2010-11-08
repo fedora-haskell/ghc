@@ -125,7 +125,10 @@ They should be installed when GHC's profiling subsystem is needed.
 %endif
 
 # use system libraries
-rm -r ghc-tarballs
+rm -r ghc-tarballs/{mingw,perl}
+%if %{with libffi}
+rm -r ghc-tarballs/libffi
+%endif
 
 %build
 cat > mk/build.mk << EOF
