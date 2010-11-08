@@ -55,9 +55,7 @@ Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
 BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
 BuildRequires: gmp-devel, ncurses-devel
-%if %{with libffi}
 BuildRequires: libffi-devel
-%endif
 Requires: gcc, gmp-devel
 %if %{with shared}
 Requires: %{name}-libs = %{version}-%{release}
