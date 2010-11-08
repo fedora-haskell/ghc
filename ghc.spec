@@ -13,14 +13,14 @@
 %bcond_without testsuite
 # include colored html src
 %bcond_without hscolour
-# use system libffi
-%bcond_without libffi
 
 ## default disabled options ##
 # include extralibs
 %bcond_with extralibs
 # quick build profile
 %bcond_with quick
+# use system libffi
+%bcond_with libffi
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
 %global debug_package %{nil}
@@ -28,7 +28,7 @@
 Name: ghc
 # part of haskell-platform-2010.2.0.0
 Version: 6.12.3
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -302,6 +302,9 @@ fi
 %endif
 
 %changelog
+* Mon Nov  8 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-9
+- disable the libffi changes for now since they break libHSffi*.so
+
 * Thu Nov  4 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-8
 - add a cronjob for doc indexing
 - disable gen_contents_index when not run with --batch for cron
