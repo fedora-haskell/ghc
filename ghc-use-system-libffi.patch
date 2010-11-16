@@ -1,58 +1,69 @@
-Index: ghc6-6.12.3/ghc.mk
-===================================================================
---- ghc6-6.12.3.orig/ghc.mk	2010-06-09 21:10:12.000000000 +0300
-+++ ghc6-6.12.3/ghc.mk	2010-07-17 11:52:25.000000000 +0300
-@@ -369,11 +369,6 @@
- endif
- BOOT_LIBS = $(foreach lib,$(BOOT_PKGS),$(libraries/$(lib)_dist-boot_v_LIB))
+diff -up ghc-7.0.1/compiler/ghc.cabal.in.libffi ghc-7.0.1/compiler/ghc.cabal.in
+--- ghc-7.0.1/compiler/ghc.cabal.in.libffi	2010-11-13 04:10:03.000000000 +1000
++++ ghc-7.0.1/compiler/ghc.cabal.in	2010-11-16 19:04:28.000000000 +1000
+@@ -83,7 +83,7 @@ Library
+     if flag(ghci)
+         Build-Depends: template-haskell
+         CPP-Options: -DGHCI
+-        Include-Dirs: ../libffi/build/include
++        pkgconfig-depends: libffi
  
--OTHER_LIBS = libffi/dist-install/build/libHSffi$(v_libsuf) libffi/dist-install/build/HSffi.o
--ifeq "$(BuildSharedLibs)" "YES"
--OTHER_LIBS  += libffi/dist-install/build/libHSffi$(dyn_libsuf)
--endif
--
- # We cannot run ghc-cabal to configure a package until we have
- # configured and registered all of its dependencies.  So the following
- # hack forces all the configure steps to happen in exactly the order
-@@ -406,7 +401,6 @@
+     if !flag(ncg)
+         CPP-Options: -DOMIT_NATIVE_CODEGEN
+diff -up ghc-7.0.1/ghc.mk.libffi ghc-7.0.1/ghc.mk
+--- ghc-7.0.1/ghc.mk.libffi	2010-11-13 04:10:05.000000000 +1000
++++ ghc-7.0.1/ghc.mk	2010-11-16 19:04:28.000000000 +1000
+@@ -437,7 +437,6 @@ utils/runghc/dist/package-data.mk: compi
  # add the final two package.conf dependencies: ghc-prim depends on RTS,
  # and RTS depends on libffi.
  libraries/ghc-prim/dist-install/package-data.mk : rts/package.conf.inplace
 -rts/package.conf.inplace : libffi/package.conf.inplace
  endif
  
- # -----------------------------------------------------------------------------
-@@ -518,7 +512,6 @@
-    driver \
+ # --------------------------------
+@@ -452,11 +451,6 @@ ALL_STAGE1_LIBS += $(foreach lib,$(PACKA
+ endif
+ BOOT_LIBS = $(foreach lib,$(STAGE0_PACKAGES),$(libraries/$(lib)_dist-boot_v_LIB))
+ 
+-OTHER_LIBS = libffi/dist-install/build/libHSffi$(v_libsuf) libffi/dist-install/build/HSffi.o
+-ifeq "$(BuildSharedLibs)" "YES"
+-OTHER_LIBS  += libffi/dist-install/build/libHSffi$(dyn_libsuf)
+-endif
+-
+ # ----------------------------------------
+ # Special magic for the ghc-prim package
+ 
+@@ -581,7 +575,6 @@ BUILD_DIRS += \
     driver/ghci \
     driver/ghc \
+    driver/haddock \
 -   libffi \
     includes \
     rts
  
-@@ -863,11 +856,10 @@
-                          $(addprefix libraries/,$(PACKAGES_STAGE2))
+@@ -937,11 +930,10 @@ INSTALL_DISTDIR_compiler = stage2
  
+ # Now we can do the installation
  install_packages: install_libexecs
 -install_packages: libffi/package.conf.install rts/package.conf.install
 +install_packages: rts/package.conf.install
  	$(INSTALL_DIR) "$(DESTDIR)$(topdir)"
- 	"$(RM)" -r $(RM_OPTS) "$(INSTALLED_PACKAGE_CONF)"
+ 	"$(RM)" $(RM_OPTS_REC) "$(INSTALLED_PACKAGE_CONF)"
  	$(INSTALL_DIR) "$(INSTALLED_PACKAGE_CONF)"
 -	"$(INSTALLED_GHC_PKG_REAL)" --force --global-conf "$(INSTALLED_PACKAGE_CONF)" update libffi/package.conf.install
  	"$(INSTALLED_GHC_PKG_REAL)" --force --global-conf "$(INSTALLED_PACKAGE_CONF)" update rts/package.conf.install
- 	$(foreach p, $(ALL_INSTALLED_PACKAGES),\
- 	    "$(GHC_CABAL_INPLACE)" install \
-@@ -942,7 +934,7 @@
+ 	$(foreach p, $(INSTALLED_PKG_DIRS),                           \
+ 	    $(call make-command,                                      \
+@@ -1024,7 +1016,7 @@ BIN_DIST_MK = $(BIN_DIST_PREP_DIR)/bindi
  unix-binary-dist-prep:
- 	"$(RM)" $(RM_OPTS) -r bindistprep/
+ 	"$(RM)" $(RM_OPTS_REC) bindistprep/
  	"$(MKDIRHIER)" $(BIN_DIST_PREP_DIR)
--	set -e; for i in LICENSE compiler ghc rts libraries utils docs libffi includes driver mk rules Makefile aclocal.m4 config.sub config.guess install-sh extra-gcc-opts.in ghc.mk inplace distrib/configure.ac distrib/README distrib/INSTALL; do ln -s ../../$$i $(BIN_DIST_PREP_DIR)/; done
-+	set -e; for i in LICENSE compiler ghc rts libraries utils docs includes driver mk rules Makefile aclocal.m4 config.sub config.guess install-sh extra-gcc-opts.in ghc.mk inplace distrib/configure.ac distrib/README distrib/INSTALL; do ln -s ../../$$i $(BIN_DIST_PREP_DIR)/; done
+-	set -e; for i in packages LICENSE compiler ghc rts libraries utils docs libffi includes driver mk rules Makefile aclocal.m4 config.sub config.guess install-sh extra-gcc-opts.in ghc.mk inplace distrib/configure.ac distrib/README distrib/INSTALL; do ln -s ../../$$i $(BIN_DIST_PREP_DIR)/; done
++	set -e; for i in packages LICENSE compiler ghc rts libraries utils docs includes driver mk rules Makefile aclocal.m4 config.sub config.guess install-sh extra-gcc-opts.in ghc.mk inplace distrib/configure.ac distrib/README distrib/INSTALL; do ln -s ../../$$i $(BIN_DIST_PREP_DIR)/; done
  	echo "HADDOCK_DOCS       = $(HADDOCK_DOCS)"       >> $(BIN_DIST_MK)
  	echo "LATEX_DOCS         = $(LATEX_DOCS)"         >> $(BIN_DIST_MK)
  	echo "BUILD_DOCBOOK_HTML = $(BUILD_DOCBOOK_HTML)" >> $(BIN_DIST_MK)
-@@ -1020,7 +1012,7 @@
+@@ -1102,7 +1094,7 @@ SRC_DIST_DIR=$(shell pwd)/$(SRC_DIST_NAM
  #
  # Files to include in source distributions
  #
@@ -61,16 +72,16 @@ Index: ghc6-6.12.3/ghc.mk
  SRC_DIST_FILES += \
  	configure.ac config.guess config.sub configure \
  	aclocal.m4 README ANNOUNCE HACKING LICENSE Makefile install-sh \
-Index: ghc6-6.12.3/rts/ghc.mk
-===================================================================
---- ghc6-6.12.3.orig/rts/ghc.mk	2010-06-09 21:10:14.000000000 +0300
-+++ ghc6-6.12.3/rts/ghc.mk	2010-07-17 11:52:25.000000000 +0300
-@@ -333,15 +333,13 @@
+diff -up ghc-7.0.1/rts/ghc.mk.libffi ghc-7.0.1/rts/ghc.mk
+--- ghc-7.0.1/rts/ghc.mk.libffi	2010-11-13 04:10:06.000000000 +1000
++++ ghc-7.0.1/rts/ghc.mk	2010-11-16 19:06:09.000000000 +1000
+@@ -430,15 +430,15 @@ endif
  
  $(eval $(call build-dependencies,rts,dist,1))
  
--$(rts_dist_depfile) : libffi/dist-install/build/ffi.h
--
+-$(rts_dist_depfile_c_asm) : libffi/dist-install/build/ffi.h $(DTRACEPROBES_H)
++$(rts_dist_depfile_c_asm) : $(DTRACEPROBES_H)
+ 
  #-----------------------------------------------------------------------------
  # libffi stuff
  
@@ -84,12 +95,11 @@ Index: ghc6-6.12.3/rts/ghc.mk
 +rts_LD_OPTS     += $(shell pkg-config --libs libffi)
  
  # -----------------------------------------------------------------------------
- # compile generic patchable dyn-wrapper
-Index: ghc6-6.12.3/rts/package.conf.in
-===================================================================
---- ghc6-6.12.3.orig/rts/package.conf.in	2010-06-09 21:10:14.000000000 +0300
-+++ ghc6-6.12.3/rts/package.conf.in	2010-07-17 11:53:57.000000000 +0300
-@@ -28,8 +28,9 @@
+ # compile dtrace probes if dtrace is supported
+diff -up ghc-7.0.1/rts/package.conf.in.libffi ghc-7.0.1/rts/package.conf.in
+--- ghc-7.0.1/rts/package.conf.in.libffi	2010-11-13 04:10:06.000000000 +1000
++++ ghc-7.0.1/rts/package.conf.in	2010-11-16 19:04:28.000000000 +1000
+@@ -24,8 +24,9 @@ library-dirs:		TOP"/rts/dist/build" PAPI
  hs-libraries:   "HSrts"
  
  extra-libraries:
@@ -100,7 +110,7 @@ Index: ghc6-6.12.3/rts/package.conf.in
  #endif
  #ifdef HAVE_LIBRT
  			      , "rt"
-@@ -59,7 +60,6 @@
+@@ -55,7 +56,6 @@ include-dirs:		TOP"/includes"
  #endif
  
  includes:		Stg.h
@@ -108,15 +118,3 @@ Index: ghc6-6.12.3/rts/package.conf.in
  hugs-options:
  cc-options:
  
-diff -u ghc-6.12.3/compiler/ghc.cabal.in\~ ghc-6.12.3/compiler/ghc.cabal.in
---- ghc-6.12.3/compiler/ghc.cabal.in~	2010-06-10 04:10:09.000000000 +1000
-+++ ghc-6.12.3/compiler/ghc.cabal.in	2010-11-05 18:08:11.000000000 +1000
-@@ -83,7 +83,7 @@
-     if flag(ghci)
-         Build-Depends: template-haskell
-         CPP-Options: -DGHCI
--        Include-Dirs: ../libffi/build/include
-+        pkgconfig-depends: libffi
- 
-     if !flag(ncg)
-         CPP-Options: -DOMIT_NATIVE_CODEGEN
