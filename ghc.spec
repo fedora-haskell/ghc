@@ -13,22 +13,22 @@
 %bcond_without testsuite
 # include colored html src
 %bcond_without hscolour
+# use system libffi
+%bcond_without libffi
 
 ## default disabled options ##
 # include extralibs
 %bcond_with extralibs
 # quick build profile
 %bcond_with quick
-# use system libffi
-%bcond_with libffi
 
 # the debuginfo subpackage is currently empty anyway, so don't generate it
 %global debug_package %{nil}
 
 Name: ghc
-# part of haskell-platform-2010.2.0.0
-Version: 6.12.3
-Release: 9%{?dist}
+# breaks haskell-platform-2010.2.0.0
+Version: 7.0.1
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -57,6 +57,7 @@ BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
 BuildRequires: gmp-devel, ncurses-devel
 BuildRequires: libffi-devel
 Requires: gcc, gmp-devel
+# llvm is an optional dependency
 %if %{with shared}
 Requires: %{name}-libs = %{version}-%{release}
 %endif
@@ -280,12 +281,11 @@ fi
 %{ghcdocbasedir}/libraries/frames.html
 %{ghcdocbasedir}/libraries/gen_contents_index
 %{ghcdocbasedir}/libraries/hscolour.css
+%{ghcdocbasedir}/libraries/ocean.css
 %{ghcdocbasedir}/libraries/prologue.txt
 %{ghcdocbasedir}/index.html
 %ghost %{ghcdocbasedir}/libraries/doc-index*.html
-%ghost %{ghcdocbasedir}/libraries/haddock.css
 %ghost %{ghcdocbasedir}/libraries/haddock-util.js
-%ghost %{ghcdocbasedir}/libraries/haskell_icon.gif
 %ghost %{ghcdocbasedir}/libraries/index*.html
 %ghost %{ghcdocbasedir}/libraries/minus.gif
 %ghost %{ghcdocbasedir}/libraries/plus.gif
@@ -303,6 +303,10 @@ fi
 %endif
 
 %changelog
+* Tue Nov 16 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-1
+- update to 7.0.1 release
+- turn on system libffi again
+
 * Mon Nov  8 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-9
 - disable the libffi changes for now since they break libHSffi*.so
 
