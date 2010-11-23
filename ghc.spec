@@ -28,7 +28,7 @@
 Name: ghc
 # breaks haskell-platform-2010.2.0.0
 Version: 7.0.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -54,9 +54,10 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 Obsoletes: ghc-time-devel < 1.1.2.4-5
 Obsoletes: ghc-time-doc < 1.1.2.4-5
 BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
-BuildRequires: gmp-devel, ncurses-devel
-BuildRequires: libffi-devel
-Requires: gcc, gmp-devel
+BuildRequires: gmp-devel, libffi-devel
+# for internal terminfo 
+BuildRequires: ncurses-devel
+Requires: gcc, gmp-devel, libffi-devel
 # llvm is an optional dependency
 %if %{with shared}
 Requires: %{name}-libs = %{version}-%{release}
@@ -303,6 +304,9 @@ fi
 %endif
 
 %changelog
+* Wed Nov 24 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-2
+- require libffi-devel
+
 * Tue Nov 16 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-1
 - update to 7.0.1 release
 - turn on system libffi now
