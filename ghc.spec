@@ -110,7 +110,7 @@ They should be installed when GHC's profiling subsystem is needed.
 
 %global ghc_version_override %{version}
 
-%ghc_binlib_package -n ghc -o 6.12.3-4
+%ghc_binlib_package -n ghc
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
@@ -305,7 +305,7 @@ fi
 %changelog
 * Tue Nov 16 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-1
 - update to 7.0.1 release
-- turn on system libffi again
+- turn on system libffi now
 
 * Mon Nov  8 2010 Jens Petersen <petersen@redhat.com> - 6.12.3-9
 - disable the libffi changes for now since they break libHSffi*.so
