@@ -24,7 +24,7 @@ for i in alex cabal-install ghc happy gtk2hs-buildtools haskell-platform xmobar;
         rpm -q --requires $i | grep -v rpmlib | grep -v ghc | sed -e "s/^/\"$PKG\" -> \"/g" -e "s/ = \(.*\)/-\1\"/" >> pkgs.dot
         ;;
       *)
-        rpm -q --requires $i | grep ghc6 | sed -e "s/libHS/\"$PKG\" -> \"/g" -e "s/-ghc6.*/\"/" >> pkgs.dot
+        rpm -q --requires $i | grep -- -ghc | sed -e "s/libHS/\"$PKG\" -> \"/g" -e "s/-ghc.*/\"/" >> pkgs.dot
         ;;
     esac
   fi
