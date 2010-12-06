@@ -39,7 +39,7 @@ echo "}" >> pkgs.dot
 cp -p pkgs.dot pkgs.dot.orig
 
 # ignore library packages provided by ghc (except ghc-6.12)
-GHC_PKGS="array base-4 base-3 bin-package-db bytestring Cabal containers directory dph extensible-exceptions filepath ffi ghc-binary ghc-prim haskell98 hpc integer-gmp old-locale old-time pretty process random rts template-haskell time unix Win32"
+GHC_PKGS="array base-4 base-3 bin-package-db $(ghc-pkg --simple-output list bytestring) Cabal containers directory dph extensible-exceptions filepath ffi ghc-binary ghc-prim haskell98 hpc integer-gmp old-locale old-time pretty process random rts template-haskell time unix Win32"
 for i in $GHC_PKGS; do sed -i -e /$i/d pkgs.dot; done
 
 which tred &>/dev/null || { echo "graphviz is needed to generate graph" ; exit 1 ; }
