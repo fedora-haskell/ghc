@@ -13,12 +13,18 @@ packages = [pkg['name'] for pkg in p.pkgs if pkg['name'] not in ['cabal2spec','e
 
 session = koji.ClientSession('http://koji.fedoraproject.org/kojihub')
 
+outlist = []
+
 for pkg in packages:
-    latest = session.getLatestBuilds('dist-rawhide', package=pkg)
+    latest = session.getLatestBuilds('dist-f14-updates', package=pkg)
     if latest:
         ver = latest[0]['version']
         name = pkg.replace('ghc-','',1)
-        print "(\"%s\",\"%s\",Just \"https://admin.fedoraproject.org/pkgdb/acls/name/%s\")" % (name,ver,pkg)
+        print "%s-%s" % (name,ver)
+        result = "(\"%s\",\"%s\",Just \"https://admin.fedoraproject.org/pkgdb/acls/name/%s\")" % (name,ver,pkg)
+        outlist.append(result)
 
-# todo
-## sort output
+f = open('Fedora', 'w')
+
+for l in sorted(outlist):
+    f.write(l+'\n')
