@@ -26,9 +26,9 @@
 %global debug_package %{nil}
 
 Name: ghc
-# breaks haskell-platform-2010.2.0.0
+# haskell-platform-2011.1.0.0
 Version: 7.0.1
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -211,6 +211,7 @@ done
 %if %{with doc}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly
 install -p --mode=755 %SOURCE3 ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly/ghc-doc-index
+mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/lib/ghc
 %endif
 
 %check
@@ -291,6 +292,7 @@ fi
 %ghost %{ghcdocbasedir}/libraries/minus.gif
 %ghost %{ghcdocbasedir}/libraries/plus.gif
 %{_sysconfdir}/cron.hourly/ghc-doc-index
+%{_localstatedir}/lib/ghc
 %endif
 
 %if %{with shared}
@@ -304,6 +306,9 @@ fi
 %endif
 
 %changelog
+* Thu Dec 30 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-3
+- store doc cronjob package cache file under /var (#664850)
+
 * Wed Nov 24 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-2
 - require libffi-devel
 
