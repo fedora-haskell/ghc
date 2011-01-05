@@ -107,7 +107,7 @@ interface.
 %package devel
 Summary: GHC development libraries meta package
 Group: Development/Libraries
-Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2,/g")
+%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2,/g")}
 
 %description devel
 This is a meta-package for all the development library packages in GHC.
@@ -116,7 +116,7 @@ This is a meta-package for all the development library packages in GHC.
 %package prof
 Summary: GHC profiling libraries meta-package
 Group: Development/Libraries
-Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")
+%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")}
 Obsoletes: ghc-haddock-prof < 2.4.2-3
 
 %description prof
