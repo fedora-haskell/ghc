@@ -335,12 +335,12 @@ fi
 - subpackage all the libraries with ghc-rpm-macros-0.11.1
 - put rts, integer-gmp and ghc-prim in base, and ghc-binary in bin-package-db
 - drop the libs mega-subpackage
-- prof is now a meta-package for backward compatibility
-- add devel meta-subpackage to install easily all ghc libraries
+- prof now a meta-package for backward compatibility
+- add devel meta-subpackage to easily install all ghc libraries
 - store doc cronjob package cache file under /var (#664850)
 - drop old extralibs bcond
 - no longer need to define or clean buildroot
-- ghc base package requires ghc-base-devel
+- ghc base package now requires ghc-base-devel
 - drop ghc-time obsoletes
 
 * Wed Nov 24 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-2
