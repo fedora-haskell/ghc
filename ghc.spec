@@ -1,5 +1,5 @@
 ## default enabled options ##
-# experimental shared libraries support available in ghc-6.12 for x86
+# haskell shared library support available in 6.12 and later for x86
 %ifarch %{ix86} x86_64
 %bcond_without shared
 %endif
@@ -17,8 +17,6 @@
 %bcond_without libffi
 
 ## default disabled options ##
-# include extralibs
-%bcond_with extralibs
 # quick build profile
 %bcond_with quick
 
@@ -28,6 +26,7 @@
 Name: ghc
 # haskell-platform-2011.1.0.0
 Version: 7.0.1
+# can't be reset - used by versioned library subpackages
 Release: 3%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
@@ -35,33 +34,26 @@ ExclusiveArch: %{ix86} x86_64 ppc alpha
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
-%if %{with extralibs}
-Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src-extralibs.tar.bz2
-%endif
 %if %{with testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
-BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 # introduced for f14
 Obsoletes: ghc-doc < 6.12.3-4
 Provides: ghc-doc = %{version}-%{release}
 # introduced for f11
 Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
 Obsoletes: ghc-haddock-doc < 2.4.2-3
-# introduced for f14
-Obsoletes: ghc-time-devel < 1.1.2.4-5
-Obsoletes: ghc-time-doc < 1.1.2.4-5
-BuildRequires: ghc, ghc-rpm-macros >= 0.8.2
+# introduced for f15
+Obsoletes: ghc-libs < 7.0.1-3
+BuildRequires: ghc, ghc-rpm-macros >= 0.11.1
 BuildRequires: gmp-devel, libffi-devel
 # for internal terminfo 
 BuildRequires: ncurses-devel
-Requires: gcc, gmp-devel, libffi-devel
+Requires: gcc
+Requires: ghc-base-devel
 # llvm is an optional dependency
-%if %{with shared}
-Requires: %{name}-libs = %{version}-%{release}
-%endif
 %if %{with manual}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
@@ -78,7 +70,7 @@ Patch4: ghc-use-system-libffi.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
-functional programming language.  It includes an optimising compiler
+functional programming language.  It includes an optimizing compiler
 generating good code for a variety of platforms, together with an
 interactive system for convenient, quick development.  The
 distribution includes space and time profiling facilities, a large
@@ -86,35 +78,54 @@ collection of libraries, and support for various language
 extensions, including concurrency, exceptions, and a foreign language
 interface.
 
-%if %{with shared}
-%package libs
-Summary: Shared libraries for GHC
-Group: Development/Libraries
-Obsoletes: ghc-time < 1.1.2.4-5
+%global ghc_version_override %{version}
 
-%description libs
-Shared libraries for Glorious Glasgow Haskell Compilation System (GHC).
-%endif
+%ghc_binlib_package Cabal 1.10.0.0
+%ghc_binlib_package array 0.3.0.2
+%ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.0.0
+%ghc_binlib_package bin-package-db 0.0.0.0
+%ghc_binlib_package bytestring 0.9.1.8
+%ghc_binlib_package containers 0.4.0.0
+%ghc_binlib_package directory 1.1.0.0
+%ghc_binlib_package extensible-exceptions 0.1.1.2
+%ghc_binlib_package filepath 1.2.0.0
+%ghc_binlib_package ghc %{ghc_version_override}
+%ghc_binlib_package haskell2010 1.0.0.0
+%ghc_binlib_package haskell98 1.1.0.0
+%ghc_binlib_package hpc 0.5.0.6
+%ghc_binlib_package old-locale 1.0.0.2
+%ghc_binlib_package old-time 1.0.0.6
+%ghc_binlib_package pretty 1.0.1.2
+%ghc_binlib_package process 1.0.1.4
+%ghc_binlib_package random 1.0.0.3
+%ghc_binlib_package template-haskell 2.5.0.0
+%ghc_binlib_package time 1.2.0.3
+%ghc_binlib_package unix 2.4.1.0
+
+%global version %{ghc_version_override}
+
+%package devel
+Summary: GHC development libraries meta package
+Group: Development/Libraries
+Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2,/g")
+
+%description devel
+This is a meta-package for all the development library packages in GHC.
 
 %if %{with prof}
 %package prof
-Summary: Profiling libraries for GHC
+Summary: GHC profiling libraries meta-package
 Group: Development/Libraries
-Requires: %{name} = %{version}-%{release}
+Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")
 Obsoletes: ghc-haddock-prof < 2.4.2-3
-Obsoletes: ghc-time-prof < 1.1.2.4-5
 
 %description prof
-Profiling libraries for Glorious Glasgow Haskell Compilation System (GHC).
+This is a meta-package for all the profiling library packages in GHC.
 They should be installed when GHC's profiling subsystem is needed.
 %endif
 
-%global ghc_version_override %{version}
-
-%ghc_binlib_package -n ghc
-
 %prep
-%setup -q -n %{name}-%{version} %{?with_extralibs:-b1} %{?with_testsuite:-b2}
+%setup -q -n %{name}-%{version} %{?with_testsuite:-b2}
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
 # type-level too big so skip it in gen_contents_index
@@ -170,32 +181,30 @@ export CFLAGS="${CFLAGS:-%optflags}"
 make -j$RPM_BUILD_NCPUS
 
 %install
-rm -rf $RPM_BUILD_ROOT
 make DESTDIR=${RPM_BUILD_ROOT} install
 
-SRC_TOP=$PWD
-( cd $RPM_BUILD_ROOT
-  # library directories
-  find .%{_libdir}/%{name}-%{version} -maxdepth 1 -type d ! -name 'include' ! -name 'package.conf.d' -fprintf $SRC_TOP/rpm-lib-dir.files "%%%%dir %%p\n"
-  # library devel subdirs
-  find .%{_libdir}/%{name}-%{version} -mindepth 1 -type d \( -fprintf $SRC_TOP/rpm-dev-dir.files "%%%%dir %%p\n" \)
-  # split dyn, devel, conf and prof files
-  find .%{_libdir}/%{name}-%{version} -mindepth 1 \( -name 'libHS*-ghc%{version}.so' -fprintf $SRC_TOP/rpm-lib.files "%%%%attr(755,root,root) %%p\n" \) -o \( \( -name '*.p_hi' -o -name '*_p.a' \) -fprint $SRC_TOP/ghc-prof.files \) -o \( \( -name '*.hi' -o -name '*.dyn_hi' -o -name 'libHS*.a' -o -name 'HS*.o' -o -name '*.h' -o -name '*.conf' -o -type f -not -name 'package.cache' \) -fprint $SRC_TOP/rpm-base.files \)
-  # manuals (src dir are subdirs so dont duplicate them)
-  find .%{_docdir}/%{name}/html/* -type d ! -name libraries ! -name src > $SRC_TOP/rpm-doc-dir.files
-)
+for i in %{ghc_packages_list}; do
+name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
+ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
+%ghc_gen_filelists $name $ver
+done
 
-# make paths absolute (filter "./usr" to "/usr")
-sed -i -e "s|\.%{_prefix}|%{_prefix}|" *.files
+%ghc_gen_filelists ghc-binary 0.5.0.2
+%ghc_gen_filelists ghc-prim 0.2.0.0
+%ghc_gen_filelists integer-gmp 0.2.0.2
 
-cat rpm-lib-dir.files rpm-lib.files > ghc-libs.files
-cat rpm-dev-dir.files rpm-base.files rpm-doc-dir.files > ghc.files
+%define merge_filelist()\
+cat ghc-%1.files >> ghc-%2.files\
+cat ghc-%1-devel.files >> ghc-%2-devel.files\
+cat ghc-%1-prof.files >> ghc-%2-prof.files
 
-# subpackage ghc libraries
-sed -i -e "/ghc-%{version}\/ghc-%{version}/d" ghc.files ghc-libs.files ghc-prof.files
-sed -i -e "/ghc-%{version}\/package.conf.d\/ghc-%{version}-.*.conf\$/d" ghc.files
-sed -i -e "/html\/libraries\/ghc-%{version}\$/d" ghc.files
-%ghc_gen_filelists ghc
+%merge_filelist integer-gmp base
+%merge_filelist ghc-prim base
+%merge_filelist ghc-binary bin-package-db
+
+ls $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.so >> ghc-base.files
+ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_rts.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
+sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base{,-devel}.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -237,9 +246,6 @@ rm testghc/*
 make -C testsuite/tests/ghc-regress fast
 %endif
 
-%clean
-rm -rf $RPM_BUILD_ROOT
-
 %post
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
@@ -269,15 +275,36 @@ fi
 %ghc_pkg_recache
 %ghc_reindex_haddock
 
-%files -f ghc.files
+%files
 %defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
-%dir %{_libdir}/%{name}-%{version}
-%ghost %{_libdir}/%{name}-%{version}/package.conf.d/package.cache
-%if %{with manual}
+%dir %{ghclibdir}
+%{ghclibdir}/extra-gcc-opts
+%{ghclibdir}/ghc
+%{ghclibdir}/ghc-asm
+%{ghclibdir}/ghc-pkg
+%{ghclibdir}/ghc-split
+%{ghclibdir}/ghc-usage.txt
+%{ghclibdir}/ghci-usage.txt
+%{ghclibdir}/haddock
+%{ghclibdir}/hsc2hs
+%{ghclibdir}/html
+%{ghclibdir}/latex
+%dir %{ghclibdir}/package.conf.d
+%ghost %{ghclibdir}/package.conf.d/package.cache
+%{ghclibdir}/runghc
+%{ghclibdir}/template-hsc.h
+%{ghclibdir}/unlit
 %{_mandir}/man1/ghc.*
+%if %{with manual}
+%{ghcdocbasedir}/Cabal
+%{ghcdocbasedir}/haddock
+%{ghcdocbasedir}/users_guide
 %endif
+%dir %{_docdir}/ghc
+%dir %{ghcdocbasedir}
+%{ghcdocbasedir}/html
 %if %{with doc}
 %dir %{ghcdocbasedir}/libraries
 %{ghcdocbasedir}/libraries/frames.html
@@ -295,19 +322,26 @@ fi
 %{_localstatedir}/lib/ghc
 %endif
 
-%if %{with shared}
-%files libs -f ghc-libs.files
+%files devel
 %defattr(-,root,root,-)
-%endif
 
 %if %{with prof}
-%files prof -f ghc-prof.files
+%files prof
 %defattr(-,root,root,-)
 %endif
 
 %changelog
 * Thu Dec 30 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-3
+- subpackage all the libraries with ghc-rpm-macros-0.11.1
+- put rts, integer-gmp and ghc-prim in base, and ghc-binary in bin-package-db
+- drop the libs mega-subpackage
+- prof is now a meta-package for backward compatibility
+- add devel meta-subpackage to install easily all ghc libraries
 - store doc cronjob package cache file under /var (#664850)
+- drop old extralibs bcond
+- no longer need to define or clean buildroot
+- ghc base package requires ghc-base-devel
+- drop ghc-time obsoletes
 
 * Wed Nov 24 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-2
 - require libffi-devel
