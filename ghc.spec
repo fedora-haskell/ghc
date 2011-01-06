@@ -80,6 +80,7 @@ interface.
 
 %global ghc_version_override %{version}
 
+%if 0%{?ghc_binlib_package:1}
 %ghc_binlib_package Cabal 1.10.0.0
 %ghc_binlib_package array 0.3.0.2
 %ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.0.0
@@ -101,6 +102,7 @@ interface.
 %ghc_binlib_package template-haskell 2.5.0.0
 %ghc_binlib_package time 1.2.0.3
 %ghc_binlib_package unix 2.4.1.0
+%endif
 
 %global version %{ghc_version_override}
 
