@@ -461,7 +461,7 @@ fi
 - add bcond for manual and extralibs
 - reenable ppc secondary arch
 - don't provide ghc-haddock-*
-- remove obsoltete post requires policycoreutils
+- remove obsolete post requires policycoreutils
 - add vanilla v to GhcLibWays when building without prof
 - handle without hscolour
 - can't smp make currently
