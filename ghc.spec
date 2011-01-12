@@ -27,7 +27,7 @@ Name: ghc
 # haskell-platform-2011.1.0.0
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -49,7 +49,8 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 Obsoletes: ghc-libs < 7.0.1-3
 BuildRequires: ghc, ghc-rpm-macros >= 0.11.1
 BuildRequires: gmp-devel, libffi-devel
-# for internal terminfo 
+BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
+# for internal terminfo
 BuildRequires: ncurses-devel
 Requires: gcc
 Requires: ghc-base-devel
@@ -204,7 +205,9 @@ cat ghc-%1-prof.files >> ghc-%2-prof.files
 %merge_filelist ghc-prim base
 %merge_filelist ghc-binary bin-package-db
 
+%if %{with shared}
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.so >> ghc-base.files
+%endif
 ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_rts.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base{,-devel}.files
 
@@ -333,6 +336,10 @@ fi
 %endif
 
 %changelog
+* Thu Jan 13 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-4
+- add BRs for various subpackaged ghc libraries needed to build ghc
+- condition rts .so libraries for non-shared builds
+
 * Thu Dec 30 2010 Jens Petersen <petersen@redhat.com> - 7.0.1-3
 - subpackage all the libraries with ghc-rpm-macros-0.11.1
 - put rts, integer-gmp and ghc-prim in base, and ghc-binary in bin-package-db
