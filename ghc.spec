@@ -27,7 +27,7 @@ Name: ghc
 # haskell-platform-2011.1.0.0
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -150,17 +150,17 @@ rm -r ghc-tarballs/libffi
 cat > mk/build.mk << EOF
 GhcLibWays = v %{?with_prof:p} %{?with_shared:dyn} 
 %if %{without doc}
-HADDOCK_DOCS       = NO
+HADDOCK_DOCS = NO
 %endif
 %if %{without manual}
 BUILD_DOCBOOK_HTML = NO
 %endif
 %if %{with quick}
-SRC_HC_OPTS        = -H64m -O0 -fasm
-GhcStage1HcOpts    = -O -fasm
-GhcStage2HcOpts    = -O0 -fasm
-GhcLibHcOpts       = -O0 -fasm
-SplitObjs          = NO
+SRC_HC_OPTS = -H64m -O0 -fasm
+GhcStage1HcOpts = -O -fasm
+GhcStage2HcOpts = -O0 -fasm
+GhcLibHcOpts = -O0 -fasm
+SplitObjs = NO
 %endif
 %if %{without hscolour}
 HSCOLOUR_SRCS = NO
@@ -292,25 +292,27 @@ fi
 %{ghclibdir}/ghc-split
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
-%{ghclibdir}/haddock
 %{ghclibdir}/hsc2hs
+%if %{with doc}
+%{ghclibdir}/haddock
 %{ghclibdir}/html
 %{ghclibdir}/latex
+%endif
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
 %{ghclibdir}/runghc
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
 %{_mandir}/man1/ghc.*
+%dir %{_docdir}/ghc
+%dir %{ghcdocbasedir}
+%if %{with doc}
+%{ghcdocbasedir}/html
 %if %{with manual}
 %{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
 %{ghcdocbasedir}/users_guide
 %endif
-%dir %{_docdir}/ghc
-%dir %{ghcdocbasedir}
-%{ghcdocbasedir}/html
-%if %{with doc}
 %dir %{ghcdocbasedir}/libraries
 %{ghcdocbasedir}/libraries/frames.html
 %{ghcdocbasedir}/libraries/gen_contents_index
@@ -336,6 +338,9 @@ fi
 %endif
 
 %changelog
+* Thu Jan 13 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-5
+- fix no doc and no manual builds
+
 * Thu Jan 13 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-4
 - add BRs for various subpackaged ghc libraries needed to build ghc
 - condition rts .so libraries for non-shared builds
