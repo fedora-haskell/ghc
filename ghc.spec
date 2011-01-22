@@ -195,8 +195,8 @@ ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
 done
 
+%ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghc-binary 0.5.0.2
-%ghc_gen_filelists ghc-ghc %{ghc_version_override}
 %ghc_gen_filelists ghc-prim 0.2.0.0
 %ghc_gen_filelists integer-gmp 0.2.0.2
 
