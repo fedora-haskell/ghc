@@ -138,16 +138,16 @@ They should be installed when GHC's profiling subsystem is needed.
 %patch2 -p1
 # disable gen_contents_index when not --batch for cron
 %patch3 -p1
+
+# use system libraries
+rm -r ghc-tarballs/{mingw,perl}
 # use system libffi
 %if %{with libffi}
 %patch4 -p1 -b .libffi
-%endif
-%patch5 -p1 .b .orig
-# use system libraries
-rm -r ghc-tarballs/{mingw,perl}
-%if %{with libffi}
 rm -r ghc-tarballs/libffi
 %endif
+
+%patch5 -p1 -b .orig
 
 %build
 cat > mk/build.mk << EOF
