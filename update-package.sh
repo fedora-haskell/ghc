@@ -1,5 +1,7 @@
 #!/bin/sh
 
+[ $# -ne 1 ] && echo "Usage: $(basename $0) [package]" && exit 1
+
 set -e -x
 
 PKG=$1

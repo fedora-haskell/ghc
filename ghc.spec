@@ -27,7 +27,7 @@ Name: ghc
 # haskell-platform-2011.1.0.0
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -68,6 +68,9 @@ Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
 Patch4: ghc-use-system-libffi.patch
+# add cabal configure option --enable-executable-dynamic
+# (see http://hackage.haskell.org/trac/hackage/ticket/600)
+Patch5: Cabal-option-executable-dynamic.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -91,7 +94,7 @@ interface.
 %ghc_binlib_package directory 1.1.0.0
 %ghc_binlib_package extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
-%ghc_binlib_package ghc %{ghc_version_override}
+%ghc_binlib_package -x ghc %{ghc_version_override}
 %ghc_binlib_package haskell2010 1.0.0.0
 %ghc_binlib_package haskell98 1.1.0.0
 %ghc_binlib_package hpc 0.5.0.6
@@ -139,7 +142,7 @@ They should be installed when GHC's profiling subsystem is needed.
 %if %{with libffi}
 %patch4 -p1 -b .libffi
 %endif
-
+%patch5 -p1 .b .orig
 # use system libraries
 rm -r ghc-tarballs/{mingw,perl}
 %if %{with libffi}
@@ -236,6 +239,7 @@ mkdir testghc
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
+[ "$(inplace/bin/runghc testghc/foo.hs)" = "Foo" ]
 rm testghc/*
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
@@ -338,6 +342,11 @@ fi
 %endif
 
 %changelog
+* Sat Jan 22 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-6
+- patch Cabal to add configure option --enable-executable-dynamic
+- exclude huge ghc API library from devel and prof metapackages
+- add a runghc test to check
+
 * Thu Jan 13 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-5
 - fix no doc and no manual builds
 
