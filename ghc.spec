@@ -193,6 +193,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
+echo "%doc libraries/$name/LICENSE" >> ghc-$name.files
 done
 
 %ghc_gen_filelists ghc %{ghc_version_override}
@@ -203,7 +204,9 @@ done
 %define merge_filelist()\
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
-cat ghc-%1-prof.files >> ghc-%2-prof.files
+cat ghc-%1-prof.files >> ghc-%2-prof.files\
+cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
+echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
@@ -344,6 +347,9 @@ fi
 %endif
 
 %changelog
+* Mon Jan 24 2011 Jens Petersen <petersen@redhat.com>
+- include LICENSE files in the shared lib subpackages
+
 * Sat Jan 22 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-6
 - patch Cabal to add configure option --enable-executable-dynamic
 - exclude huge ghc API library from devel and prof metapackages
