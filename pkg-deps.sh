@@ -14,7 +14,7 @@ ghc-pkg dot --global | sed '$d' > pkgs.dot
 
 # check for binary deps too
 # (exclude binlib for now since covered by libs): cpphs, darcs, hlint, hscolour, xmonad
-for i in alex cabal-install ghc happy gtk2hs-buildtools haskell-platform xmobar; do
+for i in alex cabal-install ghc happy gtk2hs-buildtools haskell-platform hedgewars-server xmobar; do
   PKG_THERE=yes
   PKG=`rpm -q --qf "%{name}-%{version}" $i` || { PKG_THERE=no ; echo "missing $i" ; }
   if [ "$PKG_THERE" = "yes" ]; then
@@ -50,3 +50,5 @@ if [ -n "$DISPLAY" ]; then
 else
   echo open ".pkg-deps/pkgs.svg" to display pkg graph
 fi
+
+echo https://fedoraproject.org/wiki/Haskell_package_interdependencies
