@@ -4,6 +4,13 @@
 
 from fedora.client import PackageDB
 import koji
+import sys
+
+if len(sys.argv) > 1:
+    release = sys.argv[1]
+else:
+    release = 'f14'
+    print release + ':'
 
 pkgdb = PackageDB()
 p = pkgdb.user_packages('haskell-sig')
@@ -16,7 +23,7 @@ session = koji.ClientSession('http://koji.fedoraproject.org/kojihub')
 outlist = []
 
 for pkg in packages:
-    latest = session.getLatestBuilds('dist-f14-updates', package=pkg)
+    latest = session.getLatestBuilds('dist-' + release + '-updates', package=pkg)
     if latest:
         ver = latest[0]['version']
         name = pkg.replace('ghc-','',1)
@@ -24,7 +31,7 @@ for pkg in packages:
         result = "(\"%s\",\"%s\",Just \"https://admin.fedoraproject.org/community/?package=%s#package_maintenance\")" % (name,ver,pkg)
         outlist.append(result)
 
-f = open('Fedora', 'w')
+f = open(release, 'w')
 
 for l in sorted(outlist):
     f.write(l+'\n')
