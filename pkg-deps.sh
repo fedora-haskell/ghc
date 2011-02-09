@@ -42,6 +42,9 @@ cp -p pkgs.dot pkgs.dot.orig
 GHC_PKGS="array base-4 base-3 bin-package-db $(ghc-pkg --simple-output list bytestring) Cabal containers directory dph extensible-exceptions filepath ffi ghc-binary ghc-prim haskell98 hpc integer-gmp old-locale old-time pretty process random rts syb-0.1 template-haskell time unix Win32"
 for i in $GHC_PKGS; do sed -i -e /$i/d pkgs.dot; done
 
+# remove singletons
+sed -i -e /^"[^ ]*"$/d pkgs.dot
+
 which tred &>/dev/null || { echo "graphviz is needed to generate graph" ; exit 1 ; }
 cat pkgs.dot | tred | dot -Nfontsize=8 -Tsvg >pkgs.svg
 
