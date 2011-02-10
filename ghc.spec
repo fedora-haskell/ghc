@@ -1,5 +1,5 @@
 ## default enabled options ##
-# haskell shared library support available in 6.12 and later for x86*
+# haskell shared library support available from 6.12 for x86*
 %ifnarch %{ix86} x86_64
 %global without_shared 1
 %endif
@@ -25,6 +25,7 @@
 
 Name: ghc
 # haskell-platform-2011.1.0.0
+# NB make sure to rebuild ghc after a version bump to avoid ABI change problems
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
 Release: 9%{?dist}
@@ -193,7 +194,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-echo "%doc libraries/$name/LICENSE" >> ghc-$name.files
+echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?without_shared:-devel}.files
 done
 
 %ghc_gen_filelists ghc %{ghc_version_override}
@@ -202,7 +203,9 @@ done
 %ghc_gen_filelists integer-gmp 0.2.0.2
 
 %define merge_filelist()\
+%if 0%{!?without_shared:1}\
 cat ghc-%1.files >> ghc-%2.files\
+%endif\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cat ghc-%1-prof.files >> ghc-%2-prof.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
@@ -213,10 +216,10 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist ghc-binary bin-package-db
 
 %if 0%{!?without_shared:1}
-ls $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.so >> ghc-base.files
+ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
-ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_rts.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
+ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
 
 # these are handled as alternatives
@@ -349,7 +352,7 @@ fi
 
 %changelog
 * Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-9
-- fix non shared build for ppc
+- fix non shared build for ppc, etc
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
