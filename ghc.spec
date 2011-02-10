@@ -1,7 +1,7 @@
 ## default enabled options ##
 # haskell shared library support available in 6.12 and later for x86*
-%ifarch %{ix86} x86_64
-%bcond_without shared
+%ifnarch %{ix86} x86_64
+%global without_shared 1
 %endif
 %bcond_without doc
 # test builds can made faster and smaller by disabling profiled libraries
@@ -27,7 +27,7 @@ Name: ghc
 # haskell-platform-2011.1.0.0
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -151,7 +151,7 @@ rm -r ghc-tarballs/libffi
 
 %build
 cat > mk/build.mk << EOF
-GhcLibWays = v %{?with_prof:p} %{?with_shared:dyn} 
+GhcLibWays = v %{?with_prof:p} %{!?without_shared:dyn} 
 %if %{without doc}
 HADDOCK_DOCS = NO
 %endif
@@ -179,7 +179,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  %{?with_shared:--enable-shared}
+  %{!?without_shared:--enable-shared}
 
 # 4 cpus or more sometimes breaks build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
@@ -212,11 +212,12 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist ghc-prim base
 %merge_filelist ghc-binary bin-package-db
 
-%if %{with shared}
+%if 0%{!?without_shared:1}
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.so >> ghc-base.files
+sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
 ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHSrts*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_rts.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
-sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base{,-devel}.files
+sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -250,7 +251,7 @@ echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
-%if %{with shared}
+%if 0%{!?without_shared:1}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
@@ -347,6 +348,9 @@ fi
 %endif
 
 %changelog
+* Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-9
+- fix non shared build for ppc
+
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
 
