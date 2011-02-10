@@ -14,7 +14,9 @@
 # include colored html src
 %bcond_without hscolour
 # use system libffi
+%ifarch %{ix86} x86_64
 %bcond_without libffi
+%endif
 
 ## default disabled options ##
 # quick build profile
@@ -50,7 +52,9 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 Obsoletes: ghc-libs < 7.0.1-3
 BuildRequires: ghc, ghc-rpm-macros >= 0.11.1
 BuildRequires: gmp-devel, libffi-devel
+%ifarch %{ix86} x86_64
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
+%endif
 # for internal terminfo
 BuildRequires: ncurses-devel
 Requires: gcc
@@ -353,6 +357,8 @@ fi
 %changelog
 * Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-9
 - fix non shared build for ppc, etc
+- disable system libffi for secondary archs
+- temporarily disable ghc-*-devel BRs for ppc
 
 * Tue Feb 08 2011 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.1-8
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_15_Mass_Rebuild
