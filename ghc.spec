@@ -10,7 +10,7 @@
 # build xml manuals (users_guide, etc)
 %bcond_without manual
 # run testsuite
-%bcond_with testsuite
+%bcond_without testsuite
 # include colored html src
 %bcond_without hscolour
 # use system libffi
@@ -30,7 +30,7 @@ Name: ghc
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha
@@ -52,9 +52,7 @@ Obsoletes: ghc-haddock-doc < 2.4.2-3
 Obsoletes: ghc-libs < 7.0.1-3
 BuildRequires: ghc, ghc-rpm-macros >= 0.11.1
 BuildRequires: gmp-devel, libffi-devel
-%ifarch %{ix86} x86_64
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
-%endif
 # for internal terminfo
 BuildRequires: ncurses-devel
 Requires: gcc
@@ -355,6 +353,9 @@ fi
 %endif
 
 %changelog
+* Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-10
+- rebuild
+
 * Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-9
 - fix without_shared build (thanks Adrian Reber)
 - disable system libffi for secondary archs
