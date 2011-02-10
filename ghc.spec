@@ -10,7 +10,7 @@
 # build xml manuals (users_guide, etc)
 %bcond_without manual
 # run testsuite
-%bcond_without testsuite
+%bcond_with testsuite
 # include colored html src
 %bcond_without hscolour
 # use system libffi
