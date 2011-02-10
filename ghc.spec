@@ -223,7 +223,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
-ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
+ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a %{!?with_libffi:$RPM_BUILD_ROOT%{ghclibdir}/HSffi.o} $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
 
 # these are handled as alternatives
@@ -356,7 +356,7 @@ fi
 
 %changelog
 * Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-9
-- fix non shared build for ppc, etc
+- fix without_shared build (thanks Adrian Reber)
 - disable system libffi for secondary archs
 - temporarily disable ghc-*-devel BRs for ppc
 
