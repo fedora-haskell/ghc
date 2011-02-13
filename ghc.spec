@@ -1,8 +1,6 @@
+# shared haskell library support for x86* archs from version 6.12
+
 ## default enabled options ##
-# haskell shared library support available from 6.12 for x86*
-%ifnarch %{ix86} x86_64
-%global without_shared 1
-%endif
 %bcond_without doc
 # test builds can made faster and smaller by disabling profiled libraries
 # (currently libHSrts_thr_p.a breaks no prof build)
@@ -22,7 +20,7 @@
 # quick build profile
 %bcond_with quick
 
-# the debuginfo subpackage is currently empty anyway, so don't generate it
+# debuginfo is not useful for ghc
 %global debug_package %{nil}
 
 Name: ghc
@@ -154,7 +152,7 @@ rm -r ghc-tarballs/libffi
 
 %build
 cat > mk/build.mk << EOF
-GhcLibWays = v %{?with_prof:p} %{!?without_shared:dyn} 
+GhcLibWays = v %{?with_prof:p} %{!?ghc_without_shared:dyn} 
 %if %{without doc}
 HADDOCK_DOCS = NO
 %endif
@@ -182,7 +180,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  %{!?without_shared:--enable-shared}
+  %{!?ghc_without_shared:--enable-shared}
 
 # 4 cpus or more sometimes breaks build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
@@ -196,7 +194,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?without_shared:-devel}.files
+echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
 done
 
 %ghc_gen_filelists ghc %{ghc_version_override}
@@ -205,7 +203,7 @@ done
 %ghc_gen_filelists integer-gmp 0.2.0.2
 
 %define merge_filelist()\
-%if 0%{!?without_shared:1}\
+%if %{undefined ghc_without_shared}\
 cat ghc-%1.files >> ghc-%2.files\
 %endif\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
@@ -217,7 +215,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist ghc-prim base
 %merge_filelist ghc-binary bin-package-db
 
-%if 0%{!?without_shared:1}
+%if %{undefined ghc_without_shared}
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
@@ -256,7 +254,7 @@ echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
-%if 0%{!?without_shared:1}
+%if %{undefined ghc_without_shared}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
@@ -353,6 +351,9 @@ fi
 %endif
 
 %changelog
+* Sun Feb 13 2011 Jens Petersen <petersen@redhat.com>
+- without_shared renamed to ghc_without_shared
+
 * Thu Feb 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.1-10
 - rebuild
 
