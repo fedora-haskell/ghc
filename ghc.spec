@@ -354,7 +354,7 @@ fi
 %endif
 
 %changelog
-* Wed Feb 23 2011 Fabio M. Di Nitto <fdinitto@redhat.com>
+* Wed Feb 23 2011 Fabio M. Di Nitto <fdinitto@redhat.com> 7.0.1-11
 - enable build on sparcv9
 - add ghc-fix-linking-on-sparc.patch to fix ld being called
   at the same time with --relax and -r. The two options conflict
