@@ -28,10 +28,10 @@ Name: ghc
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
 Version: 7.0.1
 # can't be reset - used by versioned library subpackages
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
-ExclusiveArch: %{ix86} x86_64 ppc alpha
+ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -48,7 +48,7 @@ Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
 Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
-BuildRequires: ghc, ghc-rpm-macros >= 0.11.1
+BuildRequires: ghc, ghc-rpm-macros >= 0.11.10
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -72,6 +72,7 @@ Patch4: ghc-use-system-libffi.patch
 # add cabal configure option --enable-executable-dynamic
 # (see http://hackage.haskell.org/trac/hackage/ticket/600)
 Patch5: Cabal-option-executable-dynamic.patch
+Patch6: ghc-fix-linking-on-sparc.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -149,6 +150,8 @@ rm -r ghc-tarballs/libffi
 %endif
 
 %patch5 -p1 -b .orig
+
+%patch6 -p1 -b .sparclinking
 
 %build
 cat > mk/build.mk << EOF
@@ -351,6 +354,14 @@ fi
 %endif
 
 %changelog
+* Wed Feb 23 2011 Fabio M. Di Nitto <fdinitto@redhat.com>
+- enable build on sparcv9
+- add ghc-fix-linking-on-sparc.patch to fix ld being called
+  at the same time with --relax and -r. The two options conflict
+  on sparc.
+- bump BuildRequires on ghc-rpm-macros to >= 0.11.10 that guarantees
+  a correct build on secondary architectures.
+
 * Sun Feb 13 2011 Jens Petersen <petersen@redhat.com>
 - without_shared renamed to ghc_without_shared
 
