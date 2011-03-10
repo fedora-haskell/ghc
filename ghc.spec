@@ -98,7 +98,7 @@ interface.
 %ghc_binlib_package directory 1.1.0.0
 %ghc_binlib_package extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
-%define ghc_pkg_obsoletes ghc-bin-package-db < 0.0.0.0-12
+%define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 %ghc_binlib_package -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_binlib_package haskell2010 1.0.0.0
