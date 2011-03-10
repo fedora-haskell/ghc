@@ -364,6 +364,7 @@ fi
 * Wed Mar  9 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-12
 - update to 7.0.2 release
 - move bin-package-db into ghc-ghc
+- disable broken testsuite
 
 * Wed Feb 23 2011 Fabio M. Di Nitto <fdinitto@redhat.com> 7.0.1-11
 - enable build on sparcv9
