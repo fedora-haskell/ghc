@@ -47,9 +47,9 @@ diff -up ghc-7.0.1/ghc.mk.libffi ghc-7.0.1/ghc.mk
  install_packages: install_libexecs
 -install_packages: libffi/package.conf.install rts/package.conf.install
 +install_packages: rts/package.conf.install
- 	$(INSTALL_DIR) "$(DESTDIR)$(topdir)"
+ 	$(call INSTALL_DIR,"$(DESTDIR)$(topdir)")
  	"$(RM)" $(RM_OPTS_REC) "$(INSTALLED_PACKAGE_CONF)"
- 	$(INSTALL_DIR) "$(INSTALLED_PACKAGE_CONF)"
+ 	$(call INSTALL_DIR,"$(INSTALLED_PACKAGE_CONF)")
 -	"$(INSTALLED_GHC_PKG_REAL)" --force --global-conf "$(INSTALLED_PACKAGE_CONF)" update libffi/package.conf.install
  	"$(INSTALLED_GHC_PKG_REAL)" --force --global-conf "$(INSTALLED_PACKAGE_CONF)" update rts/package.conf.install
  	$(foreach p, $(INSTALLED_PKG_DIRS),                           \

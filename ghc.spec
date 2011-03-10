@@ -1,4 +1,4 @@
-# shared haskell library support for x86* archs from version 6.12
+# shared haskell libraries supported for x86* archs (enabled in ghc-rpm-macros)
 
 ## default enabled options ##
 %bcond_without doc
@@ -8,7 +8,7 @@
 # build xml manuals (users_guide, etc)
 %bcond_without manual
 # run testsuite
-%bcond_without testsuite
+%bcond_with testsuite
 # include colored html src
 %bcond_without hscolour
 # use system libffi
@@ -20,15 +20,18 @@
 # quick build profile
 %bcond_with quick
 
-# debuginfo is not useful for ghc
+# ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
 Name: ghc
-# haskell-platform-2011.1.0.0
+# haskell-platform-2011.2.0.0
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
-Version: 7.0.1
-# can't be reset - used by versioned library subpackages
-Release: 11%{?dist}
+Version: 7.0.2
+# Since library subpackages are versioned:
+# - release can only be reset if all library versions get bumped simultaneously
+#   (eg for a major release)
+# - minor release numbers should be incremented monotonically
+Release: 12%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
@@ -48,7 +51,7 @@ Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
 Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
-BuildRequires: ghc, ghc-rpm-macros >= 0.11.10
+BuildRequires: ghc, ghc-rpm-macros >= 0.11.11
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -87,27 +90,28 @@ interface.
 %global ghc_version_override %{version}
 
 %if 0%{?ghclibdir:1}
-%ghc_binlib_package Cabal 1.10.0.0
+%ghc_binlib_package Cabal 1.10.1.0
 %ghc_binlib_package array 0.3.0.2
-%ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.0.0
-%ghc_binlib_package bin-package-db 0.0.0.0
-%ghc_binlib_package bytestring 0.9.1.8
+%ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.1.0
+%ghc_binlib_package bytestring 0.9.1.10
 %ghc_binlib_package containers 0.4.0.0
 %ghc_binlib_package directory 1.1.0.0
 %ghc_binlib_package extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
+%define ghc_pkg_obsoletes ghc-bin-package-db < 0.0.0.0-12
 %ghc_binlib_package -x ghc %{ghc_version_override}
+%undefine ghc_pkg_obsoletes
 %ghc_binlib_package haskell2010 1.0.0.0
-%ghc_binlib_package haskell98 1.1.0.0
+%ghc_binlib_package haskell98 1.1.0.1
 %ghc_binlib_package hpc 0.5.0.6
 %ghc_binlib_package old-locale 1.0.0.2
 %ghc_binlib_package old-time 1.0.0.6
 %ghc_binlib_package pretty 1.0.1.2
-%ghc_binlib_package process 1.0.1.4
+%ghc_binlib_package process 1.0.1.5
 %ghc_binlib_package random 1.0.0.3
 %ghc_binlib_package template-haskell 2.5.0.0
 %ghc_binlib_package time 1.2.0.3
-%ghc_binlib_package unix 2.4.1.0
+%ghc_binlib_package unix 2.4.2.0
 %endif
 
 %global version %{ghc_version_override}
@@ -197,13 +201,15 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
+# now handled by macro
+#echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
 done
 
+%ghc_gen_filelists bin-package-db 0.0.0.0
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghc-binary 0.5.0.2
 %ghc_gen_filelists ghc-prim 0.2.0.0
-%ghc_gen_filelists integer-gmp 0.2.0.2
+%ghc_gen_filelists integer-gmp 0.2.0.3
 
 %define merge_filelist()\
 %if %{undefined ghc_without_shared}\
@@ -216,7 +222,8 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
-%merge_filelist ghc-binary bin-package-db
+%merge_filelist ghc-binary ghc
+%merge_filelist bin-package-db ghc
 
 %if %{undefined ghc_without_shared}
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
@@ -354,6 +361,10 @@ fi
 %endif
 
 %changelog
+* Wed Mar  9 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-12
+- update to 7.0.2 release
+- move bin-package-db into ghc-ghc
+
 * Wed Feb 23 2011 Fabio M. Di Nitto <fdinitto@redhat.com> 7.0.1-11
 - enable build on sparcv9
 - add ghc-fix-linking-on-sparc.patch to fix ld being called
