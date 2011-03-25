@@ -51,7 +51,7 @@ Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
 Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
-BuildRequires: ghc, ghc-rpm-macros >= 0.11.11
+BuildRequires: ghc, ghc-rpm-macros >= 0.11.12
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -201,8 +201,6 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-# now handled by macro
-#echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
 done
 
 %ghc_gen_filelists bin-package-db 0.0.0.0
