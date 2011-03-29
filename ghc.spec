@@ -31,7 +31,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
@@ -145,7 +145,7 @@ They should be installed when GHC's profiling subsystem is needed.
 # disable gen_contents_index when not --batch for cron
 %patch3 -p1
 
-# use system libraries
+# make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
 # use system libffi
 %if %{with libffi}
@@ -201,6 +201,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
+echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
 done
 
 %ghc_gen_filelists bin-package-db 0.0.0.0
@@ -255,7 +256,7 @@ mkdir testghc
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
-# don't seem to work inplace:
+# doesn't seem to work inplace:
 #[ "$(inplace/bin/runghc testghc/foo.hs)" = "Foo" ]
 rm testghc/*
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
@@ -299,7 +300,6 @@ fi
 %posttrans
 # (posttrans to make sure any old libs and docs have been removed first)
 %ghc_pkg_recache
-%ghc_reindex_haddock
 
 %files
 %defattr(-,root,root,-)
@@ -359,6 +359,10 @@ fi
 %endif
 
 %changelog
+* Tue Mar 29 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-14
+- fix back missing LICENSE files in library subpackages
+- drop ghc_reindex_haddock from install script
+
 * Thu Mar 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-13
 - rebuild against 7.0.2
 
