@@ -1,4 +1,5 @@
-# shared haskell libraries supported for x86* archs (enabled in ghc-rpm-macros)
+# shared haskell libraries supported for x86* archs
+# (disabled for other archs in ghc-rpm-macros)
 
 ## default enabled options ##
 %bcond_without doc
@@ -23,6 +24,20 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
+# override /usr/lib/rpm/redhat/macros
+%global __os_install_post    \
+    /usr/lib/rpm/redhat/brp-compress \
+    %{!?__debug_package:\
+    /usr/lib/rpm/redhat/brp-strip %{__strip} \
+    /usr/lib/rpm/redhat/brp-strip-comment-note %{__strip} %{__objdump} \
+    } \
+# Disable static stripping since it breaks loading libHSghc.a for ghc 7.0.2 and 7.0.3\
+#    /usr/lib/rpm/redhat/brp-strip-static-archive %{__strip} \
+    /usr/lib/rpm/brp-python-bytecompile %{__python} %{?_python_bytecompile_errors_terminate_build} \
+    /usr/lib/rpm/redhat/brp-python-hardlink \
+    %{!?__jar_repack:/usr/lib/rpm/redhat/brp-java-repack-jars} \
+%{nil}
+
 Name: ghc
 # haskell-platform-2011.2.0.0
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
@@ -31,7 +46,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
@@ -45,10 +60,6 @@ Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
 # introduced for f14
 Obsoletes: ghc-doc < 6.12.3-4
-Provides: ghc-doc = %{version}-%{release}
-# introduced for f11
-Obsoletes: haddock < 2.4.2-3, ghc-haddock-devel < 2.4.2-3
-Obsoletes: ghc-haddock-doc < 2.4.2-3
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
 BuildRequires: ghc, ghc-rpm-macros >= 0.11.12
@@ -89,7 +100,7 @@ interface.
 
 %global ghc_version_override %{version}
 
-%if 0%{?ghclibdir:1}
+%if %{defined ghclibdir}\
 %ghc_binlib_package Cabal 1.10.1.0
 %ghc_binlib_package array 0.3.0.2
 %ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.1.0
@@ -129,7 +140,6 @@ This is a meta-package for all the development library packages in GHC.
 Summary: GHC profiling libraries meta-package
 Group: Development/Libraries
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")}
-Obsoletes: ghc-haddock-prof < 2.4.2-3
 
 %description prof
 This is a meta-package for all the profiling library packages in GHC.
@@ -189,7 +199,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   %{!?ghc_without_shared:--enable-shared}
 
-# 4 cpus or more sometimes breaks build
+# >4 cpus tends to break build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(/usr/bin/getconf _NPROCESSORS_ONLN)
 [ "$RPM_BUILD_NCPUS" -gt 4 ] && RPM_BUILD_NCPUS=4
 make -j$RPM_BUILD_NCPUS
@@ -359,6 +369,11 @@ fi
 %endif
 
 %changelog
+* Wed Mar 30 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-15
+- do not strip static libs since it breaks ghci-7.0.2 loading libHSghc.a
+- no longer provide ghc-doc
+- no longer obsolete old haddock
+
 * Tue Mar 29 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-14
 - fix back missing LICENSE files in library subpackages
 - drop ghc_reindex_haddock from install script
