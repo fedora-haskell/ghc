@@ -24,6 +24,7 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
+# workaround http://hackage.haskell.org/trac/ghc/ticket/5004
 # override /usr/lib/rpm/redhat/macros
 %global __os_install_post    \
     /usr/lib/rpm/redhat/brp-compress \
@@ -46,7 +47,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 15%{?dist}
+Release: 16%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
@@ -60,6 +61,8 @@ Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
 # introduced for f14
 Obsoletes: ghc-doc < 6.12.3-4
+# BR for lib and binlib packages
+Provides: ghc-doc = %{version}-%{release}
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
 BuildRequires: ghc, ghc-rpm-macros >= 0.11.12
@@ -130,6 +133,7 @@ interface.
 %package devel
 Summary: GHC development libraries meta package
 Group: Development/Libraries
+Requires: ghc = %{version}-%{release}
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2,/g")}
 
 %description devel
@@ -139,6 +143,7 @@ This is a meta-package for all the development library packages in GHC.
 %package prof
 Summary: GHC profiling libraries meta-package
 Group: Development/Libraries
+Requires: ghc-devel = %{version}-%{release}
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")}
 
 %description prof
@@ -369,8 +374,14 @@ fi
 %endif
 
 %changelog
+* Fri Apr  1 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-16
+- provides ghc-doc again: it is still a buildrequires for libraries
+- ghc-prof now requires ghc-devel
+- ghc-devel now requires ghc explicitly
+
 * Wed Mar 30 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-15
 - do not strip static libs since it breaks ghci-7.0.2 loading libHSghc.a
+  (see http://hackage.haskell.org/trac/ghc/ticket/5004)
 - no longer provide ghc-doc
 - no longer obsolete old haddock
 
