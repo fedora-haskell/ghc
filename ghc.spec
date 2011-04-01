@@ -47,7 +47,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
@@ -374,6 +374,9 @@ fi
 %endif
 
 %changelog
+* Fri Apr  1 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-17
+- rebuild against ghc-rpm-macros-0.11.14 to provide ghc-*-doc
+
 * Fri Apr  1 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-16
 - provides ghc-doc again: it is still a buildrequires for libraries
 - ghc-prof now requires ghc-devel
