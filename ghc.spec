@@ -47,10 +47,10 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
-ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9
+ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -82,6 +82,9 @@ BuildRequires: hscolour
 %if %{with testsuite}
 BuildRequires: python
 %endif
+%ifarch ppc64
+BuildRequires: autoconf
+%endif
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
@@ -90,6 +93,7 @@ Patch4: ghc-use-system-libffi.patch
 # (see http://hackage.haskell.org/trac/hackage/ticket/600)
 Patch5: Cabal-option-executable-dynamic.patch
 Patch6: ghc-fix-linking-on-sparc.patch
+Patch7: ghc-ppc64-pthread.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -172,6 +176,11 @@ rm -r ghc-tarballs/libffi
 
 %patch6 -p1 -b .sparclinking
 
+%ifarch ppc64
+%patch7 -p1 -b .pthread
+%endif
+
+
 %build
 cat > mk/build.mk << EOF
 GhcLibWays = v %{?with_prof:p} %{!?ghc_without_shared:dyn} 
@@ -194,8 +203,20 @@ HSCOLOUR_SRCS = NO
 %if %{with libffi}
 SRC_HC_OPTS += -lffi
 %endif
+%ifarch ppc64
+GhcUnregisterised=YES
+GhcWithNativeCodeGen=NO
+SplitObjs=NO
+GhcWithInterpreter=NO
+GhcNotThreaded=YES
+SRC_HC_OPTS+=-optc-mminimal-toc -optl-pthread
+SRC_CC_OPTS+=-mminimal-toc -pthread -Wa,--noexecstack
+%endif
 EOF
 
+%ifarch ppc64
+autoreconf
+%endif
 export CFLAGS="${CFLAGS:-%optflags}"
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
@@ -323,9 +344,11 @@ fi
 %dir %{ghclibdir}
 %{ghclibdir}/extra-gcc-opts
 %{ghclibdir}/ghc
-%{ghclibdir}/ghc-asm
 %{ghclibdir}/ghc-pkg
+%ifnarch ppc64
+%{ghclibdir}/ghc-asm
 %{ghclibdir}/ghc-split
+%endif
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
 %{ghclibdir}/hsc2hs
@@ -374,6 +397,9 @@ fi
 %endif
 
 %changelog
+* Thu Apr 21 2011 Jiri Skala <jskala@redhat.com> - 7.0.2-18
+- bootstrap to ppc64
+
 * Fri Apr  1 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-17
 - rebuild against ghc-rpm-macros-0.11.14 to provide ghc-*-doc
 
