@@ -47,7 +47,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 18%{?dist}
+Release: 19%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 
@@ -94,6 +94,8 @@ Patch4: ghc-use-system-libffi.patch
 Patch5: Cabal-option-executable-dynamic.patch
 Patch6: ghc-fix-linking-on-sparc.patch
 Patch7: ghc-ppc64-pthread.patch
+# http://hackage.haskell.org/trac/ghc/ticket/4999
+Patch8: ghc-powerpc-linker-mmap.patch
 
 %description
 GHC is a state-of-the-art programming suite for Haskell, a purely
@@ -178,6 +180,7 @@ rm -r ghc-tarballs/libffi
 
 %ifarch ppc64
 %patch7 -p1 -b .pthread
+%patch8 -p1 -b .mmap
 %endif
 
 
@@ -397,6 +400,9 @@ fi
 %endif
 
 %changelog
+* Tue Apr 26 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-19
+- upstream ghc-powerpc-linker-mmap.patch for ppc64 (Jiri Skala)
+
 * Thu Apr 21 2011 Jiri Skala <jskala@redhat.com> - 7.0.2-18
 - bootstrap to ppc64
 
