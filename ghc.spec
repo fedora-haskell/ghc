@@ -180,6 +180,9 @@ rm -r ghc-tarballs/libffi
 
 %ifarch ppc64
 %patch7 -p1 -b .pthread
+%endif
+
+%ifarch ppc ppc64
 %patch8 -p1 -b .mmap
 %endif
 
