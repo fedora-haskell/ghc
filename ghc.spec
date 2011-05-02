@@ -10,8 +10,6 @@
 %bcond_without manual
 # run testsuite
 %bcond_with testsuite
-# include colored html src
-%bcond_without hscolour
 # use system libffi
 %ifarch %{ix86} x86_64
 %bcond_without libffi
@@ -76,7 +74,7 @@ Requires: ghc-base-devel
 %if %{with manual}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
-%if %{with hscolour}
+%if %{undefined without_hscolour}
 BuildRequires: hscolour
 %endif
 %if %{with testsuite}
@@ -203,7 +201,7 @@ GhcStage2HcOpts = -O0 -fasm
 GhcLibHcOpts = -O0 -fasm
 SplitObjs = NO
 %endif
-%if %{without hscolour}
+%if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
 %endif
 %if %{with libffi}
