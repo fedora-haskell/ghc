@@ -45,7 +45,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 19.1%{?dist}
+Release: 20%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 
@@ -107,6 +107,8 @@ interface.
 
 %global ghc_version_override %{version}
 
+%global ghc_pkg_c_deps ghc = %{ghc_version_override}-%{release}
+
 %if %{defined ghclibdir}
 %ghc_binlib_package Cabal 1.10.1.0
 %ghc_binlib_package array 0.3.0.2
@@ -138,7 +140,7 @@ interface.
 Summary: GHC development libraries meta package
 Group: Development/Libraries
 Requires: ghc = %{version}-%{release}
-%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2,/g")}
+%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2-%{release},/g")}
 
 %description devel
 This is a meta-package for all the development library packages in GHC.
@@ -148,7 +150,7 @@ This is a meta-package for all the development library packages in GHC.
 Summary: GHC profiling libraries meta-package
 Group: Development/Libraries
 Requires: ghc-devel = %{version}-%{release}
-%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2,/g")}
+%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2-%{release},/g")}
 
 %description prof
 This is a meta-package for all the profiling library packages in GHC.
@@ -404,11 +406,15 @@ fi
 %endif
 
 %changelog
+* Mon May  9 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-20
+- make devel and prof meta packages require libs with release
+- make ghc-*-devel subpackages require ghc with release
+
 * Wed May 04 2011 Jiri Skala <jskala@redhat.com> - 7.0.2-19.1
 - fixes path to gcc on ppc64 arch
 
 * Tue Apr 26 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-19
-- upstream ghc-powerpc-linker-mmap.patch for ppc64 (Jiri Skala)
+- add upstream ghc-powerpc-linker-mmap.patch for ppc64 (Jiri Skala)
 
 * Thu Apr 21 2011 Jiri Skala <jskala@redhat.com> - 7.0.2-18
 - bootstrap to ppc64
