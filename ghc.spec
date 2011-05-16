@@ -45,7 +45,7 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 21%{?dist}
+Release: 22%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has only been bootstrapped on the following archs:
 ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 
@@ -63,7 +63,7 @@ Obsoletes: ghc-doc < 6.12.3-4
 Provides: ghc-doc = %{version}-%{release}
 # introduced for f15
 Obsoletes: ghc-libs < 7.0.1-3
-BuildRequires: ghc, ghc-rpm-macros >= 0.11.12
+BuildRequires: ghc, ghc-rpm-macros >= 0.13
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -140,22 +140,12 @@ interface.
 Summary: GHC development libraries meta package
 Group: Development/Libraries
 Requires: ghc = %{version}-%{release}
+Obsoletes: ghc-prof < %{version}-%{release}
+Provides: ghc-prof = %{version}-%{release}
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2-%{release},/g")}
 
 %description devel
 This is a meta-package for all the development library packages in GHC.
-
-%if %{with prof}
-%package prof
-Summary: GHC profiling libraries meta-package
-Group: Development/Libraries
-Requires: ghc-devel = %{version}-%{release}
-%{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-prof = \2-%{release},/g")}
-
-%description prof
-This is a meta-package for all the profiling library packages in GHC.
-They should be installed when GHC's profiling subsystem is needed.
-%endif
 
 %prep
 %setup -q -n %{name}-%{version} %{?with_testsuite:-b2}
@@ -259,7 +249,6 @@ done
 cat ghc-%1.files >> ghc-%2.files\
 %endif\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
-cat ghc-%1-prof.files >> ghc-%2-prof.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
 echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
@@ -395,12 +384,10 @@ fi
 %files devel
 %defattr(-,root,root,-)
 
-%if %{with prof}
-%files prof
-%defattr(-,root,root,-)
-%endif
-
 %changelog
+* Mon May 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-22
+- merge the prof subpackage into devel with ghc-rpm-macros-0.13
+
 * Wed May 11 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-21
 - configure with /usr/bin/gcc to help bootstrapping to new archs
   (otherwise ccache tends to get hardcoded as gcc, which not in koji)
