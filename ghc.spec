@@ -386,7 +386,7 @@ fi
 
 %changelog
 * Mon May 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-22
-- merge the prof subpackage into devel with ghc-rpm-macros-0.13
+- merge prof subpackages into the devel subpackages with ghc-rpm-macros-0.13
 
 * Wed May 11 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-21
 - configure with /usr/bin/gcc to help bootstrapping to new archs
