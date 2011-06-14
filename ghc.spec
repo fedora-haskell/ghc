@@ -45,10 +45,11 @@ Version: 7.0.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 23%{?dist}
+Release: 24%{?dist}
 Summary: Glasgow Haskell Compilation system
-# fedora ghc has only been bootstrapped on the following archs:
-ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 
+# fedora ghc has been bootstrapped on the following archs:
+#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
+ExcludeArch: sparc64 s390x
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -392,6 +393,9 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Tue Jun 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-24
+- finally change from ExclusiveArch to ExcludeArch to target more archs
+
 * Sat May 21 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-23
 - obsolete dph libraries and feldspar-language
 
