@@ -31,7 +31,7 @@ Version: 7.0.4
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
 Release: 25%{?dist}
-Summary: Glasgow Haskell Compilation system
+Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
 ExcludeArch: sparc64 s390x
@@ -395,6 +395,7 @@ fi
 - strip static again (upstream #5004 fixed)
 - Cabal updated to 1.10.2.0
 - re-enable testsuite
+- update summary and description
 
 * Tue Jun 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-24
 - finally change from ExclusiveArch to ExcludeArch to target more archs
