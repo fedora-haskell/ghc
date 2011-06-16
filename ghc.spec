@@ -9,7 +9,7 @@
 # build xml manuals (users_guide, etc)
 %bcond_without manual
 # run testsuite
-%bcond_with testsuite
+%bcond_without testsuite
 # use system libffi
 %ifarch %{ix86} x86_64
 %bcond_without libffi
@@ -22,30 +22,15 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
-# workaround http://hackage.haskell.org/trac/ghc/ticket/5004
-# override /usr/lib/rpm/redhat/macros
-%global __os_install_post    \
-    /usr/lib/rpm/redhat/brp-compress \
-    %{!?__debug_package:\
-    /usr/lib/rpm/redhat/brp-strip %{__strip} \
-    /usr/lib/rpm/redhat/brp-strip-comment-note %{__strip} %{__objdump} \
-    } \
-# Disable static stripping since it breaks loading libHSghc.a for ghc 7.0.2 and 7.0.3\
-#    /usr/lib/rpm/redhat/brp-strip-static-archive %{__strip} \
-    /usr/lib/rpm/brp-python-bytecompile %{__python} %{?_python_bytecompile_errors_terminate_build} \
-    /usr/lib/rpm/redhat/brp-python-hardlink \
-    %{!?__jar_repack:/usr/lib/rpm/redhat/brp-java-repack-jars} \
-%{nil}
-
 Name: ghc
-# haskell-platform-2011.2.0.0
+# haskell-platform-2011.2.0.1
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
-Version: 7.0.2
+Version: 7.0.4
 # Since library subpackages are versioned:
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 24%{?dist}
+Release: 25%{?dist}
 Summary: Glasgow Haskell Compilation system
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
@@ -104,21 +89,31 @@ Patch7: ghc-ppc64-pthread.patch
 Patch8: ghc-powerpc-linker-mmap.patch
 
 %description
-GHC is a state-of-the-art programming suite for Haskell, a purely
-functional programming language.  It includes an optimizing compiler
-generating good code for a variety of platforms, together with an
-interactive system for convenient, quick development.  The
-distribution includes space and time profiling facilities, a large
-collection of libraries, and support for various language
-extensions, including concurrency, exceptions, and a foreign language
-interface.
+GHC is a state-of-the-art, open source, compiler and interactive environment
+for the functional language Haskell. Highlights:
+
+- GHC supports the entire Haskell 2010 language plus various extensions.
+- GHC has particularly good support for concurrency and parallelism,
+  including support for Software Transactional Memory (STM).
+- GHC generates fast code, particularly for concurrent programs
+  (check the results on the "Computer Language Benchmarks Game").
+- GHC works on several platforms including Windows, Mac, Linux,
+  most varieties of Unix, and several different processor architectures.
+- GHC has extensive optimisation capabilities,
+  including inter-module optimisation.
+- GHC compiles Haskell code either directly to native code or using LLVM
+  as a back-end. GHC can also generate C code as an intermediate target for
+  porting to new platforms. The interactive environment compiles Haskell to
+  bytecode, and supports execution of mixed bytecode/compiled programs.
+- Profiling is supported, both by time/allocation and heap profiling.
+- GHC comes with core libraries, and thousands more are available on Hackage.
 
 %global ghc_version_override %{version}
 
 %global ghc_pkg_c_deps ghc = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_binlib_package Cabal 1.10.1.0
+%ghc_binlib_package Cabal 1.10.2.0
 %ghc_binlib_package array 0.3.0.2
 %ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.1.0
 %ghc_binlib_package bytestring 0.9.1.10
@@ -186,6 +181,8 @@ rm -r ghc-tarballs/libffi
 
 
 %build
+# http://hackage.haskell.org/trac/ghc/wiki/Platforms
+# cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
 GhcLibWays = v %{?with_prof:p} %{!?ghc_without_shared:dyn} 
 %if %{without doc}
@@ -393,6 +390,12 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
+- update to 7.0.4 bugfix release
+- strip static again (upstream #5004 fixed)
+- Cabal updated to 1.10.2.0
+- re-enable testsuite
+
 * Tue Jun 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.2-24
 - finally change from ExclusiveArch to ExcludeArch to target more archs
 
