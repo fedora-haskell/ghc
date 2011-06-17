@@ -1,23 +1,20 @@
-# shared haskell libraries supported for x86* archs
+# Shared haskell libraries are supported for x86* archs
 # (disabled for other archs in ghc-rpm-macros)
 
-## default enabled options ##
-%bcond_without doc
+# bootstrap build skips shared and prof libs, documentation, and testsuite
+%if %{defined ghc_bootstrap}
 # test builds can made faster and smaller by disabling profiled libraries
 # (currently libHSrts_thr_p.a breaks no prof build)
-%bcond_without prof
-# build xml manuals (users_guide, etc)
-%bcond_without manual
-# run testsuite
-%bcond_without testsuite
-# use system libffi
-%ifarch %{ix86} x86_64
-%bcond_without libffi
+%global ghc_without_shared 1
+%global without_prof 1
+%global without_haddock 1
+# docbook manuals (users_guide, etc)
+%global without_manual 1
+%global without_testsuite 1
 %endif
 
-## default disabled options ##
-# quick build profile
-%bcond_with quick
+# archs that use system libffi
+%global libffi_archs %{ix86} x86_64
 
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
@@ -30,7 +27,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 25%{?dist}
+Release: 26%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
@@ -38,7 +35,7 @@ ExcludeArch: sparc64 s390x
 License: BSD
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
-%if %{with testsuite}
+%if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
@@ -56,7 +53,8 @@ Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-pa
 Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
-BuildRequires: ghc, ghc-rpm-macros >= 0.13
+BuildRequires: ghc %{!?ghc_bootstrap: = %{version}}
+BuildRequires: ghc-rpm-macros >= 0.13.4
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -64,13 +62,13 @@ BuildRequires: ncurses-devel
 Requires: gcc
 Requires: ghc-base-devel
 # llvm is an optional dependency
-%if %{with manual}
+%if %{undefined without_manual}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
 %if %{undefined without_hscolour}
 BuildRequires: hscolour
 %endif
-%if %{with testsuite}
+%if %{undefined without_testsuite}
 BuildRequires: python
 %endif
 %ifarch ppc64
@@ -151,7 +149,7 @@ Provides: ghc-prof = %{version}-%{release}
 This is a meta-package for all the development library packages in GHC.
 
 %prep
-%setup -q -n %{name}-%{version} %{?with_testsuite:-b2}
+%setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
 # absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
 # type-level too big so skip it in gen_contents_index
@@ -162,7 +160,7 @@ This is a meta-package for all the development library packages in GHC.
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
 # use system libffi
-%if %{with libffi}
+%ifarch %{libffi_archs}
 %patch4 -p1 -b .libffi
 rm -r ghc-tarballs/libffi
 %endif
@@ -181,27 +179,24 @@ rm -r ghc-tarballs/libffi
 
 
 %build
+%if %{undefined ghc_bootstrap}
+%ghc_check_bootstrap
+%endif
+
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
-GhcLibWays = v %{?with_prof:p} %{!?ghc_without_shared:dyn} 
-%if %{without doc}
+GhcLibWays = v %{!?without_prof:p} %{!?ghc_without_shared:dyn}
+%if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
-%if %{without manual}
+%if %{defined without_manual}
 BUILD_DOCBOOK_HTML = NO
-%endif
-%if %{with quick}
-SRC_HC_OPTS = -H64m -O0 -fasm
-GhcStage1HcOpts = -O -fasm
-GhcStage2HcOpts = -O0 -fasm
-GhcLibHcOpts = -O0 -fasm
-SplitObjs = NO
 %endif
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
 %endif
-%if %{with libffi}
+%ifarch %{libffi_archs}
 SRC_HC_OPTS += -lffi
 %endif
 %ifarch ppc64
@@ -266,7 +261,10 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
-ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a %{!?with_libffi:$RPM_BUILD_ROOT%{ghclibdir}/HSffi.o} $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
+ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a  $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
+%ifnarch %{libffi_archs}
+echo $RPM_BUILD_ROOT%{ghclibdir}/HSffi.o >> ghc-base-devel.files
+%endif
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
 
 # these are handled as alternatives
@@ -280,7 +278,7 @@ done
 
 %ghc_strip_dynlinked
 
-%if %{with doc}
+%if %{undefined without_haddock}
 mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly
 install -p --mode=755 %SOURCE3 ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly/ghc-doc-index
 mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/lib/ghc
@@ -307,7 +305,7 @@ inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %endif
-%if %{with testsuite}
+%if %{undefined without_testsuite}
 make -C testsuite/tests/ghc-regress fast
 %endif
 
@@ -365,7 +363,7 @@ fi
 %dir %{ghcdocbasedir}
 %if %{with doc}
 %{ghcdocbasedir}/html
-%if %{with manual}
+%if %{undefined without_manual}
 %{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
 %{ghcdocbasedir}/users_guide
@@ -390,6 +388,14 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
+- packaging cleanup:
+- add ghc_bootstrap build mode using: ghc_without_shared, without_prof,
+  without_haddock, without_manual, without_testsuite
+- add libffi_archs
+- use ghc-rpm-macros-0.13.4 for ghc_check_bootstrap
+- drop the quick build profile
+
 * Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
 - update to 7.0.4 bugfix release
 - strip static again (upstream #5004 fixed)
