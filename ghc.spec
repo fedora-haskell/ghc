@@ -47,7 +47,7 @@ Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-se
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
 BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13.4
+BuildRequires: ghc-rpm-macros >= 0.13.5
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -382,9 +382,10 @@ fi
 * Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
 - BR same ghc version unless ghc_bootstrapping defined
 - add libffi_archs
-- use ghc-rpm-macros-0.13.4 for ghc_check_bootstrap
+- use ghc_check_bootstrap
 - drop the quick build profile
 - put dyn before p in GhcLibWays
+- explain new bootstrapping mode using ghc_bootstrap (ghc-rpm-macros-0.13.5)
 
 * Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
 - update to 7.0.4 bugfix release
