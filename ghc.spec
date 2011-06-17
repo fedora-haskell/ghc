@@ -179,9 +179,7 @@ rm -r ghc-tarballs/libffi
 
 
 %build
-%if %{undefined ghc_bootstrap}
 %ghc_check_bootstrap
-%endif
 
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
@@ -389,7 +387,6 @@ fi
 
 %changelog
 * Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
-- packaging cleanup:
 - add ghc_bootstrap build mode using: ghc_without_shared, without_prof,
   without_haddock, without_manual, without_testsuite
 - add libffi_archs
