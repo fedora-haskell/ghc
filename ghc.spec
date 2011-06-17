@@ -54,7 +54,7 @@ Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-se
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
 BuildRequires: ghc %{!?ghc_bootstrap: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13.4
+BuildRequires: ghc-rpm-macros >= 0.13
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -179,8 +179,6 @@ rm -r ghc-tarballs/libffi
 
 
 %build
-%ghc_check_bootstrap
-
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
@@ -390,7 +388,6 @@ fi
 - add ghc_bootstrap build mode using: ghc_without_shared, without_prof,
   without_haddock, without_manual, without_testsuite
 - add libffi_archs
-- use ghc-rpm-macros-0.13.4 for ghc_check_bootstrap
 - drop the quick build profile
 
 * Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
