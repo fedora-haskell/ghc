@@ -172,7 +172,7 @@ rm -r ghc-tarballs/libffi
 
 
 %build
-%ghc_check_bootstrap
+#%%ghc_check_bootstrap
 
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
@@ -382,7 +382,6 @@ fi
 * Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
 - BR same ghc version unless ghc_bootstrapping defined
 - add libffi_archs
-- use ghc_check_bootstrap
 - drop the quick build profile
 - put dyn before p in GhcLibWays
 - explain new bootstrapping mode using ghc_bootstrap (ghc-rpm-macros-0.13.5)
