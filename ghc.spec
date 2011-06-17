@@ -339,11 +339,6 @@ fi
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
 %{ghclibdir}/hsc2hs
-%if %{with doc}
-%{ghclibdir}/haddock
-%{ghclibdir}/html
-%{ghclibdir}/latex
-%endif
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
 %{ghclibdir}/runghc
@@ -352,7 +347,10 @@ fi
 %{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
-%if %{with doc}
+%if %{undefined without_haddock}
+%{ghclibdir}/haddock
+%{ghclibdir}/html
+%{ghclibdir}/latex
 %{ghcdocbasedir}/html
 %if %{undefined without_manual}
 %{ghcdocbasedir}/Cabal
