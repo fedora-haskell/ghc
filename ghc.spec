@@ -1,17 +1,10 @@
 # Shared haskell libraries are supported for x86* archs
 # (disabled for other archs in ghc-rpm-macros)
 
-# bootstrap build skips shared and prof libs, documentation, and testsuite
-%if %{defined ghc_bootstrap}
-# test builds can made faster and smaller by disabling profiled libraries
-# (currently libHSrts_thr_p.a breaks no prof build)
-%global ghc_without_shared 1
-%global without_prof 1
-%global without_haddock 1
-# docbook manuals (users_guide, etc)
-%global without_manual 1
-%global without_testsuite 1
-%endif
+# to bootstrap a new version of ghc, uncomment the following:
+#%%global ghc_bootstrapping 1
+#%%{?ghc_bootstrap}
+#%%global without_hscolour 1
 
 # archs that use system libffi
 %global libffi_archs %{ix86} x86_64
@@ -53,8 +46,8 @@ Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-pa
 Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
-BuildRequires: ghc %{!?ghc_bootstrap: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13
+BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
+BuildRequires: ghc-rpm-macros >= 0.13.4
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -65,7 +58,7 @@ Requires: ghc-base-devel
 %if %{undefined without_manual}
 BuildRequires: libxslt, docbook-style-xsl
 %endif
-%if %{undefined without_hscolour}
+%if %{undefined without_haddock} && %{undefined without_hscolour}
 BuildRequires: hscolour
 %endif
 %if %{undefined without_testsuite}
@@ -179,10 +172,12 @@ rm -r ghc-tarballs/libffi
 
 
 %build
+%ghc_check_bootstrap
+
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
-GhcLibWays = v %{!?without_prof:p} %{!?ghc_without_shared:dyn}
+GhcLibWays = v %{!?ghc_without_shared:dyn} %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
@@ -385,10 +380,11 @@ fi
 
 %changelog
 * Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
-- add ghc_bootstrap build mode using: ghc_without_shared, without_prof,
-  without_haddock, without_manual, without_testsuite
+- BR same ghc version unless ghc_bootstrapping defined
 - add libffi_archs
+- use ghc-rpm-macros-0.13.4 for ghc_check_bootstrap
 - drop the quick build profile
+- put dyn before p in GhcLibWays
 
 * Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
 - update to 7.0.4 bugfix release
