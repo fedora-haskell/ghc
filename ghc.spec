@@ -17,7 +17,7 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
-%if %{defined ghc_bootstrapping}
+%if %{undefined ghc_bootstrapping}
 %global _use_internal_dependency_generator 0
 %global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
 %global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
@@ -31,7 +31,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 27%{?dist}
+Release: 28%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
@@ -385,6 +385,9 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Wed Sep 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-28
+- setup ghc-deps.sh when not bootstrapping!
+
 * Wed Sep 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-27
 - setup dependency generation with ghc-deps.sh since it was moved to
   ghc_lib_install in ghc-rpm-macros
