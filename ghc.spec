@@ -1,9 +1,14 @@
 # Shared haskell libraries are supported for x86* archs
 # (disabled for other archs in ghc-rpm-macros)
 
-# to bootstrap a new version of ghc, uncomment the following:
+# To bootstrap a new version of ghc, uncomment the following:
 #%%global ghc_bootstrapping 1
 #%%{?ghc_bootstrap}
+#%%global without_hscolour 1
+
+# To do a test build instead with shared libs, uncomment the following:
+#%%global ghc_bootstrapping 1
+#%%{?ghc_test}
 #%%global without_hscolour 1
 
 # archs that use system libffi
@@ -12,15 +17,21 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
+%if %{defined ghc_bootstrapping}
+%global _use_internal_dependency_generator 0
+%global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
+%global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
+%endif
+
 Name: ghc
-# haskell-platform-2011.2.0.1
+# part of haskell-platform
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
 Version: 7.0.4
 # Since library subpackages are versioned:
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 26%{?dist}
+Release: 27%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
@@ -172,8 +183,6 @@ rm -r ghc-tarballs/libffi
 
 
 %build
-#%%ghc_check_bootstrap
-
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
@@ -211,8 +220,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc \
-  %{!?ghc_without_shared:--enable-shared}
+  --with-gcc=%{_bindir}/gcc
 
 # >4 cpus tends to break build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(%{_bindir}/getconf _NPROCESSORS_ONLN)
@@ -377,6 +385,10 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Wed Sep 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-27
+- setup dependency generation with ghc-deps.sh since it was moved to
+  ghc_lib_install in ghc-rpm-macros
+
 * Fri Jun 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-26
 - BR same ghc version unless ghc_bootstrapping defined
 - add libffi_archs
@@ -386,6 +398,7 @@ fi
 
 * Thu Jun 16 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-25
 - update to 7.0.4 bugfix release
+  http://haskell.org/ghc/docs/7.0.4/html/users_guide/release-7-0-4.html
 - strip static again (upstream #5004 fixed)
 - Cabal updated to 1.10.2.0
 - re-enable testsuite
