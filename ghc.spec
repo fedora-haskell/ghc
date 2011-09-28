@@ -14,6 +14,9 @@
 # archs that use system libffi
 %global libffi_archs %{ix86} x86_64
 
+# unregisterized archs
+%global unregisterised_archs ppc64 armv7hl
+
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
@@ -31,10 +34,10 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 28%{?dist}
+Release: 29%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
-#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64
+#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
 ExcludeArch: sparc64 s390x
 License: BSD
 Group: Development/Languages
@@ -199,11 +202,10 @@ HSCOLOUR_SRCS = NO
 %ifarch %{libffi_archs}
 SRC_HC_OPTS += -lffi
 %endif
-%ifarch ppc64
+%ifarch %{unregisterised_archs}
 GhcUnregisterised=YES
-GhcWithNativeCodeGen=NO
-SplitObjs=NO
-GhcWithInterpreter=NO
+%endif
+%ifarch ppc64
 GhcNotThreaded=YES
 SRC_HC_OPTS+=-optc-mminimal-toc -optl-pthread
 SRC_CC_OPTS+=-mminimal-toc -pthread -Wa,--noexecstack
@@ -340,7 +342,7 @@ fi
 %{ghclibdir}/extra-gcc-opts
 %{ghclibdir}/ghc
 %{ghclibdir}/ghc-pkg
-%ifnarch ppc64
+%ifnarch %{unregisterised_archs}
 %{ghclibdir}/ghc-asm
 %{ghclibdir}/ghc-split
 %endif
@@ -385,6 +387,9 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Wed Sep 28 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-29
+- port to armv7hl by Henrik Nordström (#741725)
+
 * Wed Sep 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-28
 - setup ghc-deps.sh when not bootstrapping!
 
