@@ -11,7 +11,10 @@
 #%%{?ghc_test}
 #%%global without_hscolour 1
 
-# archs that use system libffi
+# faster:
+#%%global without_testsuite 1
+
+# archs that use system libffi (needs fixing for secondary archs)
 %global libffi_archs %{ix86} x86_64
 
 # unregisterized archs
@@ -34,7 +37,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 29%{?dist}
+Release: 30%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -198,9 +201,6 @@ BUILD_DOCBOOK_HTML = NO
 %endif
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
-%endif
-%ifarch %{libffi_archs}
-SRC_HC_OPTS += -lffi
 %endif
 %ifarch %{unregisterised_archs}
 GhcUnregisterised=YES
@@ -387,6 +387,9 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Thu Sep 29 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-30
+- no need to specify -lffi in build.mk (Henrik Nordström)
+
 * Wed Sep 28 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-29
 - port to armv7hl by Henrik Nordström (#741725)
 
