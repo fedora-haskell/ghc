@@ -37,7 +37,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 30%{?dist}
+Release: 31%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -64,7 +64,7 @@ Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-se
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
 BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13.5
+BuildRequires: ghc-rpm-macros >= 0.13.11
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -387,6 +387,10 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Fri Sep 30 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-31
+- build with ghc-rpm-macros >= 0.13.11 to fix provides and obsoletes versions
+  in library devel subpackages
+
 * Thu Sep 29 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-30
 - no need to specify -lffi in build.mk (Henrik Nordström)
 
