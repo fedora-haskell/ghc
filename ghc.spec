@@ -380,7 +380,7 @@ fi
 
 %changelog
 * Mon Oct 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-32
-- remove libffi_archs: not allowed to bundle system libraries in Fedora
+- remove libffi_archs: not allowed to bundle libffi on any arch
 - include the ghc (ghci) library in ghc-devel
 
 * Tue Oct 11 2011 Peter Schiffer <pschiffe@redhat.com> - 7.0.4-31.1
