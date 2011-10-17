@@ -14,9 +14,6 @@
 # faster:
 #%%global without_testsuite 1
 
-# archs that use system libffi (needs fixing for secondary archs)
-%global libffi_archs %{ix86} x86_64
-
 # unregisterized archs
 %global unregisterised_archs ppc64 armv7hl
 
@@ -37,7 +34,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 31%{?dist}.1
+Release: 32%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -130,7 +127,7 @@ for the functional language Haskell. Highlights:
 %ghc_binlib_package extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
-%ghc_binlib_package -x ghc %{ghc_version_override}
+%ghc_binlib_package ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_binlib_package haskell2010 1.0.0.0
 %ghc_binlib_package haskell98 1.1.0.1
@@ -170,10 +167,8 @@ This is a meta-package for all the development library packages in GHC.
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
 # use system libffi
-%ifarch %{libffi_archs}
 %patch4 -p1 -b .libffi
 rm -r ghc-tarballs/libffi
-%endif
 
 %patch5 -p1 -b .orig
 
@@ -263,9 +258,6 @@ ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
 %endif
 ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a  $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
-%ifnarch %{libffi_archs}
-echo $RPM_BUILD_ROOT%{ghclibdir}/HSffi.o >> ghc-base-devel.files
-%endif
 sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
 
 # these are handled as alternatives
@@ -387,6 +379,10 @@ fi
 %defattr(-,root,root,-)
 
 %changelog
+* Mon Oct 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-32
+- remove libffi_archs: not allowed to bundle system libraries in Fedora
+- include the ghc (ghci) library in ghc-devel
+
 * Tue Oct 11 2011 Peter Schiffer <pschiffe@redhat.com> - 7.0.4-31.1
 - rebuild with new gmp
 
