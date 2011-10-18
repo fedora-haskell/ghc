@@ -15,16 +15,14 @@
 #%%global without_testsuite 1
 
 # unregisterized archs
-%global unregisterised_archs ppc64 armv7hl
+%global unregisterised_archs ppc64 armv7hl armv5tel
 
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
-%if %{undefined ghc_bootstrapping}
 %global _use_internal_dependency_generator 0
 %global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
 %global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
-%endif
 
 Name: ghc
 # part of haskell-platform
@@ -34,7 +32,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 32%{?dist}
+Release: 33%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -61,7 +59,7 @@ Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-se
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
 BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13.11
+BuildRequires: ghc-rpm-macros >= 0.13.13
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -327,7 +325,6 @@ if [ "$1" = 0 ]; then
 fi
 
 %files
-%defattr(-,root,root,-)
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/*
 %dir %{ghclibdir}
@@ -376,9 +373,12 @@ fi
 %endif
 
 %files devel
-%defattr(-,root,root,-)
 
 %changelog
+* Tue Oct 18 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-33
+- add armv5tel (ported by Henrik Nordström)
+- also use ghc-deps.sh when bootstrapping (ghc-rpm-macros-0.13.13)
+
 * Mon Oct 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-32
 - remove libffi_archs: not allowed to bundle libffi on any arch
 - include the ghc (ghci) library in ghc-devel
