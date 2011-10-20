@@ -28,7 +28,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 34%{?dist}
+Release: 34%{?dist}.1
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -377,6 +377,9 @@ fi
 %files devel
 
 %changelog
+* Thu Oct 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 7.0.4-34.1
+- rebuild with new gmp without compat lib
+
 * Thu Oct 20 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-34
 - setup ghc-deps.sh after ghc_version_override for bootstrapping
 
