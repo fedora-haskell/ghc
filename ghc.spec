@@ -20,10 +20,6 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
-%global _use_internal_dependency_generator 0
-%global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
-%global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
-
 Name: ghc
 # part of haskell-platform
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
@@ -32,7 +28,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 33%{?dist}
+Release: 34%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -112,6 +108,12 @@ for the functional language Haskell. Highlights:
 - GHC comes with core libraries, and thousands more are available on Hackage.
 
 %global ghc_version_override %{version}
+
+# needs ghc_version_override for bootstrapping
+%global _use_internal_dependency_generator 0
+%global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
+%global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
+
 
 %global ghc_pkg_c_deps ghc = %{ghc_version_override}-%{release}
 
@@ -375,6 +377,9 @@ fi
 %files devel
 
 %changelog
+* Thu Oct 20 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-34
+- setup ghc-deps.sh after ghc_version_override for bootstrapping
+
 * Tue Oct 18 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-33
 - add armv5tel (ported by Henrik Nordström)
 - also use ghc-deps.sh when bootstrapping (ghc-rpm-macros-0.13.13)
