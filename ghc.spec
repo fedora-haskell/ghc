@@ -28,7 +28,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 35%{?dist}
+Release: 35%{?dist}.1
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -380,6 +380,9 @@ fi
 %files devel
 
 %changelog
+* Fri Oct 28 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-35.1
+- rebuild against new gmp
+
 * Fri Oct 28 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-35
 - add HaskellReport license tag to some of the library subpackages
   which contain some code from the Haskell Reports
