@@ -28,7 +28,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 34%{?dist}.1
+Release: 35%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -117,26 +117,29 @@ for the functional language Haskell. Highlights:
 
 %global ghc_pkg_c_deps ghc = %{ghc_version_override}-%{release}
 
+%define space %(echo -n ' ')
+%define BSDHaskellReport BSD%{space}and%{space}HaskellReport
+
 %if %{defined ghclibdir}
 %ghc_binlib_package Cabal 1.10.2.0
-%ghc_binlib_package array 0.3.0.2
-%ghc_binlib_package -c gmp-devel,libffi-devel base 4.3.1.0
+%ghc_binlib_package -l %BSDHaskellReport array 0.3.0.2
+%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel,libffi-devel base 4.3.1.0
 %ghc_binlib_package bytestring 0.9.1.10
-%ghc_binlib_package containers 0.4.0.0
-%ghc_binlib_package directory 1.1.0.0
-%ghc_binlib_package extensible-exceptions 0.1.1.2
+%ghc_binlib_package -l %BSDHaskellReport containers 0.4.0.0
+%ghc_binlib_package -l %BSDHaskellReport directory 1.1.0.0
+%ghc_binlib_package -l %BSDHaskellReport extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 %ghc_binlib_package ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_binlib_package haskell2010 1.0.0.0
-%ghc_binlib_package haskell98 1.1.0.1
+%ghc_binlib_package -l HaskellReport haskell2010 1.0.0.0
+%ghc_binlib_package -l HaskellReport haskell98 1.1.0.1
 %ghc_binlib_package hpc 0.5.0.6
-%ghc_binlib_package old-locale 1.0.0.2
-%ghc_binlib_package old-time 1.0.0.6
+%ghc_binlib_package -l %BSDHaskellReport old-locale 1.0.0.2
+%ghc_binlib_package -l %BSDHaskellReport old-time 1.0.0.6
 %ghc_binlib_package pretty 1.0.1.2
-%ghc_binlib_package process 1.0.1.5
-%ghc_binlib_package random 1.0.0.3
+%ghc_binlib_package -l %BSDHaskellReport process 1.0.1.5
+%ghc_binlib_package -l %BSDHaskellReport random 1.0.0.3
 %ghc_binlib_package template-haskell 2.5.0.0
 %ghc_binlib_package time 1.2.0.3
 %ghc_binlib_package unix 2.4.2.0
@@ -377,6 +380,10 @@ fi
 %files devel
 
 %changelog
+* Fri Oct 28 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-35
+- add HaskellReport license tag to some of the library subpackages
+  which contain some code from the Haskell Reports
+
 * Thu Oct 20 2011 Marcela Mašláňová <mmaslano@redhat.com> - 7.0.4-34.1
 - rebuild with new gmp without compat lib
 
@@ -389,7 +396,7 @@ fi
 
 * Mon Oct 17 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-32
 - remove libffi_archs: not allowed to bundle libffi on any arch
-- include the ghc (ghci) library in ghc-devel
+- include the ghc (ghci) library in ghc-devel (Narasim)
 
 * Tue Oct 11 2011 Peter Schiffer <pschiffe@redhat.com> - 7.0.4-31.1
 - rebuild with new gmp
