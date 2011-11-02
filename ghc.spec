@@ -390,7 +390,7 @@ fi
 %{_localstatedir}/lib/ghc
 %endif
 
-%files devel
+%files libraries
 
 %changelog
 * Wed Nov  2 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-37
