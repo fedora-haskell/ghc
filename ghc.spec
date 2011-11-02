@@ -26,7 +26,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 36%{?dist}
+Release: 37%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -50,8 +50,9 @@ Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-pa
 Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
+# change to ghc-compiler once backported
 BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
-BuildRequires: ghc-rpm-macros >= 0.13.13
+BuildRequires: ghc-rpm-macros >= 0.14
 BuildRequires: gmp-devel, libffi-devel
 BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
 # for internal terminfo
@@ -69,7 +70,7 @@ BuildRequires: python
 BuildRequires: autoconf
 %endif
 Requires: ghc-compiler = %{version}-%{release}
-Requires: ghc-devel = %{version}-%{release}
+Requires: ghc-libraries = %{version}-%{release}
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
@@ -101,6 +102,19 @@ for the functional language Haskell. Highlights:
   bytecode, and supports execution of mixed bytecode/compiled programs.
 - Profiling is supported, both by time/allocation and heap profiling.
 - GHC comes with core libraries, and thousands more are available on Hackage.
+
+%package compiler
+Summary: GHC compiler and utilities
+Group: Development/Languages
+Requires: gcc
+Requires: ghc-base-devel
+# llvm is an optional dependency
+
+%description compiler
+The package contains the GHC compiler, tools and utilities.
+
+The ghc libraries are provided by ghc-devel.
+To install all of ghc, install the ghc base package.
 
 %global ghc_version_override %{version}
 
@@ -142,28 +156,17 @@ for the functional language Haskell. Highlights:
 
 %global version %{ghc_version_override}
 
-%package compiler
-Summary: GHC compiler and utilities
-Group: Development/Languages
-Requires: gcc
-Requires: ghc-base-devel
-# llvm is an optional dependency
-
-%description compiler
-The package contains the GHC compiler, tools and utilities.
-
-The ghc libraries are provided by ghc-devel.
-To install all of ghc, install the ghc base package.
-
-%package devel
+%package libraries
 Summary: GHC development libraries meta package
 Group: Development/Libraries
 Requires: ghc-compiler = %{version}-%{release}
+Obsoletes: ghc-devel < %{version}-%{release}
+Provides: ghc-devel = %{version}-%{release}
 Obsoletes: ghc-prof < %{version}-%{release}
 Provides: ghc-prof = %{version}-%{release}
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2-%{release},/g")}
 
-%description devel
+%description libraries
 This is a meta-package for all the development library packages in GHC.
 
 %prep
@@ -390,6 +393,10 @@ fi
 %files devel
 
 %changelog
+* Wed Nov  2 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-37
+- rename ghc-devel metapackage to ghc-libraries
+- require ghc-rpm-macros-0.14
+
 * Tue Nov  1 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-36
 - move compiler and tools to ghc-compiler
 - the ghc base package is now a metapackage that installs all of ghc,
