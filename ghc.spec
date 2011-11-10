@@ -26,7 +26,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 37%{?dist}
+Release: 38%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -316,7 +316,7 @@ rm testghc/*
 make -C testsuite/tests/ghc-regress fast
 %endif
 
-%post
+%post compiler
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
 #
@@ -334,7 +334,7 @@ update-alternatives --install %{_bindir}/runhaskell runhaskell \
 update-alternatives --install %{_bindir}/hsc2hs hsc2hs \
   %{_bindir}/hsc2hs-ghc 500
 
-%preun
+%preun compiler
 if [ "$1" = 0 ]; then
   update-alternatives --remove runhaskell %{_bindir}/runghc
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
@@ -393,6 +393,9 @@ fi
 %files libraries
 
 %changelog
+* Thu Nov 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-38
+- the post and postun scripts are now for the compiler subpackage
+
 * Wed Nov  2 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-37
 - rename ghc-devel metapackage to ghc-libraries
 - require ghc-rpm-macros-0.14
