@@ -29,7 +29,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 39%{?dist}
+Release: 40%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -108,6 +108,8 @@ License: BSD
 Group: Development/Languages
 Requires: gcc
 Requires: ghc-base-devel
+Requires(post): chkconfig
+Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 # llvm is an optional dependency
@@ -283,6 +285,7 @@ for i in hsc2hs runhaskell; do
   else
     mv ${RPM_BUILD_ROOT}%{_bindir}/$i{,-ghc}
   fi
+  touch ${RPM_BUILD_ROOT}%{_bindir}/$i
 done
 
 %ghc_strip_dynlinked
@@ -346,7 +349,21 @@ fi
 
 %files compiler
 %doc ANNOUNCE HACKING LICENSE README
-%{_bindir}/*
+%{_bindir}/ghc
+%{_bindir}/ghc-%{version}
+%{_bindir}/ghc-pkg
+%{_bindir}/ghc-pkg-%{version}
+%{_bindir}/ghci
+%{_bindir}/ghci-%{version}
+%{_bindir}/haddock
+%{_bindir}/haddock-ghc-%{version}
+%{_bindir}/hp2ps
+%{_bindir}/hpc
+%ghost %{_bindir}/hsc2hs-ghc
+%{_bindir}/hsc2hs-ghc
+%{_bindir}/runghc
+%ghost %{_bindir}/runhaskell
+%{_bindir}/runhaskell-ghc
 %dir %{ghclibdir}
 %{ghclibdir}/extra-gcc-opts
 %{ghclibdir}/ghc
@@ -395,6 +412,10 @@ fi
 %files libraries
 
 %changelog
+* Mon Nov 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-40
+- do alternatives handling correctly (reported by Giam Teck Choon, #753661)
+  see https://fedoraproject.org/wiki/Packaging:Alternatives
+
 * Sat Nov 12 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-39
 - move ghc-doc and ghc-libs obsoletes
 - add HaskellReport license also to the base and libraries subpackages
