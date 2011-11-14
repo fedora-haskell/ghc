@@ -18,6 +18,9 @@
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
 
+%global space %(echo -n ' ')
+%global BSDHaskellReport BSD%{space}and%{space}HaskellReport
+
 Name: ghc
 # part of haskell-platform
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
@@ -26,12 +29,12 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 38%{?dist}
+Release: 39%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
 ExcludeArch: sparc64 s390x
-License: BSD
+License: %BSDHaskellReport
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
@@ -39,10 +42,6 @@ Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
-# introduced for f14
-Obsoletes: ghc-doc < 6.12.3-4
-# introduced for f15
-Obsoletes: ghc-libs < 7.0.1-3
 Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
 Obsoletes: ghc-dph-par < 0.5, ghc-dph-par-devel < 0.5, ghc-dph-par-prof < 0.5
 Obsoletes: ghc-dph-prim-interface < 0.5, ghc-dph-prim-interface-devel < 0.5, ghc-dph-interface-prim-prof < 0.5
@@ -105,9 +104,12 @@ for the functional language Haskell. Highlights:
 
 %package compiler
 Summary: GHC compiler and utilities
+License: BSD
 Group: Development/Languages
 Requires: gcc
 Requires: ghc-base-devel
+# added in f14
+Obsoletes: ghc-doc < 6.12.3-4
 # llvm is an optional dependency
 
 %description compiler
@@ -125,9 +127,6 @@ To install all of ghc, install the ghc base package.
 
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
-
-%define space %(echo -n ' ')
-%define BSDHaskellReport BSD%{space}and%{space}HaskellReport
 
 %if %{defined ghclibdir}
 %ghc_binlib_package Cabal 1.10.2.0
@@ -158,12 +157,15 @@ To install all of ghc, install the ghc base package.
 
 %package libraries
 Summary: GHC development libraries meta package
+License: %BSDHaskellReport
 Group: Development/Libraries
 Requires: ghc-compiler = %{version}-%{release}
 Obsoletes: ghc-devel < %{version}-%{release}
 Provides: ghc-devel = %{version}-%{release}
 Obsoletes: ghc-prof < %{version}-%{release}
 Provides: ghc-prof = %{version}-%{release}
+# since f15
+Obsoletes: ghc-libs < 7.0.1-3
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2-%{release},/g")}
 
 %description libraries
@@ -393,6 +395,10 @@ fi
 %files libraries
 
 %changelog
+* Sat Nov 12 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-39
+- move ghc-doc and ghc-libs obsoletes
+- add HaskellReport license also to the base and libraries subpackages
+
 * Thu Nov 10 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-38
 - the post and postun scripts are now for the compiler subpackage
 
