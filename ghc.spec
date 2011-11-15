@@ -359,7 +359,7 @@ fi
 %{_bindir}/haddock-ghc-%{version}
 %{_bindir}/hp2ps
 %{_bindir}/hpc
-%ghost %{_bindir}/hsc2hs-ghc
+%ghost %{_bindir}/hsc2hs
 %{_bindir}/hsc2hs-ghc
 %{_bindir}/runghc
 %ghost %{_bindir}/runhaskell
