@@ -355,8 +355,6 @@ fi
 %{_bindir}/ghc-pkg-%{version}
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
-%{_bindir}/haddock
-%{_bindir}/haddock-ghc-%{version}
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
@@ -384,6 +382,8 @@ fi
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
+%{_bindir}/haddock
+%{_bindir}/haddock-ghc-%{version}
 %{ghclibdir}/haddock
 %{ghclibdir}/html
 %{ghclibdir}/latex
