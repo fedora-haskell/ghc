@@ -29,7 +29,7 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 40%{?dist}
+Release: 41%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
@@ -412,6 +412,9 @@ fi
 %files libraries
 
 %changelog
+* Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.4-41
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
+
 * Mon Nov 14 2011 Jens Petersen <petersen@redhat.com> - 7.0.4-40
 - do alternatives handling correctly (reported by Giam Teck Choon, #753661)
   see https://fedoraproject.org/wiki/Packaging:Alternatives
