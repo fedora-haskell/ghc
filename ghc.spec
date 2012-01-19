@@ -29,10 +29,10 @@ Version: 7.0.4
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 41%{?dist}
+Release: 42%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
-#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl
+#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel
 ExcludeArch: sparc64 s390x
 License: %BSDHaskellReport
 Group: Development/Languages
@@ -49,7 +49,7 @@ Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-pa
 Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
-# change to ghc-compiler once backported
+# change to ghc-compiler once backported to el6
 BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
 BuildRequires: ghc-rpm-macros >= 0.14
 BuildRequires: gmp-devel, libffi-devel
@@ -70,6 +70,7 @@ BuildRequires: autoconf
 %endif
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
+Requires: ghc-ghc-devel = %{version}-%{release}
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
@@ -140,7 +141,8 @@ To install all of ghc, install the ghc base package.
 %ghc_binlib_package -l %BSDHaskellReport extensible-exceptions 0.1.1.2
 %ghc_binlib_package filepath 1.2.0.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
-%ghc_binlib_package ghc %{ghc_version_override}
+# in ghc not ghc-libraries:
+%ghc_binlib_package -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_binlib_package -l HaskellReport haskell2010 1.0.0.0
 %ghc_binlib_package -l HaskellReport haskell98 1.1.0.1
@@ -171,7 +173,8 @@ Obsoletes: ghc-libs < 7.0.1-3
 %{?ghc_packages_list:Requires: %(echo %{ghc_packages_list} | sed -e "s/\([^ ]*\)-\([^ ]*\)/ghc-\1-devel = \2-%{release},/g")}
 
 %description libraries
-This is a meta-package for all the development library packages in GHC.
+This is a meta-package for all the development library packages in GHC
+except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
@@ -412,6 +415,9 @@ fi
 %files libraries
 
 %changelog
+* Thu Jan 19 2012 Jens Petersen <petersen@redhat.com> - 7.0.4-42
+- move ghc-ghc-devel from ghc-libraries to the ghc metapackage
+
 * Fri Jan 13 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.0.4-41
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_17_Mass_Rebuild
 
