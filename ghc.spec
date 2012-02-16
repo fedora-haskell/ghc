@@ -195,6 +195,8 @@ rm -r ghc-tarballs/{mingw,perl}
 # use system libffi
 %patch4 -p1 -b .libffi
 rm -r ghc-tarballs/libffi
+mkdir -p rts/dist/build
+cp $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 %ifarch ppc64
 %patch7 -p1 -b .pthread
@@ -426,6 +428,7 @@ fi
 - Cabal --enable-executable-dynamic patch is upstream
 - add Cabal-fix-dynamic-exec-for-TH.patch
 - sparc linking fix is upstream
+- uses Debian's system-libffi patch by Joachim Breitner
 - setup ghc-deps.sh after ghc_version_override for bootstrapping
 
 * Thu Jan 19 2012 Jens Petersen <petersen@redhat.com> - 7.0.4-42

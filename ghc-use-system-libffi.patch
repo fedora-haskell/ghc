@@ -1,6 +1,21 @@
 This patch could be replaced by a configure call if
 http://hackage.haskell.org/trac/ghc/ticket/5743 were fixed.
 
+Index: ghc-7.4.0.20111219/rts/package.conf.in
+===================================================================
+--- ghc-7.4.0.20111219.orig/rts/package.conf.in	2011-12-21 23:21:03.000000000 +0100
++++ ghc-7.4.0.20111219/rts/package.conf.in	2011-12-21 23:21:04.000000000 +0100
+@@ -24,8 +24,9 @@
+ hs-libraries:   "HSrts"
+ 
+ extra-libraries:
++				"ffi"
+ #ifdef HAVE_LIBM
+-                		"m"		/* for ldexp() */
++			      , "m"		/* for ldexp() */
+ #endif
+ #ifdef HAVE_LIBRT
+ 			      , "rt"
 Index: ghc-7.4.0.20111219/ghc.mk
 ===================================================================
 --- ghc-7.4.0.20111219.orig/ghc.mk	2011-12-21 23:21:03.000000000 +0100
@@ -17,7 +32,23 @@ Index: ghc-7.4.0.20111219/rts/ghc.mk
 ===================================================================
 --- ghc-7.4.0.20111219.orig/rts/ghc.mk	2011-12-21 19:56:29.000000000 +0100
 +++ ghc-7.4.0.20111219/rts/ghc.mk	2011-12-21 23:23:52.000000000 +0100
-@@ -177,7 +176,7 @@
+@@ -86,8 +86,7 @@
+ ALL_RTS_DEF_LIBNAMES 	= base ghc-prim
+ ALL_RTS_DEF_LIBS	= \
+ 	rts/dist/build/win32/libHSbase.dll.a \
+-	rts/dist/build/win32/libHSghc-prim.dll.a \
+-	libffi/build/inst/lib/libffi.dll.a
++	rts/dist/build/win32/libHSghc-prim.dll.a 
+ 
+ # -- import libs for the regular Haskell libraries
+ define make-importlib-def # args $1 = lib name
+@@ -172,12 +171,12 @@
+ # Making a shared library for the RTS.
+ ifneq "$$(findstring dyn, $1)" ""
+ ifeq "$$(HOSTPLATFORM)" "i386-unknown-mingw32"
+-$$(rts_$1_LIB) : $$(rts_$1_OBJS) $$(ALL_RTS_DEF_LIBS) rts/libs.depend rts/dist/build/libffi-5.dll
++$$(rts_$1_LIB) : $$(rts_$1_OBJS) $$(ALL_RTS_DEF_LIBS) rts/libs.depend
+ 	"$$(RM)" $$(RM_OPTS) $$@
  	"$$(rts_dist_HC)" -package-name rts -shared -dynamic -dynload deploy \
  	  -no-auto-link-packages -Lrts/dist/build -lffi-5 `cat rts/libs.depend` $$(rts_$1_OBJS) $$(ALL_RTS_DEF_LIBS) -o $$@
  else
