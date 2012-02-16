@@ -1,0 +1,33 @@
+diff -u ghc-7.2.0.20110728/libraries/Cabal/cabal/Distribution/Simple/GHC.hs.orig ghc-7.2.0.20110728/libraries/Cabal/cabal/Distribution/Simple/GHC.hs
+--- ghc-7.2.0.20110728/libraries/Cabal/Cabal/Distribution/Simple/GHC.hs.orig	2011-07-29 02:12:09.000000000 +0900
++++ ghc-7.2.0.20110728/libraries/Cabal/Cabal/Distribution/Simple/GHC.hs	2011-08-05 18:08:05.192042529 +0900
+@@ -778,7 +778,10 @@
+           ++ ["-L"++libDir | libDir <- extraLibDirs exeBi]
+           ++ concat [["-framework", f] | f <- PD.frameworks exeBi]
+           ++ if dynExe
+-                then ["-dynamic"]
++                then ["-dynamic",
++                      "-hisuf", "dyn_hi",
++                      "-osuf", "dyn_o"
++                     ]
+                 else []
+           ++ if profExe
+                 then ["-prof",
+@@ -787,13 +790,14 @@
+                      ] ++ ghcProfOptions exeBi
+                 else []
+ 
+-  -- For building exe's for profiling that use TH we actually
++  -- For building exe's for profiling or dynamic that use TH we actually
+   -- have to build twice, once without profiling and the again
+   -- with profiling. This is because the code that TH needs to
+   -- run at compile time needs to be the vanilla ABI so it can
+   -- be loaded up and run by the compiler.
+-  when (withProfExe lbi && EnableExtension TemplateHaskell `elem` allExtensions exeBi)
+-     (runGhcProg (binArgs False (withDynExe lbi) False))
++  when ((withProfExe lbi || withDynExe lbi) &&
++        EnableExtension TemplateHaskell `elem` allExtensions exeBi)
++     (runGhcProg (binArgs False False False))
+ 
+   runGhcProg (binArgs True (withDynExe lbi) (withProfExe lbi))
+ 

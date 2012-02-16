@@ -2,8 +2,8 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%{?ghc_bootstrap}
+%global ghc_bootstrapping 1
+%{?ghc_bootstrap}
 #%%global without_hscolour 1
 
 # To do a test build instead with shared libs, uncomment the following:
@@ -24,12 +24,12 @@
 Name: ghc
 # part of haskell-platform
 # NB make sure to rebuild ghc after a version bump to avoid ABI change problems
-Version: 7.0.4
+Version: 7.4.1
 # Since library subpackages are versioned:
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 42%{?dist}
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on the following archs:
 #ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel
@@ -38,7 +38,7 @@ License: %BSDHaskellReport
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/testsuite-%{version}.tar.bz2
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
@@ -68,6 +68,9 @@ BuildRequires: python
 %ifarch ppc64
 BuildRequires: autoconf
 %endif
+%ifarch armv7hl armv5tel
+BuildRequires: llvm >= 3.0
+%endif
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
@@ -77,11 +80,11 @@ Patch3: ghc-gen_contents_index-cron-batch.patch
 Patch4: ghc-use-system-libffi.patch
 # add cabal configure option --enable-executable-dynamic
 # (see http://hackage.haskell.org/trac/hackage/ticket/600)
-Patch5: Cabal-option-executable-dynamic.patch
-Patch6: ghc-fix-linking-on-sparc.patch
 Patch7: ghc-ppc64-pthread.patch
 # http://hackage.haskell.org/trac/ghc/ticket/4999
 Patch8: ghc-powerpc-linker-mmap.patch
+# fix dynamic linking of executables using Template Haskell
+Patch9: Cabal-fix-dynamic-exec-for-TH.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -132,29 +135,31 @@ To install all of ghc, install the ghc base package.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_binlib_package Cabal 1.10.2.0
-%ghc_binlib_package -l %BSDHaskellReport array 0.3.0.2
-%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel,libffi-devel base 4.3.1.0
-%ghc_binlib_package bytestring 0.9.1.10
-%ghc_binlib_package -l %BSDHaskellReport containers 0.4.0.0
-%ghc_binlib_package -l %BSDHaskellReport directory 1.1.0.0
-%ghc_binlib_package -l %BSDHaskellReport extensible-exceptions 0.1.1.2
-%ghc_binlib_package filepath 1.2.0.0
+%ghc_binlib_package Cabal 1.14.0
+%ghc_binlib_package -l %BSDHaskellReport array 0.4.0.0
+%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel,libffi-devel base 4.5.0.0
+%ghc_binlib_package binary 0.5.1.0
+%ghc_binlib_package bytestring 0.9.2.1
+%ghc_binlib_package -l %BSDHaskellReport containers 0.4.2.1
+%ghc_binlib_package -l %BSDHaskellReport deepseq 1.3.0.0
+%ghc_binlib_package -l %BSDHaskellReport directory 1.1.0.2
+%ghc_binlib_package -l %BSDHaskellReport extensible-exceptions 0.1.1.4
+%ghc_binlib_package filepath 1.3.0.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_binlib_package -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_binlib_package -l HaskellReport haskell2010 1.0.0.0
-%ghc_binlib_package -l HaskellReport haskell98 1.1.0.1
-%ghc_binlib_package hpc 0.5.0.6
-%ghc_binlib_package -l %BSDHaskellReport old-locale 1.0.0.2
-%ghc_binlib_package -l %BSDHaskellReport old-time 1.0.0.6
-%ghc_binlib_package pretty 1.0.1.2
-%ghc_binlib_package -l %BSDHaskellReport process 1.0.1.5
-%ghc_binlib_package -l %BSDHaskellReport random 1.0.0.3
-%ghc_binlib_package template-haskell 2.5.0.0
-%ghc_binlib_package time 1.2.0.3
-%ghc_binlib_package unix 2.4.2.0
+%ghc_binlib_package -l HaskellReport haskell2010 1.1.0.1
+%ghc_binlib_package -l HaskellReport haskell98 2.0.0.1
+%ghc_binlib_package hoopl 3.8.7.3
+%ghc_binlib_package hpc 0.5.1.1
+%ghc_binlib_package -l %BSDHaskellReport old-locale 1.0.0.4
+%ghc_binlib_package -l %BSDHaskellReport old-time 1.1.0.0
+%ghc_binlib_package pretty 1.1.1.0
+%ghc_binlib_package -l %BSDHaskellReport process 1.1.0.1
+%ghc_binlib_package template-haskell 2.7.0.0
+%ghc_binlib_package time 1.4
+%ghc_binlib_package unix 2.5.1.0
 %endif
 
 %global version %{ghc_version_override}
@@ -191,10 +196,6 @@ rm -r ghc-tarballs/{mingw,perl}
 %patch4 -p1 -b .libffi
 rm -r ghc-tarballs/libffi
 
-%patch5 -p1 -b .orig
-
-%patch6 -p1 -b .sparclinking
-
 %ifarch ppc64
 %patch7 -p1 -b .pthread
 %endif
@@ -202,6 +203,8 @@ rm -r ghc-tarballs/libffi
 %ifarch ppc ppc64
 %patch8 -p1 -b .mmap
 %endif
+
+%patch9 -p1 -b .orig
 
 
 %build
@@ -257,9 +260,8 @@ done
 
 %ghc_gen_filelists bin-package-db 0.0.0.0
 %ghc_gen_filelists ghc %{ghc_version_override}
-%ghc_gen_filelists ghc-binary 0.5.0.2
 %ghc_gen_filelists ghc-prim 0.2.0.0
-%ghc_gen_filelists integer-gmp 0.2.0.3
+%ghc_gen_filelists integer-gmp 0.4.0.0
 
 %define merge_filelist()\
 %if %{undefined ghc_without_shared}\
@@ -271,7 +273,6 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
-%merge_filelist ghc-binary ghc
 %merge_filelist bin-package-db ghc
 
 %if %{undefined ghc_without_shared}
@@ -321,7 +322,7 @@ inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
 rm testghc/*
 %endif
 %if %{undefined without_testsuite}
-make -C testsuite/tests/ghc-regress fast
+make test
 %endif
 
 %post compiler
@@ -366,11 +367,9 @@ fi
 %ghost %{_bindir}/runhaskell
 %{_bindir}/runhaskell-ghc
 %dir %{ghclibdir}
-%{ghclibdir}/extra-gcc-opts
 %{ghclibdir}/ghc
 %{ghclibdir}/ghc-pkg
 %ifnarch %{unregisterised_archs}
-%{ghclibdir}/ghc-asm
 %{ghclibdir}/ghc-split
 %endif
 %{ghclibdir}/ghc-usage.txt
@@ -379,6 +378,7 @@ fi
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
 %{ghclibdir}/runghc
+%{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
 %{_mandir}/man1/ghc.*
@@ -415,6 +415,19 @@ fi
 %files libraries
 
 %changelog
+* Wed Feb 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1
+- update to new 7.4.1 major release
+  http://www.haskell.org/ghc/docs/7.4.1/html/users_guide/release-7-4-1.html
+- all library versions bumped
+- binary package replaces ghc-binary
+- random library dropped
+- new hoopl library
+- deepseq is now included in ghc
+- Cabal --enable-executable-dynamic patch is upstream
+- add Cabal-fix-dynamic-exec-for-TH.patch
+- sparc linking fix is upstream
+- setup ghc-deps.sh after ghc_version_override for bootstrapping
+
 * Thu Jan 19 2012 Jens Petersen <petersen@redhat.com> - 7.0.4-42
 - move ghc-ghc-devel from ghc-libraries to the ghc metapackage
 
