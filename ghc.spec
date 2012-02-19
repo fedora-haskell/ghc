@@ -5,6 +5,7 @@
 %global ghc_bootstrapping 1
 %{?ghc_bootstrap}
 #%%global without_hscolour 1
+#%%global without_testsuite 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -49,11 +50,18 @@ Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-pa
 Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
 Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
 Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
-# change to ghc-compiler once backported to el6
-BuildRequires: ghc %{!?ghc_bootstrapping: = %{version}}
+%if %{undefined ghc_bootstrapping}
+BuildRequires: ghc-compiler = %{version}
+%endif
 BuildRequires: ghc-rpm-macros >= 0.14
-BuildRequires: gmp-devel, libffi-devel
-BuildRequires: ghc-directory-devel, ghc-process-devel, ghc-pretty-devel, ghc-containers-devel, ghc-haskell98-devel, ghc-bytestring-devel
+BuildRequires: ghc-bytestring-devel
+BuildRequires: ghc-containers-devel
+BuildRequires: ghc-directory-devel
+BuildRequires: ghc-haskell98-devel
+BuildRequires: ghc-pretty-devel
+BuildRequires: ghc-process-devel
+BuildRequires: gmp-devel
+BuildRequires: libffi-devel
 # for internal terminfo
 BuildRequires: ncurses-devel
 %if %{undefined without_manual}
@@ -196,7 +204,7 @@ rm -r ghc-tarballs/{mingw,perl}
 %patch4 -p1 -b .libffi
 rm -r ghc-tarballs/libffi
 mkdir -p rts/dist/build
-cp $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
+ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 %ifarch ppc64
 %patch7 -p1 -b .pthread
