@@ -73,9 +73,6 @@ BuildRequires: hscolour
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
-%ifarch ppc64
-BuildRequires: autoconf
-%endif
 %ifarch armv7hl armv5tel
 BuildRequires: llvm >= 3.0
 %endif
@@ -206,14 +203,6 @@ rm -r ghc-tarballs/libffi
 mkdir -p rts/dist/build
 ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
-%ifarch ppc64
-%patch7 -p1 -b .pthread
-%endif
-
-%ifarch ppc ppc64
-%patch8 -p1 -b .mmap
-%endif
-
 %patch9 -p1 -b .orig
 
 
@@ -234,16 +223,8 @@ HSCOLOUR_SRCS = NO
 %ifarch %{unregisterised_archs}
 GhcUnregisterised=YES
 %endif
-%ifarch ppc64
-GhcNotThreaded=YES
-SRC_HC_OPTS+=-optc-mminimal-toc -optl-pthread
-SRC_CC_OPTS+=-mminimal-toc -pthread -Wa,--noexecstack
-%endif
 EOF
 
-%ifarch ppc64
-autoreconf
-%endif
 export CFLAGS="${CFLAGS:-%optflags}"
 # specify gcc to avoid problems when bootstrapping with ccache
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
