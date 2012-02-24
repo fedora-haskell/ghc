@@ -4,8 +4,8 @@
 # To bootstrap a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
 %{?ghc_bootstrap}
-#%%global without_hscolour 1
-#%%global without_testsuite 1
+%global without_hscolour 1
+%global without_testsuite 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -118,8 +118,8 @@ for the functional language Haskell. Highlights:
 Summary: GHC compiler and utilities
 License: BSD
 Group: Development/Languages
-Requires: gcc
-Requires: ghc-base-devel
+Requires: gcc%{?_isa}
+Requires: ghc-base-devel%{?_isa}
 Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
@@ -145,7 +145,7 @@ To install all of ghc, install the ghc base package.
 %if %{defined ghclibdir}
 %ghc_binlib_package Cabal 1.14.0
 %ghc_binlib_package -l %BSDHaskellReport array 0.4.0.0
-%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel,libffi-devel base 4.5.0.0
+%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.5.0.0
 %ghc_binlib_package binary 0.5.1.0
 %ghc_binlib_package bytestring 0.9.2.1
 %ghc_binlib_package -l %BSDHaskellReport containers 0.4.2.1
