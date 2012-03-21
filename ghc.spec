@@ -14,7 +14,7 @@
 #%%global without_testsuite 1
 
 # unregisterized archs
-%global unregisterised_archs ppc64 armv7hl armv5tel
+%global unregisterised_archs ppc64 armv7hl armv5tel s390 s390x
 
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
@@ -30,11 +30,12 @@ Version: 7.4.1
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 0.1%{?dist}
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compiler
-# fedora ghc has been bootstrapped on the following archs:
-#ExclusiveArch: %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel
-ExcludeArch: sparc64 s390x
+# fedora ghc has been bootstrapped on
+# %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
+# see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
+ExcludeArch: sparc64
 License: %BSDHaskellReport
 Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
@@ -79,13 +80,17 @@ BuildRequires: llvm >= 3.0
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
+# absolute haddock path (was for html/libraries -> libraries)
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
+# type-level too big so skip it in gen_contents_index
 Patch2: ghc-gen_contents_index-type-level.patch
+# disable gen_contents_index when not --batch for cron
 Patch3: ghc-gen_contents_index-cron-batch.patch
+# fedora does not allow copy libraries
 Patch4: ghc-use-system-libffi.patch
 # add cabal configure option --enable-executable-dynamic
 # (see http://hackage.haskell.org/trac/hackage/ticket/600)
-Patch7: ghc-ppc64-pthread.patch
+Patch7: ghc-powerpc-pthread.patch
 # http://hackage.haskell.org/trac/ghc/ticket/4999
 Patch8: ghc-powerpc-linker-mmap.patch
 # fix dynamic linking of executables using Template Haskell
@@ -188,11 +193,8 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
-# absolute haddock path (was for html/libraries -> libraries)
 %patch1 -p1 -b .orig
-# type-level too big so skip it in gen_contents_index
 %patch2 -p1
-# disable gen_contents_index when not --batch for cron
 %patch3 -p1
 
 # make sure we don't use these
@@ -204,7 +206,6 @@ mkdir -p rts/dist/build
 ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 %patch9 -p1 -b .orig
-
 
 %build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
@@ -220,8 +221,9 @@ BUILD_DOCBOOK_HTML = NO
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
 %endif
+## should be unnecessary
 %ifarch %{unregisterised_archs}
-GhcUnregisterised=YES
+#GhcUnregisterised=YES
 %endif
 EOF
 
@@ -372,7 +374,6 @@ fi
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
-%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
@@ -381,9 +382,10 @@ fi
 %{ghclibdir}/haddock
 %{ghclibdir}/html
 %{ghclibdir}/latex
-%{ghcdocbasedir}/html
 %if %{undefined without_manual}
-%{ghcdocbasedir}/Cabal
+%{_mandir}/man1/ghc.*
+## needs pandoc
+#%{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
 %{ghcdocbasedir}/users_guide
 %endif
@@ -417,8 +419,12 @@ fi
 - Cabal --enable-executable-dynamic patch is upstream
 - add Cabal-fix-dynamic-exec-for-TH.patch
 - sparc linking fix is upstream
-- uses Debian's system-libffi patch by Joachim Breitner
+- use Debian's system-libffi patch by Joachim Breitner
 - setup ghc-deps.sh after ghc_version_override for bootstrapping
+- drop ppc64 config, pthread and mmap patches
+- do not set GhcUnregisterised explicitly
+- add s390 and s390x to unregisterised_archs
+- Cabal manual needs pandoc
 
 * Thu Jan 19 2012 Jens Petersen <petersen@redhat.com> - 7.0.4-42
 - move ghc-ghc-devel from ghc-libraries to the ghc metapackage
