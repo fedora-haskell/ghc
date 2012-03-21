@@ -374,6 +374,7 @@ fi
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
+%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
@@ -383,7 +384,6 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
-%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
