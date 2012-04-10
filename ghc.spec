@@ -2,10 +2,10 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%{?ghc_bootstrap}
-#%%global without_hscolour 1
-#%%global without_testsuite 1
+%global ghc_bootstrapping 1
+%{?ghc_bootstrap}
+%global without_hscolour 1
+%global without_testsuite 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -30,7 +30,7 @@ Version: 7.4.1
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 2%{?dist}
+Release: 1.1%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -75,7 +75,7 @@ BuildRequires: hscolour
 BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: llvm >= 3.0
+BuildRequires: clang >= 3.0
 %endif
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
@@ -408,8 +408,9 @@ fi
 %files libraries
 
 %changelog
-* Wed Mar 21 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-2
-- full build
+* Tue Apr 10 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1.1
+- BR clang not just llvm for ARM
+- bootstrap build
 
 * Wed Feb 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1
 - update to new 7.4.1 major release
