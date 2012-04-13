@@ -14,7 +14,7 @@
 #%%global without_testsuite 1
 
 # unregisterized archs
-%global unregisterised_archs ppc64 armv7hl armv5tel s390 s390x
+%global unregisterised_archs ppc64 s390 s390x
 
 # ghc does not output dwarf format so debuginfo is not useful
 %global debug_package %{nil}
@@ -75,7 +75,7 @@ BuildRequires: hscolour
 BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: clang >= 3.0
+BuildRequires: llvm >= 3.0
 %endif
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
@@ -95,6 +95,12 @@ Patch7: ghc-powerpc-pthread.patch
 Patch8: ghc-powerpc-linker-mmap.patch
 # fix dynamic linking of executables using Template Haskell
 Patch9: Cabal-fix-dynamic-exec-for-TH.patch
+# Debian armel fixes
+Patch10: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
+Patch11: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
+# Debian armhf fixes
+Patch12: ghc-debian-ARM-VFPv3D16.patch
+Patch13: ghc-debian-armhf_llvm_abi.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -126,7 +132,9 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
-# llvm is an optional dependency
+%ifarch armv7hl armv5tel
+Requires: llvm >= 3.0
+%endif
 
 %description compiler
 The package contains the GHC compiler, tools and utilities.
@@ -207,6 +215,14 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 %patch9 -p1 -b .orig
 
+# ARM patches
+%ifarch armv7hl armv5tel
+%patch10 -p0 -b .arm1
+%patch11 -p0 -b .arm2
+%patch12 -p1 -b .arm
+%patch13 -p1 -b .arm
+%endif
+
 %build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
@@ -229,14 +245,12 @@ EOF
 
 export CFLAGS="${CFLAGS:-%optflags}"
 # use --with-gcc=%{_bindir}/gcc when bootstrapping to avoid ccache hardcoding problem
-%ifarch armv7hl armv5tel
-export CC=clang
-%endif
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
+  --with-gcc=%{_bindir}/gcc
 
 # >4 cpus tends to break build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(%{_bindir}/getconf _NPROCESSORS_ONLN)
@@ -411,8 +425,9 @@ fi
 
 %changelog
 * Tue Apr 10 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1.1
-- build with llvm clang on ARM
-- drop --with-gcc
+- build with llvm-3.0 on ARM
+- remove arm from unregisterised_archs
+- add 4 Debian ARM patches for armel and armhf (Iain Lane)
 - bootstrap build
 
 * Wed Feb 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1
