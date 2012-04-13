@@ -229,6 +229,9 @@ EOF
 
 export CFLAGS="${CFLAGS:-%optflags}"
 # use --with-gcc=%{_bindir}/gcc when bootstrapping to avoid ccache hardcoding problem
+%ifarch armv7hl armv5tel
+export CC=clang
+%endif
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
@@ -408,7 +411,7 @@ fi
 
 %changelog
 * Tue Apr 10 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1.1
-- BR clang not just llvm for ARM
+- build with llvm clang on ARM
 - drop --with-gcc
 - bootstrap build
 
