@@ -217,8 +217,8 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 # ARM patches
 %ifarch armv7hl armv5tel
-%patch10 -p0 -b .arm1
-%patch11 -p0 -b .arm2
+%patch10 -p1 -b .arm1
+%patch11 -p1 -b .arm2
 %patch12 -p1 -b .arm
 %patch13 -p1 -b .arm
 %endif
