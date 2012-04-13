@@ -228,13 +228,12 @@ HSCOLOUR_SRCS = NO
 EOF
 
 export CFLAGS="${CFLAGS:-%optflags}"
-# specify gcc to avoid problems when bootstrapping with ccache
+# use --with-gcc=%{_bindir}/gcc when bootstrapping to avoid ccache hardcoding problem
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
-  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc
+  --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir}
 
 # >4 cpus tends to break build
 [ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(%{_bindir}/getconf _NPROCESSORS_ONLN)
@@ -410,6 +409,7 @@ fi
 %changelog
 * Tue Apr 10 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1.1
 - BR clang not just llvm for ARM
+- drop --with-gcc
 - bootstrap build
 
 * Wed Feb 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1
