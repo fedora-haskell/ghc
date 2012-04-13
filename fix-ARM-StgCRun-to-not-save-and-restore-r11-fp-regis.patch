@@ -1,0 +1,29 @@
+From 1cbf3bcae87dd102942d85ce71ea17d42d4b5f5a Mon Sep 17 00:00:00 2001
+From: Karel Gardas <karel.gardas@centrum.cz>
+Date: Tue, 14 Feb 2012 08:03:07 +0100
+Subject: [PATCH 2/2] fix ARM StgCRun to not save and restore r11/fp register twice
+
+---
+ rts/StgCRun.c |    4 ++--
+ 1 files changed, 2 insertions(+), 2 deletions(-)
+
+--- a/rts/StgCRun.c
++++ b/rts/StgCRun.c
+@@ -632,7 +632,7 @@
+         /*
+          * save callee-saves registers on behalf of the STG code.
+          */
+-        "stmfd sp!, {r4-r11, fp, ip, lr}\n\t"
++        "stmfd sp!, {r4-r10, fp, ip, lr}\n\t"
+ #if !defined(arm_HOST_ARCH_PRE_ARMv6)
+         "vstmdb sp!, {d8-d11}\n\t"
+ #endif
+@@ -669,7 +669,7 @@
+ #if !defined(arm_HOST_ARCH_PRE_ARMv6)
+         "vldmia sp!, {d8-d11}\n\t"
+ #endif
+-        "ldmfd sp!, {r4-r11, fp, ip, lr}\n\t"
++        "ldmfd sp!, {r4-r10, fp, ip, lr}\n\t"
+       : "=r" (r)
+       : "r" (f), "r" (basereg), "i" (RESERVED_C_STACK_BYTES)
+ #if !defined(__thumb__)
