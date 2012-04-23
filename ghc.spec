@@ -238,7 +238,7 @@ BUILD_DOCBOOK_HTML = NO
 HSCOLOUR_SRCS = NO
 %endif
 %ifarch armv7hl
-SRC_HC_OPTS += -D__ARM_PCS_VFP"
+SRC_HC_OPTS += -D__ARM_PCS_VFP
 %endif
 EOF
 
