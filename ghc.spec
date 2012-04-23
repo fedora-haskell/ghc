@@ -99,7 +99,7 @@ Patch9: Cabal-fix-dynamic-exec-for-TH.patch
 Patch10: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
 Patch11: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
 # Debian armhf fixes
-#Patch12: ghc-debian-ARM-VFPv3D16.patch
+Patch12: ghc-debian-ARM-VFPv3D16.patch
 Patch13: ghc-debian-armhf_llvm_abi.patch
 
 %description
@@ -219,7 +219,7 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %ifarch armv7hl armv5tel
 %patch10 -p1 -b .arm1
 %patch11 -p1 -b .arm2
-#%%patch12 -p1 -b .arm
+%patch12 -p1 -b .arm
 %patch13 -p1 -b .arm
 %endif
 
@@ -237,9 +237,8 @@ BUILD_DOCBOOK_HTML = NO
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
 %endif
-## should be unnecessary
-%ifarch %{unregisterised_archs}
-#GhcUnregisterised=YES
+%ifarch armv7hl
+SRC_HC_OPTS += -D__ARM_PCS_VFP"
 %endif
 EOF
 
