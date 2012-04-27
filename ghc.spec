@@ -77,6 +77,9 @@ BuildRequires: python
 %ifarch armv7hl armv5tel
 BuildRequires: llvm >= 3.0
 %endif
+%ifarch armv7hl
+BuildRequires: autoconf
+%endif
 Requires: ghc-compiler = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
