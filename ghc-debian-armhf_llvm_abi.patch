@@ -1,0 +1,26 @@
+Description: If we are on armhf, tell llvm to generate code for this ABI. Not
+ forwarded upstream, because they will do a more 'proper' patch. See upstream
+ bug #5914.
+Author: Iain Lane <laney@debian.org>
+
+Index: ghc/compiler/main/DriverPipeline.hs
+===================================================================
+--- ghc.orig/compiler/main/DriverPipeline.hs	2012-03-10 16:41:46.000000000 +0000
++++ ghc/compiler/main/DriverPipeline.hs	2012-03-10 16:42:59.209169474 +0000
+@@ -1,5 +1,5 @@
+ {-# OPTIONS -fno-cse #-}
+-{-# LANGUAGE NamedFieldPuns #-}
++{-# LANGUAGE NamedFieldPuns, CPP #-}
+ -- -fno-cse is needed for GLOBAL_VAR's to behave properly
+ 
+ -----------------------------------------------------------------------------
+@@ -1379,6 +1379,9 @@
+                                       then ["-mattr=+v7,+vfp3"]
+                                       else if (elem VFPv3D16 ext)
+                                            then ["-mattr=+v7,+vfp3,+d16"]
++#ifdef __ARM_PCS_VFP
++                                                ++ ["-float-abi=hard"]
++#endif
+                                            else []
+                    _               -> []
+ 
