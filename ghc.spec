@@ -98,9 +98,8 @@ Patch9: Cabal-fix-dynamic-exec-for-TH.patch
 # Debian armel fixes
 Patch10: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
 Patch11: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
-# Debian armhf fixes
-Patch12: ghc-debian-ARM-VFPv3D16.patch
-Patch13: ghc-debian-armhf_llvm_abi.patch
+# need to tell llc to use hard float on armv7hl
+Patch12: ghc-7.4.1-armv7hl-llc-hard-float.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -220,7 +219,6 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %patch10 -p1 -b .arm1
 %patch11 -p1 -b .arm2
 %patch12 -p1 -b .arm
-%patch13 -p1 -b .arm
 %endif
 
 %build
@@ -236,9 +234,6 @@ BUILD_DOCBOOK_HTML = NO
 %endif
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
-%endif
-%ifarch armv7hl
-SRC_HC_OPTS += -D__ARM_PCS_VFP
 %endif
 EOF
 
@@ -426,7 +421,8 @@ fi
 * Tue Apr 10 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1.1
 - build with llvm-3.0 on ARM
 - remove arm from unregisterised_archs
-- add 4 Debian ARM patches for armel and armhf (Iain Lane)
+- add Debian ARM register patches (Iain Lane)
+- make llc use -float-abi=hard on armv7hl (thanks Debian and Ubuntu)
 - bootstrap build
 
 * Wed Feb 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-1
