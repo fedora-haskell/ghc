@@ -30,7 +30,7 @@ Version: 7.4.1
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -98,12 +98,14 @@ Patch7: ghc-powerpc-pthread.patch
 Patch8: ghc-powerpc-linker-mmap.patch
 # fix dynamic linking of executables using Template Haskell
 Patch9: Cabal-fix-dynamic-exec-for-TH.patch
+# add libffi include dir to ghc wrapper for archs using gcc/llc
+Patch10: ghc-wrapper-libffi-include.patch
 # Debian armel fixes
-Patch10: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
-Patch11: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
+Patch11: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
+Patch12: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
 # Debian armhf fixes
-Patch12: ghc-debian-ARM-VFPv3D16.patch
-Patch13: ghc-debian-armhf_llvm_abi.patch
+Patch13: ghc-debian-ARM-VFPv3D16.patch
+Patch14: ghc-debian-armhf_llvm_abi.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -218,15 +220,19 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 
 %patch9 -p1 -b .orig
 
+%ifnarch %{ix86} x86_64
+%patch10 -p1 -b .10-ffi
+%endif
+
 # ARM patches
 %ifarch armv7hl armv5tel
-%patch10 -p1 -b .arm1
-%patch11 -p1 -b .arm2
+%patch11 -p1 -b .arm1
+%patch12 -p1 -b .arm2
 %endif
 %ifarch armv7hl
 # touches aclocal.m4
-%patch12 -p1 -b .arm
 %patch13 -p1 -b .arm
+%patch14 -p1 -b .arm
 autoreconf
 %endif
 
@@ -430,6 +436,10 @@ fi
 %files libraries
 
 %changelog
+* Wed May  2 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-4
+- add ghc-wrapper-libffi-include.patch to workaround "missing libffi.h"
+  for prof compiling on secondary archs
+
 * Sat Apr 28 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-3
 - build with llvm-3.0 on ARM
 - remove ARM from unregisterised_archs

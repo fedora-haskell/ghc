@@ -1,0 +1,6 @@
+diff -u ghc-7.4.1/ghc/ghc.wrapper\~ ghc-7.4.1/ghc/ghc.wrapper
+--- ghc-7.4.1/ghc/ghc.wrapper~	2012-02-02 03:10:32.000000000 +0900
++++ ghc-7.4.1/ghc/ghc.wrapper	2012-05-02 19:39:05.503872527 +0900
+@@ -1 +1 @@
+-exec "$executablename" -B"$topdir" ${1+"$@"}
++exec "$executablename" -B"$topdir" -optc-I$(pkg-config --variable=includedir libffi) ${1+"$@"}
