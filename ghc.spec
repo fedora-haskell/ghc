@@ -24,13 +24,13 @@
 
 Name: ghc
 # part of haskell-platform
-# NB make sure to rebuild ghc after a version bump to avoid ABI change problems
+# ghc must be rebuilt after a version bump to avoid ABI change problems
 Version: 7.4.1
 # Since library subpackages are versioned:
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 4%{?dist}
+Release: 5%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -54,7 +54,7 @@ Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-f
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
-BuildRequires: ghc-rpm-macros >= 0.14
+BuildRequires: ghc-rpm-macros >= 0.91
 BuildRequires: ghc-bytestring-devel
 BuildRequires: ghc-containers-devel
 BuildRequires: ghc-directory-devel
@@ -91,8 +91,6 @@ Patch2: ghc-gen_contents_index-type-level.patch
 Patch3: ghc-gen_contents_index-cron-batch.patch
 # fedora does not allow copy libraries
 Patch4: ghc-use-system-libffi.patch
-# add cabal configure option --enable-executable-dynamic
-# (see http://hackage.haskell.org/trac/hackage/ticket/600)
 Patch7: ghc-powerpc-pthread.patch
 # http://hackage.haskell.org/trac/ghc/ticket/4999
 Patch8: ghc-powerpc-linker-mmap.patch
@@ -133,6 +131,7 @@ License: BSD
 Group: Development/Languages
 Requires: gcc%{?_isa}
 Requires: ghc-base-devel%{?_isa}
+# for alternatives
 Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
@@ -158,31 +157,31 @@ To install all of ghc, install the ghc base package.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_binlib_package Cabal 1.14.0
-%ghc_binlib_package -l %BSDHaskellReport array 0.4.0.0
-%ghc_binlib_package -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.5.0.0
-%ghc_binlib_package binary 0.5.1.0
-%ghc_binlib_package bytestring 0.9.2.1
-%ghc_binlib_package -l %BSDHaskellReport containers 0.4.2.1
-%ghc_binlib_package -l %BSDHaskellReport deepseq 1.3.0.0
-%ghc_binlib_package -l %BSDHaskellReport directory 1.1.0.2
-%ghc_binlib_package -l %BSDHaskellReport extensible-exceptions 0.1.1.4
-%ghc_binlib_package filepath 1.3.0.0
+%ghc_lib_subpackage Cabal 1.14.0
+%ghc_lib_subpackage -l %BSDHaskellReport array 0.4.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.5.0.0
+%ghc_lib_subpackage binary 0.5.1.0
+%ghc_lib_subpackage bytestring 0.9.2.1
+%ghc_lib_subpackage -l %BSDHaskellReport containers 0.4.2.1
+%ghc_lib_subpackage -l %BSDHaskellReport deepseq 1.3.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport directory 1.1.0.2
+%ghc_lib_subpackage -l %BSDHaskellReport extensible-exceptions 0.1.1.4
+%ghc_lib_subpackage filepath 1.3.0.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
-%ghc_binlib_package -x ghc %{ghc_version_override}
+%ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_binlib_package -l HaskellReport haskell2010 1.1.0.1
-%ghc_binlib_package -l HaskellReport haskell98 2.0.0.1
-%ghc_binlib_package hoopl 3.8.7.3
-%ghc_binlib_package hpc 0.5.1.1
-%ghc_binlib_package -l %BSDHaskellReport old-locale 1.0.0.4
-%ghc_binlib_package -l %BSDHaskellReport old-time 1.1.0.0
-%ghc_binlib_package pretty 1.1.1.0
-%ghc_binlib_package -l %BSDHaskellReport process 1.1.0.1
-%ghc_binlib_package template-haskell 2.7.0.0
-%ghc_binlib_package time 1.4
-%ghc_binlib_package unix 2.5.1.0
+%ghc_lib_subpackage -l HaskellReport haskell2010 1.1.0.1
+%ghc_lib_subpackage -l HaskellReport haskell98 2.0.0.1
+%ghc_lib_subpackage hoopl 3.8.7.3
+%ghc_lib_subpackage hpc 0.5.1.1
+%ghc_lib_subpackage -l %BSDHaskellReport old-locale 1.0.0.4
+%ghc_lib_subpackage -l %BSDHaskellReport old-time 1.1.0.0
+%ghc_lib_subpackage pretty 1.1.1.0
+%ghc_lib_subpackage -l %BSDHaskellReport process 1.1.0.1
+%ghc_lib_subpackage template-haskell 2.7.0.0
+%ghc_lib_subpackage time 1.4
+%ghc_lib_subpackage unix 2.5.1.0
 %endif
 
 %global version %{ghc_version_override}
@@ -436,6 +435,9 @@ fi
 %files libraries
 
 %changelog
+* Fri Jun 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-5
+- use ghc_lib_subpackage instead of ghc_binlib_package (ghc-rpm-macros 0.91)
+
 * Wed May  2 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-4
 - add ghc-wrapper-libffi-include.patch to workaround "missing libffi.h"
   for prof compiling on secondary archs
