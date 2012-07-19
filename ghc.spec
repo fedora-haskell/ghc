@@ -30,7 +30,7 @@ Version: 7.4.1
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 5%{?dist}
+Release: 6%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -435,6 +435,9 @@ fi
 %files libraries
 
 %changelog
+* Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
+- Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
+
 * Fri Jun 15 2012 Jens Petersen <petersen@redhat.com> - 7.4.1-5
 - use ghc_lib_subpackage instead of ghc_binlib_package (ghc-rpm-macros 0.91)
 
