@@ -1,0 +1,13 @@
+--- ghc-7.4.2/libraries/Cabal/Cabal/Distribution/Simple/Setup.hs~	2012-06-07 02:10:40.000000000 +0900
++++ ghc-7.4.2/libraries/Cabal/Cabal/Distribution/Simple/Setup.hs	2012-08-24 20:33:00.032123967 +0900
+@@ -313,7 +313,7 @@
+     configDistPref     = Flag defaultDistPref,
+     configVerbosity    = Flag normal,
+     configUserInstall  = Flag False,           --TODO: reverse this
+-    configGHCiLib      = Flag True,
++    configGHCiLib      = Flag False,
+     configSplitObjs    = Flag False, -- takes longer, so turn off by default
+     configStripExes    = Flag True,
+     configTests  = Flag False,
+
+Diff finished.  Fri Aug 24 20:33:10 2012

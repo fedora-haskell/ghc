@@ -100,6 +100,8 @@ Patch9: Cabal-fix-dynamic-exec-for-TH.patch
 Patch10: ghc-wrapper-libffi-include.patch
 # latest arm hf patch
 Patch11: ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch
+# disable building HS*.o libs for ghci
+Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -225,6 +227,8 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %patch11 -p1 -b .arm
 autoreconf
 %endif
+
+%patch12 -p1 -b .orig
 
 %build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
@@ -427,6 +431,7 @@ fi
 - ARM StgCRun patches not longer needed
 - use Karel Gardas' ARM hardfloat patch committed upstream
 - use _smp_mflags again
+- disable Cabal building ghci lib files
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
