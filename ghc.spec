@@ -2,10 +2,10 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%{?ghc_bootstrap}
-#%%global without_hscolour 1
-#%%global without_testsuite 1
+%global ghc_bootstrapping 1
+%{?ghc_bootstrap}
+%global without_hscolour 1
+%global without_testsuite 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -25,12 +25,12 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.4.1
+Version: 7.4.2
 # Since library subpackages are versioned:
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 6%{?dist}
+Release: 7%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -98,12 +98,8 @@ Patch8: ghc-powerpc-linker-mmap.patch
 Patch9: Cabal-fix-dynamic-exec-for-TH.patch
 # add libffi include dir to ghc wrapper for archs using gcc/llc
 Patch10: ghc-wrapper-libffi-include.patch
-# Debian armel fixes
-Patch11: fix-ARM-s-StgCRun-clobbered-register-list-for-both-A.patch
-Patch12: fix-ARM-StgCRun-to-not-save-and-restore-r11-fp-regis.patch
-# Debian armhf fixes
-Patch13: ghc-debian-ARM-VFPv3D16.patch
-Patch14: ghc-debian-armhf_llvm_abi.patch
+# latest arm hf patch
+Patch11: ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -159,7 +155,7 @@ To install all of ghc, install the ghc base package.
 %if %{defined ghclibdir}
 %ghc_lib_subpackage Cabal 1.14.0
 %ghc_lib_subpackage -l %BSDHaskellReport array 0.4.0.0
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.5.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.5.1.0
 %ghc_lib_subpackage binary 0.5.1.0
 %ghc_lib_subpackage bytestring 0.9.2.1
 %ghc_lib_subpackage -l %BSDHaskellReport containers 0.4.2.1
@@ -181,7 +177,7 @@ To install all of ghc, install the ghc base package.
 %ghc_lib_subpackage -l %BSDHaskellReport process 1.1.0.1
 %ghc_lib_subpackage template-haskell 2.7.0.0
 %ghc_lib_subpackage time 1.4
-%ghc_lib_subpackage unix 2.5.1.0
+%ghc_lib_subpackage unix 2.5.1.1
 %endif
 
 %global version %{ghc_version_override}
@@ -224,14 +220,9 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %endif
 
 # ARM patches
-%ifarch armv7hl armv5tel
-%patch11 -p1 -b .arm1
-%patch12 -p1 -b .arm2
-%endif
 %ifarch armv7hl
 # touches aclocal.m4
-%patch13 -p1 -b .arm
-%patch14 -p1 -b .arm
+%patch11 -p1 -b .arm
 autoreconf
 %endif
 
@@ -249,9 +240,6 @@ BUILD_DOCBOOK_HTML = NO
 %if %{undefined without_hscolour}
 HSCOLOUR_SRCS = NO
 %endif
-%ifarch armv7hl
-SRC_HC_OPTS += -D__ARM_PCS_VFP
-%endif
 EOF
 
 export CFLAGS="${CFLAGS:-%optflags}"
@@ -263,10 +251,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --with-gcc=%{_bindir}/gcc
 
-# >4 cpus tends to break build
-[ -z "$RPM_BUILD_NCPUS" ] && RPM_BUILD_NCPUS=$(%{_bindir}/getconf _NPROCESSORS_ONLN)
-[ "$RPM_BUILD_NCPUS" -gt 4 ] && RPM_BUILD_NCPUS=4
-make -j$RPM_BUILD_NCPUS
+make %{?_smp_mflags}
 
 %install
 make DESTDIR=${RPM_BUILD_ROOT} install
@@ -435,6 +420,14 @@ fi
 %files libraries
 
 %changelog
+* Fri Aug 24 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
+- 7.4.2 bootstrap
+  http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
+- update base and unix library versions
+- ARM StgCRun patches not longer needed
+- use Karel Gardas' ARM hardfloat patch committed upstream
+- use _smp_mflags again
+
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
 
