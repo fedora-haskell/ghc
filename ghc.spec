@@ -258,7 +258,10 @@ export CFLAGS="${CFLAGS:-%optflags}"
 make %{?_smp_mflags}
 
 %install
-make DESTDIR=${RPM_BUILD_ROOT} install
+make DESTDIR=%{buildroot} install
+
+# this should be done in the buildsys
+find %{buildroot} -type f -name "HS*.o" -delete
 
 for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
@@ -285,28 +288,28 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist bin-package-db ghc
 
 %if %{undefined ghc_without_shared}
-ls $RPM_BUILD_ROOT%{ghclibdir}/libHS*.so >> ghc-base.files
-sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base.files
+ls %{buildroot}%{ghclibdir}/libHS*.so >> ghc-base.files
+sed -i -e "s|^%{buildroot}||g" ghc-base.files
 %endif
-ls -d $RPM_BUILD_ROOT%{ghclibdir}/libHS*.a  $RPM_BUILD_ROOT%{ghclibdir}/package.conf.d/builtin_*.conf $RPM_BUILD_ROOT%{ghclibdir}/include >> ghc-base-devel.files
-sed -i -e "s|^$RPM_BUILD_ROOT||g" ghc-base-devel.files
+ls -d %{buildroot}%{ghclibdir}/libHS*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
+sed -i -e "s|^%{buildroot}||g" ghc-base-devel.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
-  if [ -x ${RPM_BUILD_ROOT}%{_bindir}/$i-ghc ]; then
-    rm ${RPM_BUILD_ROOT}%{_bindir}/$i
+  if [ -x %{buildroot}%{_bindir}/$i-ghc ]; then
+    rm %{buildroot}%{_bindir}/$i
   else
-    mv ${RPM_BUILD_ROOT}%{_bindir}/$i{,-ghc}
+    mv %{buildroot}%{_bindir}/$i{,-ghc}
   fi
-  touch ${RPM_BUILD_ROOT}%{_bindir}/$i
+  touch %{buildroot}%{_bindir}/$i
 done
 
 %ghc_strip_dynlinked
 
 %if %{undefined without_haddock}
-mkdir -p ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly
-install -p --mode=755 %SOURCE3 ${RPM_BUILD_ROOT}%{_sysconfdir}/cron.hourly/ghc-doc-index
-mkdir -p ${RPM_BUILD_ROOT}%{_localstatedir}/lib/ghc
+mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
+install -p --mode=755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
+mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
 %endif
 
 %check
@@ -432,6 +435,7 @@ fi
 - use Karel Gardas' ARM hardfloat patch committed upstream
 - use _smp_mflags again
 - disable Cabal building ghci lib files
+- forcibly remove HS*.o files from ghc libs for now
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
