@@ -260,9 +260,6 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 
-# this should be done in the buildsys
-find %{buildroot} -type f -name "HS*.o" -delete
-
 for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
@@ -435,7 +432,6 @@ fi
 - use Karel Gardas' ARM hardfloat patch committed upstream
 - use _smp_mflags again
 - disable Cabal building ghci lib files
-- forcibly remove HS*.o files from ghc libs for now
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
