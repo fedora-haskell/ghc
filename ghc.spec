@@ -1,16 +1,14 @@
 # Shared haskell libraries are supported for x86* archs
 # (disabled for other archs in ghc-rpm-macros)
 
-# To bootstrap a new version of ghc, uncomment the following:
+# To bootstrap build a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
 %{?ghc_bootstrap}
-%global without_hscolour 1
 %global without_testsuite 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
 #%%{?ghc_test}
-#%%global without_hscolour 1
 #%%global without_testsuite 1
 
 # unregisterized archs
@@ -67,9 +65,6 @@ BuildRequires: libffi-devel
 BuildRequires: ncurses-devel
 %if %{undefined without_manual}
 BuildRequires: libxslt, docbook-style-xsl
-%endif
-%if %{undefined without_haddock} && %{undefined without_hscolour}
-BuildRequires: hscolour
 %endif
 %if %{undefined without_testsuite}
 BuildRequires: python
@@ -240,9 +235,6 @@ HADDOCK_DOCS = NO
 %endif
 %if %{defined without_manual}
 BUILD_DOCBOOK_HTML = NO
-%endif
-%if %{undefined without_hscolour}
-HSCOLOUR_SRCS = NO
 %endif
 EOF
 
@@ -432,6 +424,9 @@ fi
 - use Karel Gardas' ARM hardfloat patch committed upstream
 - use _smp_mflags again
 - disable Cabal building ghci lib files
+- do not disable hscolour in build.mk
+- drop the explicit hscolour BR
+- without_hscolour should now be set by ghc-rpm-macros for bootstrapping
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
