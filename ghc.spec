@@ -40,7 +40,6 @@ Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
-Source3: ghc-doc-index.cron
 URL: http://haskell.org/ghc/
 Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
 Obsoletes: ghc-dph-par < 0.5, ghc-dph-par-devel < 0.5, ghc-dph-par-prof < 0.5
@@ -82,8 +81,6 @@ Requires: ghc-ghc-devel = %{version}-%{release}
 Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
 # type-level too big so skip it in gen_contents_index
 Patch2: ghc-gen_contents_index-type-level.patch
-# disable gen_contents_index when not --batch for cron
-Patch3: ghc-gen_contents_index-cron-batch.patch
 # fedora does not allow copy libraries
 Patch4: ghc-use-system-libffi.patch
 Patch7: ghc-powerpc-pthread.patch
@@ -200,7 +197,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
 %patch1 -p1 -b .orig
 %patch2 -p1
-%patch3 -p1
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -296,10 +292,9 @@ done
 %ghc_strip_dynlinked
 
 %if %{undefined without_haddock}
-mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
-install -p --mode=755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
-mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
+mkdir -p %{buildroot}%{_localstatedir}/lib/rpm-state/ghc
 %endif
+
 
 %check
 # stolen from ghc6/debian/rules:
@@ -409,14 +404,13 @@ fi
 %ghost %{ghcdocbasedir}/libraries/index*.html
 %ghost %{ghcdocbasedir}/libraries/minus.gif
 %ghost %{ghcdocbasedir}/libraries/plus.gif
-%{_sysconfdir}/cron.hourly/ghc-doc-index
-%{_localstatedir}/lib/ghc
+%{_localstatedir}/lib/rpm-state/ghc
 %endif
 
 %files libraries
 
 %changelog
-* Fri Aug 24 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
+* Mon Oct 29 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
 - 7.4.2 bootstrap
   http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
 - update base and unix library versions
@@ -427,6 +421,9 @@ fi
 - do not disable hscolour in build.mk
 - drop the explicit hscolour BR
 - without_hscolour should now be set by ghc-rpm-macros for bootstrapping
+- drop cronjob for re-indexing html docs and add a rpm-state dir for
+  sharing state between devel posttrans scripts (#870694)
+  (http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Saving_state_between_scriptlets)
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
