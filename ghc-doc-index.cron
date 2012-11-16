@@ -1,0 +1,13 @@
+#! /bin/bash
+
+if [ -e /etc/sysconfig/ghc-doc-index ]; then
+    . /etc/sysconfig/ghc-doc-index
+fi
+
+if [ "$CRON" = "no" ]; then
+   exit 0
+fi
+
+/usr/bin/ghc-doc-index >/dev/null
+
+exit 0

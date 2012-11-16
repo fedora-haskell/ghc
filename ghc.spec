@@ -40,6 +40,8 @@ Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
+Source3: ghc-doc-index.cron
+Source4: ghc-doc-index
 URL: http://haskell.org/ghc/
 Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
 Obsoletes: ghc-dph-par < 0.5, ghc-dph-par-devel < 0.5, ghc-dph-par-prof < 0.5
@@ -75,6 +77,7 @@ BuildRequires: llvm >= 3.0
 BuildRequires: autoconf
 %endif
 Requires: ghc-compiler = %{version}-%{release}
+Requires: ghc-doc-index = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
 # absolute haddock path (was for html/libraries -> libraries)
@@ -94,6 +97,7 @@ Patch10: ghc-wrapper-libffi-include.patch
 Patch11: ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch
 # disable building HS*.o libs for ghci
 Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
+Patch17: ghc-7.4-silence-gen_contents_index.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -195,8 +199,11 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
+
+# tweaks to gen_contents_index
 %patch1 -p1 -b .orig
 %patch2 -p1
+%patch17 -p1
 
 # make sure we don't use these
 rm -r ghc-tarballs/{mingw,perl}
@@ -292,9 +299,10 @@ done
 %ghc_strip_dynlinked
 
 %if %{undefined without_haddock}
-mkdir -p %{buildroot}%{_localstatedir}/lib/rpm-state/ghc
+mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
+install -p --mode=755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
+mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
 %endif
-
 
 %check
 # stolen from ghc6/debian/rules:
@@ -351,6 +359,7 @@ fi
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/ghc
 %{_bindir}/ghc-%{version}
+%{_bindir}/ghc-doc-index
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
 %{_bindir}/ghci
@@ -404,7 +413,12 @@ fi
 %ghost %{ghcdocbasedir}/libraries/index*.html
 %ghost %{ghcdocbasedir}/libraries/minus.gif
 %ghost %{ghcdocbasedir}/libraries/plus.gif
-%{_localstatedir}/lib/rpm-state/ghc
+%{_localstatedir}/lib/ghc
+%endif
+
+%if %{undefined without_haddock}
+%files doc-index
+%{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %files libraries
@@ -418,12 +432,11 @@ fi
 - use Karel Gardas' ARM hardfloat patch committed upstream
 - use _smp_mflags again
 - disable Cabal building ghci lib files
+- silence the doc re-indexing script and move the doc indexing cronjob
+  to a new ghc-doc-index subpackage (#870694)
 - do not disable hscolour in build.mk
 - drop the explicit hscolour BR
 - without_hscolour should now be set by ghc-rpm-macros for bootstrapping
-- drop cronjob for re-indexing html docs and add a rpm-state dir for
-  sharing state between devel posttrans scripts (#870694)
-  (http://fedoraproject.org/wiki/Packaging:ScriptletSnippets#Saving_state_between_scriptlets)
 
 * Thu Jul 19 2012 Fedora Release Engineering <rel-eng@lists.fedoraproject.org> - 7.4.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_18_Mass_Rebuild
