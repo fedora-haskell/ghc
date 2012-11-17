@@ -2,10 +2,10 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%{?ghc_bootstrap}
-%global without_testsuite 1
-%global without_haddock 1
+#%%global ghc_bootstrapping 1
+#%%{?ghc_bootstrap}
+#%%global without_testsuite 1
+#%%global without_haddock 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -29,7 +29,7 @@ Version: 7.4.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -434,9 +434,12 @@ fi
 %files libraries
 
 %changelog
+* Sat Nov 17 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-8
+- production 7.4.2 build
+  http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
+
 * Sat Nov 17 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
 - 7.4.2 bootstrap
-  http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
 - update base and unix library versions
 - ARM StgCRun patches not longer needed
 - use Karel Gardas' ARM hardfloat patch committed upstream
