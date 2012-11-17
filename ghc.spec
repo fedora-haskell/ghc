@@ -311,6 +311,7 @@ done
 mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
 install -p --mode=755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
 mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
+install -p -m 0644 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
 %endif
 
 %check
@@ -368,7 +369,6 @@ fi
 %doc ANNOUNCE HACKING LICENSE README
 %{_bindir}/ghc
 %{_bindir}/ghc-%{version}
-%{_bindir}/ghc-doc-index
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
 %{_bindir}/ghci
@@ -399,6 +399,7 @@ fi
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
+%{_bindir}/ghc-doc-index
 %{_bindir}/haddock
 %{_bindir}/haddock-ghc-%{version}
 %{ghclibdir}/haddock
