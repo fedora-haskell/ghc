@@ -5,6 +5,7 @@
 %global ghc_bootstrapping 1
 %{?ghc_bootstrap}
 %global without_testsuite 1
+%global without_haddock 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -35,7 +36,6 @@ Summary: Glasgow Haskell Compiler
 # see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 ExcludeArch: sparc64
 License: %BSDHaskellReport
-Group: Development/Languages
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
@@ -122,7 +122,6 @@ for the functional language Haskell. Highlights:
 %package compiler
 Summary: GHC compiler and utilities
 License: BSD
-Group: Development/Languages
 Requires: gcc%{?_isa}
 Requires: ghc-base-devel%{?_isa}
 # for alternatives
@@ -139,6 +138,17 @@ The package contains the GHC compiler, tools and utilities.
 
 The ghc libraries are provided by ghc-devel.
 To install all of ghc, install the ghc base package.
+
+%if %{undefined without_haddock}
+%package doc-index
+Summary: GHC library development documentation indexing
+License: BSD
+Requires: ghc-compiler = %{version}-%{release}
+
+%description doc-index
+The package provides a cronjob for re-indexing installed library development
+documention.
+%endif
 
 %global ghc_version_override %{version}
 
@@ -183,7 +193,6 @@ To install all of ghc, install the ghc base package.
 %package libraries
 Summary: GHC development libraries meta package
 License: %BSDHaskellReport
-Group: Development/Libraries
 Requires: ghc-compiler = %{version}-%{release}
 Obsoletes: ghc-devel < %{version}-%{release}
 Provides: ghc-devel = %{version}-%{release}
