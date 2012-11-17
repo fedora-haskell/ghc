@@ -1015,7 +1015,7 @@ fi
 * Sun Jan 06 2008 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-6
 - Fix docdir
 
-* Tue Dec 12 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-1
+* Wed Dec 12 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.2-1
 - Update to 6.8.2
 
 * Fri Nov 23 2007 Bryan O'Sullivan <bos@serpentine.com> - 6.8.1-2
