@@ -424,7 +424,7 @@ fi
 %files libraries
 
 %changelog
-* Mon Oct 29 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
+* Sat Nov 17 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-7
 - 7.4.2 bootstrap
   http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
 - update base and unix library versions
