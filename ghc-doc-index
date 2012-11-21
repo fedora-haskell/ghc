@@ -10,6 +10,11 @@ if [ -f $LOCKFILE ]; then
   exit 0
 fi
 
+if [ "$(id -u)" != "0" ]; then
+  echo Need to be root!
+  exit 1
+fi
+
 trap "{ rm -f $LOCKFILE ; exit 255; }" EXIT
 touch $LOCKFILE
 

@@ -1,13 +1,9 @@
 #! /bin/bash
+# updates the library documentation index after updates
 
-if [ -e /etc/sysconfig/ghc-doc-index ]; then
-    . /etc/sysconfig/ghc-doc-index
-fi
+# This can be disabled by uninstalling ghc-doc-index
+# or adding ghc-doc-index to "./jobs-deny".
 
-if [ "$CRON" = "no" ]; then
-   exit 0
-fi
-
-/usr/bin/ghc-doc-index >/dev/null
+/usr/bin/ghc-doc-index
 
 exit 0

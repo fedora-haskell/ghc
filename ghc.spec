@@ -29,7 +29,7 @@ Version: 7.4.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -309,9 +309,9 @@ done
 
 %if %{undefined without_haddock}
 mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
-install -p --mode=755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
+install -p --mode=0755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
 mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
-install -p -m 0644 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
+install -p --mode=0755 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
 %endif
 
 %check
@@ -434,6 +434,10 @@ fi
 %files libraries
 
 %changelog
+* Wed Nov 21 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-9
+- fix permissions of ghc-doc-index and only run when root
+- ghc-doc-index cronjob no longer looks at /etc/sysconfig/ghc-doc-index
+
 * Sat Nov 17 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-8
 - production 7.4.2 build
   http://www.haskell.org/ghc/docs/7.4.2/html/users_guide/release-7-4-2.html
