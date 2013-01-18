@@ -29,7 +29,7 @@ Version: 7.4.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 9%{?dist}
+Release: 10%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -434,6 +434,9 @@ fi
 %files libraries
 
 %changelog
+* Thu Jan 17 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-10
+- rebuild for F19 libffi soname bump
+
 * Wed Nov 21 2012 Jens Petersen <petersen@redhat.com> - 7.4.2-9
 - fix permissions of ghc-doc-index and only run when root
 - ghc-doc-index cronjob no longer looks at /etc/sysconfig/ghc-doc-index
