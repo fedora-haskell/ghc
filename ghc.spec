@@ -29,7 +29,7 @@ Version: 7.4.2
 # - release can only be reset if all library versions get bumped simultaneously
 #   (eg for a major release)
 # - minor release numbers should be incremented monotonically
-Release: 10%{?dist}
+Release: 11%{?dist}
 Summary: Glasgow Haskell Compiler
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -271,6 +271,9 @@ ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 echo "%doc libraries/$name/LICENSE" >> ghc-$name%{?ghc_without_shared:-devel}.files
 done
 
+# ghc-base should own ghclibdir
+echo "%dir %{ghclibdir}" >> ghc-base%{?ghc_without_shared:-devel}.files
+
 %ghc_gen_filelists bin-package-db 0.0.0.0
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghc-prim 0.2.0.0
@@ -288,6 +291,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist ghc-prim base
 %merge_filelist bin-package-db ghc
 
+# add rts libs
 %if %{undefined ghc_without_shared}
 ls %{buildroot}%{ghclibdir}/libHS*.so >> ghc-base.files
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
@@ -380,7 +384,6 @@ fi
 %{_bindir}/runghc
 %ghost %{_bindir}/runhaskell
 %{_bindir}/runhaskell-ghc
-%dir %{ghclibdir}
 %{ghclibdir}/ghc
 %{ghclibdir}/ghc-pkg
 %ifnarch %{unregisterised_archs}
@@ -434,6 +437,10 @@ fi
 %files libraries
 
 %changelog
+* Tue Feb  5 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-11
+- ghclibdir should be owned at runtime by ghc-base instead of ghc-compiler
+  (thanks Michael Scherer, #907671)
+
 * Thu Jan 17 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-10
 - rebuild for F19 libffi soname bump
 
