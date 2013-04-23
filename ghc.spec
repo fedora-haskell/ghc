@@ -84,7 +84,9 @@ BuildRequires: python
 BuildRequires: llvm >= 3.0
 %endif
 Requires: ghc-compiler = %{version}-%{release}
+%if %{undefined without_haddock}
 Requires: ghc-doc-index = %{version}-%{release}
+%endif
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
 
