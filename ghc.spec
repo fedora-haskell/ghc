@@ -172,7 +172,9 @@ documention.
 %ghc_lib_subpackage -l %BSDHaskellReport old-locale 1.0.0.5
 %ghc_lib_subpackage -l %BSDHaskellReport old-time 1.1.0.1
 %ghc_lib_subpackage pretty 1.1.1.0
+%define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
 %ghc_lib_subpackage -l %BSDHaskellReport process 1.1.0.2
+%undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell 2.8.0.0
 %ghc_lib_subpackage time 1.4.0.1
 %ghc_lib_subpackage unix 2.6.0.1
@@ -222,6 +224,13 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
+%if %{undefined ghc_bootstrapping}
+%ifnarch armv7hl armv5tel
+BuildFlavour = perf
+%else
+BuildFlavour = perf-llvm
+%endif
+%endif
 GhcLibWays = v %{!?ghc_without_shared:dyn} %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
@@ -433,6 +442,8 @@ fi
   ghc-7.4-silence-gen_contents_index.patch are no longer needed
 - build with ghc-rpm-macros-extra
 - no longer filter type-level package from haddock index
+- process obsoletes process-leksah
+- do production build with BuildFlavour perf (#880135)
 
 * Tue Feb  5 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-11
 - ghclibdir should be owned at runtime by ghc-base instead of ghc-compiler
