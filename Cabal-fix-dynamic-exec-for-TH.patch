@@ -17,7 +17,7 @@
 +  when ((withProfExe lbi || withDynExe lbi) &&
          EnableExtension TemplateHaskell `elem` allExtensions exeBi) $
 -    runGhcProg exeProfOpts { ghcOptNoLink = toFlag True }
-+    runGhcProg staticOpts { ghcOptNoLink = toFlag True }
++    runGhcProg vanillaOpts { ghcOptNoLink = toFlag True }
  
    runGhcProg exeOpts { ghcOptOutputFile = toFlag (targetDir </> exeNameReal) }
  
