@@ -41,9 +41,11 @@ Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
-Patch1: ghc-gen_contents_index-haddock-path.patch
+Patch1:  ghc-gen_contents_index-haddock-path.patch
 # fedora does not allow copy libraries
-Patch4: ghc-use-system-libffi.patch
+Patch4:  ghc-use-system-libffi.patch
+# fix dynamic linking of executables using Template Haskell
+Patch9:  Cabal-fix-dynamic-exec-for-TH.patch
 # add libffi include dir to ghc wrapper for archs using gcc/llc
 Patch10: ghc-wrapper-libffi-include.patch
 # disable building HS*.o libs for ghci
@@ -212,6 +214,8 @@ rm -r ghc-tarballs/{mingw*,perl}
 rm -r ghc-tarballs/libffi
 mkdir -p rts/dist/build
 ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
+
+%patch9 -p1 -b .orig
 
 %ifnarch %{ix86} x86_64
 %patch10 -p1 -b .10-ffi
