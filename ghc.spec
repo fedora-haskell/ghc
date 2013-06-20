@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 11.9%{?dist}
+Release: 12%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -435,7 +435,7 @@ fi
 
 
 %changelog
-* Mon Apr 22 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-11.9
+* Mon Apr 22 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-12
 - bootstrap 7.6.3, see release notes:
   http://www.haskell.org/ghc/docs/7.6.3/html/users_guide/release-7-6-1.html
   http://www.haskell.org/ghc/docs/7.6.3/html/users_guide/release-7-6-2.html
