@@ -2,10 +2,10 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%{?ghc_bootstrap}
-%global without_testsuite 1
-%global without_haddock 1
+#%%global ghc_bootstrapping 1
+#%%{?ghc_bootstrap}
+#%%global without_testsuite 1
+#%%global without_haddock 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 12%{?dist}
+Release: 13%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -435,11 +435,15 @@ fi
 
 
 %changelog
-* Mon Apr 22 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-12
-- bootstrap 7.6.3, see release notes:
+* Thu Jun 20 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-13
+- production perf -O2 build
+- see release notes:
   http://www.haskell.org/ghc/docs/7.6.3/html/users_guide/release-7-6-1.html
   http://www.haskell.org/ghc/docs/7.6.3/html/users_guide/release-7-6-2.html
   http://www.haskell.org/ghc/docs/7.6.3/html/users_guide/release-7-6-3.html
+
+* Thu Jun 20 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-12
+- bootstrap 7.6.3
 - all library versions bumped except pretty
 - Cabal-fix-dynamic-exec-for-TH.patch,
   ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch, and
