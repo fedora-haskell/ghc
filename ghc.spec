@@ -26,23 +26,45 @@ Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
 Version: 7.4.2
 # Since library subpackages are versioned:
-# - release can only be reset if all library versions get bumped simultaneously
-#   (eg for a major release)
-# - minor release numbers should be incremented monotonically
-Release: 11%{?dist}
+# - release can only be reset if *all* library versions get bumped simultaneously
+#   (sometimes after a major release)
+# - minor release numbers for a branch should be incremented monotonically
+Release: 11.1%{?dist}
 Summary: Glasgow Haskell Compiler
-# fedora ghc has been bootstrapped on
-# %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
-# see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
-ExcludeArch: sparc64
+
 License: %BSDHaskellReport
+URL: http://haskell.org/ghc/
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
-URL: http://haskell.org/ghc/
+# absolute haddock path (was for html/libraries -> libraries)
+Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
+# type-level too big so skip it in gen_contents_index
+Patch2: ghc-gen_contents_index-type-level.patch
+# fedora does not allow copy libraries
+Patch4: ghc-use-system-libffi.patch
+Patch7: ghc-powerpc-pthread.patch
+# http://hackage.haskell.org/trac/ghc/ticket/4999
+Patch8: ghc-powerpc-linker-mmap.patch
+# fix dynamic linking of executables using Template Haskell
+Patch9: Cabal-fix-dynamic-exec-for-TH.patch
+# add libffi include dir to ghc wrapper for archs using gcc/llc
+Patch10: ghc-wrapper-libffi-include.patch
+# latest arm hf patch
+Patch11: ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch
+# disable building HS*.o libs for ghci
+Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
+# fix compilation with llvm-3.3
+Patch13: ghc-llvmCodeGen-empty-array.patch
+Patch17: ghc-7.4-silence-gen_contents_index.patch
+
+# fedora ghc has been bootstrapped on
+# %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
+# see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
+ExcludeArch: sparc64
 Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
 Obsoletes: ghc-dph-par < 0.5, ghc-dph-par-devel < 0.5, ghc-dph-par-prof < 0.5
 Obsoletes: ghc-dph-prim-interface < 0.5, ghc-dph-prim-interface-devel < 0.5, ghc-dph-interface-prim-prof < 0.5
@@ -77,27 +99,11 @@ BuildRequires: llvm >= 3.0
 BuildRequires: autoconf
 %endif
 Requires: ghc-compiler = %{version}-%{release}
+%if %{undefined without_haddock}
 Requires: ghc-doc-index = %{version}-%{release}
+%endif
 Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
-# absolute haddock path (was for html/libraries -> libraries)
-Patch1: ghc-6.12.1-gen_contents_index-haddock-path.patch
-# type-level too big so skip it in gen_contents_index
-Patch2: ghc-gen_contents_index-type-level.patch
-# fedora does not allow copy libraries
-Patch4: ghc-use-system-libffi.patch
-Patch7: ghc-powerpc-pthread.patch
-# http://hackage.haskell.org/trac/ghc/ticket/4999
-Patch8: ghc-powerpc-linker-mmap.patch
-# fix dynamic linking of executables using Template Haskell
-Patch9: Cabal-fix-dynamic-exec-for-TH.patch
-# add libffi include dir to ghc wrapper for archs using gcc/llc
-Patch10: ghc-wrapper-libffi-include.patch
-# latest arm hf patch
-Patch11: ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch
-# disable building HS*.o libs for ghci
-Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
-Patch17: ghc-7.4-silence-gen_contents_index.patch
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -206,6 +212,7 @@ Obsoletes: ghc-libs < 7.0.1-3
 This is a meta-package for all the development library packages in GHC
 except the ghc library, which is installed by the toplevel ghc metapackage.
 
+
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
 
@@ -237,6 +244,9 @@ autoreconf
 
 %patch12 -p1 -b .orig
 
+%patch13 -p1 -b .orig
+
+
 %build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
@@ -260,6 +270,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --with-gcc=%{_bindir}/gcc
 
 make %{?_smp_mflags}
+
 
 %install
 make DESTDIR=%{buildroot} install
@@ -318,6 +329,7 @@ mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
 install -p --mode=0755 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
 %endif
 
+
 %check
 # stolen from ghc6/debian/rules:
 # Do some very simple tests that the compiler actually works
@@ -343,6 +355,7 @@ rm testghc/*
 make test
 %endif
 
+
 %post compiler
 # Alas, GHC, Hugs, and nhc all come with different set of tools in
 # addition to a runFOO:
@@ -366,6 +379,7 @@ if [ "$1" = 0 ]; then
   update-alternatives --remove runhaskell %{_bindir}/runghc
   update-alternatives --remove hsc2hs     %{_bindir}/hsc2hs-ghc
 fi
+
 
 %files
 
@@ -436,7 +450,12 @@ fi
 
 %files libraries
 
+
 %changelog
+* Tue Jun 25 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-11.1
+- fix compilation with llvm-3.3 (#977652)
+  see http://hackage.haskell.org/trac/ghc/ticket/7996
+
 * Tue Feb  5 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-11
 - ghclibdir should be owned at runtime by ghc-base instead of ghc-compiler
   (thanks Michael Scherer, #907671)
