@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 13%{?dist}
+Release: 14%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -50,6 +50,8 @@ Patch9:  Cabal-fix-dynamic-exec-for-TH.patch
 Patch10: ghc-wrapper-libffi-include.patch
 # disable building HS*.o libs for ghci
 Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
+# fix compilation with llvm-3.3
+Patch13: ghc-llvmCodeGen-empty-array.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -222,6 +224,8 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %endif
 
 %patch12 -p1 -b .orig
+
+%patch13 -p1 -b .orig
 
 
 %build
@@ -435,6 +439,10 @@ fi
 
 
 %changelog
+* Tue Jun 25 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-14
+- fix compilation with llvm-3.3 (#977652)
+  see http://hackage.haskell.org/trac/ghc/ticket/7996
+
 * Thu Jun 20 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-13
 - production perf -O2 build
 - see release notes:
