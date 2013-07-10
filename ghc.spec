@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 14%{?dist}
+Release: 15%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -52,6 +52,8 @@ Patch10: ghc-wrapper-libffi-include.patch
 Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
 # fix compilation with llvm-3.3
 Patch13: ghc-llvmCodeGen-empty-array.patch
+# disable executable stack
+Patch14: ghc-NCG-no-execstack.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -224,8 +226,8 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %endif
 
 %patch12 -p1 -b .orig
-
 %patch13 -p1 -b .orig
+%patch14 -p1 -b .orig
 
 
 %build
@@ -439,6 +441,10 @@ fi
 
 
 %changelog
+* Wed Jul 10 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-15
+- turn off executable stack flag in executables (#973512)
+  (thanks Edward Zhang for upstream patch and Dhiru Kholia for report)
+
 * Tue Jun 25 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-14
 - fix compilation with llvm-3.3 (#977652)
   see http://hackage.haskell.org/trac/ghc/ticket/7996
@@ -453,8 +459,7 @@ fi
 * Thu Jun 20 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-12
 - bootstrap 7.6.3
 - all library versions bumped except pretty
-- Cabal-fix-dynamic-exec-for-TH.patch,
-  ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch, and
+- ghc-7.4-add-support-for-ARM-hard-float-ABI-fixes-5914.patch, and
   ghc-7.4-silence-gen_contents_index.patch are no longer needed
 - build with ghc-rpm-macros-extra
 - no longer filter type-level package from haddock index
