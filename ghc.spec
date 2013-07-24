@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 16%{?dist}
+Release: 17%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -52,6 +52,8 @@ Patch10: ghc-wrapper-libffi-include.patch
 Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
 # fix compilation with llvm-3.3
 Patch13: ghc-llvmCodeGen-empty-array.patch
+# stop warnings about unsupported version of llvm
+Patch14: ghc-7.6.3-LlvmCodeGen-no-3.3-warning.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -226,6 +228,10 @@ ln -s $(pkg-config --variable=includedir libffi)/*.h rts/dist/build
 %patch12 -p1 -b .orig
 
 %patch13 -p1 -b .orig
+
+%ifarch armv7hl armv5tel
+%patch14 -p1 -b .orig
+%endif
 
 
 %build
@@ -439,6 +445,9 @@ fi
 
 
 %changelog
+* Wed Jul 24 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-17
+- silence warnings about unsupported llvm version (> 3.1) on ARM
+
 * Thu Jul 11 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-16
 - revert the executable stack patch since it didn't fully fix the problem
   and yet changed the ghc library hash
