@@ -2,10 +2,10 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%{?ghc_bootstrap}
-#%%global without_testsuite 1
-#%%global without_haddock 1
+%global ghc_bootstrapping 1
+%{?ghc_bootstrap}
+%global without_testsuite 1
+%global without_haddock 1
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 16%{?dist}
+Release: 14.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -439,13 +439,8 @@ fi
 
 
 %changelog
-* Thu Jul 11 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-16
-- revert the executable stack patch since it didn't fully fix the problem
-  and yet changed the ghc library hash
-
-* Wed Jul 10 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-15
-- turn off executable stack flag in executables (#973512)
-  (thanks Edward Zhang for upstream patch and Dhiru Kholia for report)
+* Wed Jul 24 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-14.1
+- temporary bootstrap build for ARM with llvm-3.3 fix
 
 * Tue Jun 25 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-14
 - fix compilation with llvm-3.3 (#977652)
