@@ -29,7 +29,7 @@ Version: 7.6.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 17%{?dist}
+Release: 18%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -141,6 +141,7 @@ To install all of ghc, install the ghc base package.
 Summary: GHC library development documentation indexing
 License: BSD
 Requires: ghc-compiler = %{version}-%{release}
+Requires: crontabs
 
 %description doc-index
 The package provides a cronjob for re-indexing installed library development
@@ -438,13 +439,17 @@ fi
 
 %if %{undefined without_haddock}
 %files doc-index
-%{_sysconfdir}/cron.hourly/ghc-doc-index
+%config(noreplace) %{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %files libraries
 
 
 %changelog
+* Sat Jul 27 2013 Jóhann B. Guðmundsson <johannbg@fedoraproject.org> - 7.6.3-18
+- ghc-doc-index requires crontabs and mark cron file config noreplace
+  (http://fedoraproject.org/wiki/Packaging:CronFiles)
+
 * Wed Jul 24 2013 Jens Petersen <petersen@redhat.com> - 7.6.3-17
 - silence warnings about unsupported llvm version (> 3.1) on ARM
 
