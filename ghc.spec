@@ -30,7 +30,7 @@ Version: 7.7.20130828
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 25%{?dist}
+Release: 25.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -46,6 +46,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 #still needed?# add libffi include dir to ghc wrapper for archs using gcc/llc
 #Patch10: ghc-wrapper-libffi-include.patch
 Patch2:  ghc-7.7-ghc-cabal-pkgdocdir.patch
+Patch3:  ghc-package-xhtml-terminfo-haskeline.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -73,7 +74,7 @@ BuildRequires: ghc-pretty-devel
 BuildRequires: ghc-process-devel
 BuildRequires: gmp-devel
 BuildRequires: libffi-devel
-# for internal terminfo
+# for terminfo
 BuildRequires: ncurses-devel
 %if %{undefined without_manual}
 BuildRequires: libxslt, docbook-style-xsl
@@ -167,6 +168,7 @@ documention.
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
+%ghc_lib_subpackage haskeline 0.7.0.4
 %ghc_lib_subpackage -l HaskellReport haskell2010 1.1.1.0
 %ghc_lib_subpackage -l HaskellReport haskell98 2.0.0.3
 %ghc_lib_subpackage hoopl 3.10.0.0
@@ -178,9 +180,11 @@ documention.
 %ghc_lib_subpackage -l %BSDHaskellReport process 1.2.0.0
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell 2.9.0.0
+%ghc_lib_subpackage terminfo 0.3.2.5
 %ghc_lib_subpackage time 1.4.0.2
 %ghc_lib_subpackage transformers 0.3.0.0
 %ghc_lib_subpackage unix 2.7.0.0
+%ghc_lib_subpackage xhtml 3000.2.1
 %endif
 
 %global version %{ghc_version_override}
@@ -212,6 +216,9 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # unversion pkgdoc htmldir
 %patch2 -p1 -b .orig
 %endif
+
+# package xhtml terminfo and haskeline
+%patch3 -p1 -b .orig
 
 rm -r libffi-tarballs
 
@@ -393,14 +400,6 @@ fi
 %{ghclibdir}/bin/runghc
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
-%if %{undefined ghc_without_shared}
-# for ghc
-%{ghclibdir}/haskeline*/libHS*.so
-# for ghc and ghc-pkg
-%{ghclibdir}/terminfo*/libHS*.so
-# for haddock
-%{ghclibdir}/xhtml*/libHS*.so
-%endif
 %{ghclibdir}/mkGmpDerivedConstants
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
@@ -449,6 +448,9 @@ fi
 
 
 %changelog
+* Thu Sep  5 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25.1
+- subpackage haskeline, terminfo and xhtml
+
 * Tue Sep  3 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25
 - 7.7.20130828 snapshot
 - ghc-use-system-libffi.patch, Cabal-fix-dynamic-exec-for-TH.patch,
