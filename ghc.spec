@@ -3,10 +3,12 @@
 
 # To bootstrap build a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
-#%%global without_prof 1
-#%%global without_haddock 1
-#%%global without_manual 1
-#%%global without_testsuite 1
+%global without_prof 1
+%global without_haddock 1
+%global without_manual 1
+%global without_testsuite 1
+
+%undefine ghc_without_shared
 
 # To do a test build instead with shared libs, uncomment the following:
 #%%global ghc_bootstrapping 1
@@ -25,7 +27,7 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.7.20130828
+Version: 7.7.20131005
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
@@ -155,12 +157,12 @@ documention.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal 1.18.0
+%ghc_lib_subpackage Cabal 1.18.1
 %ghc_lib_subpackage -l %BSDHaskellReport array 0.4.0.2
 %ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.7.0.0
-%ghc_lib_subpackage binary 0.7.0.0
+%ghc_lib_subpackage binary 0.7.1.0
 %ghc_lib_subpackage bytestring 0.10.3.0
-%ghc_lib_subpackage -l %BSDHaskellReport containers 0.5.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport containers 0.5.3.1
 %ghc_lib_subpackage -l %BSDHaskellReport deepseq 1.3.0.2
 %ghc_lib_subpackage -l %BSDHaskellReport directory 1.2.0.1
 %ghc_lib_subpackage filepath 1.3.0.2
@@ -181,7 +183,7 @@ documention.
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell 2.9.0.0
 %ghc_lib_subpackage terminfo 0.3.2.5
-%ghc_lib_subpackage time 1.4.0.2
+%ghc_lib_subpackage time 1.4.1
 %ghc_lib_subpackage transformers 0.3.0.0
 %ghc_lib_subpackage unix 2.7.0.0
 %ghc_lib_subpackage xhtml 3000.2.1
@@ -261,6 +263,8 @@ export CFLAGS="${CFLAGS:-%optflags}"
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --with-gcc=%{_bindir}/gcc --with-system-libffi
 
+# avoid "ghc: hGetContents: invalid argument (invalid byte sequence)"
+export LANG=en_US.utf8
 make %{?_smp_mflags}
 
 
@@ -407,7 +411,6 @@ fi
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
-%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
@@ -418,6 +421,7 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
+%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
@@ -448,7 +452,12 @@ fi
 
 
 %changelog
-* Wed Oct  2 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25.4
+* Mon Oct  7 2013 Jens Petersen <petersen@redhat.com> - 7.7.20131005-25.4
+- update to latest git
+- update libraries versions
+- build with utf8 locale to avoid hGetContents encoding errors
+
+* Wed Oct  2 2013 Jens Petersen <petersen@redhat.com>
 - enable dyn by default
 
 * Thu Sep  5 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25.1
