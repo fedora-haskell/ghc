@@ -30,7 +30,7 @@ Version: 7.7.20130828
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 25.1%{?dist}
+Release: 25.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -243,7 +243,7 @@ BuildFlavour = perf
 BuildFlavour = perf-llvm
 %endif
 %endif
-GhcLibWays = v %{!?ghc_without_shared:dyn} %{!?without_prof:p}
+GhcLibWays = v dyn %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
@@ -448,6 +448,9 @@ fi
 
 
 %changelog
+* Wed Oct  2 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25.4
+- enable dyn by default
+
 * Thu Sep  5 2013 Jens Petersen <petersen@redhat.com> - 7.7.20130828-25.1
 - subpackage haskeline, terminfo and xhtml
 
