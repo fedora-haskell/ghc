@@ -1,0 +1,11 @@
+Index: rts/Adjustor.c
+===================================================================
+--- rts/Adjustor.c	(revision c2870706b29c24ac86ae2a9e2359dd1e4af71ac8)
++++ rts/Adjustor.c	(revision 27cf625ab871f34434d9fe86cecf85a31f73f0e5)
+@@ -390,5 +390,5 @@
+         
+         adjustorStub->call[0] = 0xe8;
+-        *(long*)&adjustorStub->call[1] = ((char*)&adjustorCode) - ((char*)adjustorStub + 5);
++        *(long*)&adjustorStub->call[1] = ((char*)&adjustorCode) - ((char*)code + 5);
+         adjustorStub->hptr = hptr;
+         adjustorStub->wptr = wptr;

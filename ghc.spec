@@ -3,20 +3,16 @@
 
 # To bootstrap build a new version of ghc, uncomment the following:
 #%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+### either:
 #%%{?ghc_bootstrap}
-#%%global without_testsuite 1
-#%%global without_haddock 1
-
-# To do a test build instead with shared libs, uncomment the following:
-#%%global ghc_bootstrapping 1
+### or for shared libs:
 #%%{?ghc_test}
-#%%global without_testsuite 1
+### uncomment to generate haddocks for bootstrap
+#%%undefine without_haddock
 
 # unregisterized archs
 %global unregisterised_archs ppc64 s390 s390x
-
-# ghc does not output dwarf format so debuginfo is not useful
-%global debug_package %{nil}
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -29,7 +25,7 @@ Version: 7.4.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 11.1%{?dist}
+Release: 11.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -60,6 +56,8 @@ Patch12: ghc-7.4.2-Cabal-disable-ghci-libs.patch
 # fix compilation with llvm-3.3
 Patch13: ghc-llvmCodeGen-empty-array.patch
 Patch17: ghc-7.4-silence-gen_contents_index.patch
+# fix libffi segfaults on 32bit
+Patch18: ghc-7.6.3-rts-Adjustor-32bit-segfault.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -142,14 +140,16 @@ Requires: llvm >= 3.0
 %description compiler
 The package contains the GHC compiler, tools and utilities.
 
-The ghc libraries are provided by ghc-devel.
-To install all of ghc, install the ghc base package.
+The ghc libraries are provided by ghc-libraries.
+To install all of ghc (including the ghc library),
+install the main ghc package.
 
 %if %{undefined without_haddock}
 %package doc-index
 Summary: GHC library development documentation indexing
 License: BSD
 Requires: ghc-compiler = %{version}-%{release}
+Requires: crontabs
 
 %description doc-index
 The package provides a cronjob for re-indexing installed library development
@@ -246,11 +246,18 @@ autoreconf
 
 %patch13 -p1 -b .orig
 
+%patch18 -p0 -b .orig
+
 
 %build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
+%if %{undefined ghc_bootstrapping}
+%ifarch %{ix86} x86_64
+BuildFlavour = perf
+%endif
+%endif
 GhcLibWays = v %{!?ghc_without_shared:dyn} %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
@@ -445,13 +452,24 @@ fi
 
 %if %{undefined without_haddock}
 %files doc-index
-%{_sysconfdir}/cron.hourly/ghc-doc-index
+%config(noreplace) %{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %files libraries
 
 
 %changelog
+* Wed Jan 29 2014 Jens Petersen <petersen@redhat.com> - 7.4.2-11.2
+- fix segfault on i686 when using ffi double-mapping for selinux (#907515)
+  see http://hackage.haskell.org/trac/ghc/ticket/7629
+  (thanks Garrett Mitchener for patch committed upstream)
+- enable debuginfo for C code bits (#989593)
+- build intel arch's with BuildFlavour perf for -O2 (#880135)
+
+* Sat Jul 27 2013 Jóhann B. Guðmundsson <johannbg@fedoraproject.org>
+- ghc-doc-index requires crontabs and mark cron file config noreplace
+  (http://fedoraproject.org/wiki/Packaging:CronFiles)
+
 * Tue Jun 25 2013 Jens Petersen <petersen@redhat.com> - 7.4.2-11.1
 - fix compilation with llvm-3.3 (#977652)
   see http://hackage.haskell.org/trac/ghc/ticket/7996
