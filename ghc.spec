@@ -3,23 +3,21 @@
 
 # To bootstrap build a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
-%global without_prof 1
-%global without_haddock 1
-%global without_manual 1
 %global without_testsuite 1
+### either:
+#%%{?ghc_bootstrap}
+### or for shared libs:
+%{?ghc_test}
+### uncomment to generate haddocks for bootstrap
+#%%undefine without_haddock
 
+# hack until ghc-rpm-macros updated
+%ifarch armv7hl armv5tel
 %undefine ghc_without_shared
-
-# To do a test build instead with shared libs, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%{?ghc_test}
-#%%global without_testsuite 1
+%endif
 
 # unregisterized archs
 %global unregisterised_archs ppc64 s390 s390x
-
-# ghc does not output dwarf format so debuginfo is not useful
-%global debug_package %{nil}
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -27,12 +25,12 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.7.20131005
+Version: 7.8.20140129
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 25.4%{?dist}
+Release: 29.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -78,9 +76,8 @@ BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
-%if %{undefined without_manual}
+# for man and docs
 BuildRequires: libxslt, docbook-style-xsl
-%endif
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
@@ -131,8 +128,9 @@ Requires: llvm >= 3.0
 %description compiler
 The package contains the GHC compiler, tools and utilities.
 
-The ghc libraries are provided by ghc-devel.
-To install all of ghc, install the ghc base package.
+The ghc libraries are provided by ghc-libraries.
+To install all of ghc (including the ghc library),
+install the main ghc package.
 
 %if %{undefined without_haddock}
 %package doc-index
@@ -157,32 +155,32 @@ documention.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal 1.18.1
-%ghc_lib_subpackage -l %BSDHaskellReport array 0.4.0.2
+%ghc_lib_subpackage Cabal 1.18.1.3
+%ghc_lib_subpackage -l %BSDHaskellReport array 0.5.0.0
 %ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.7.0.0
 %ghc_lib_subpackage binary 0.7.1.0
-%ghc_lib_subpackage bytestring 0.10.3.0
-%ghc_lib_subpackage -l %BSDHaskellReport containers 0.5.3.1
+%ghc_lib_subpackage bytestring 0.10.4.0
+%ghc_lib_subpackage -l %BSDHaskellReport containers 0.5.4.0
 %ghc_lib_subpackage -l %BSDHaskellReport deepseq 1.3.0.2
-%ghc_lib_subpackage -l %BSDHaskellReport directory 1.2.0.1
+%ghc_lib_subpackage -l %BSDHaskellReport directory 1.2.0.2
 %ghc_lib_subpackage filepath 1.3.0.2
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage haskeline 0.7.0.4
-%ghc_lib_subpackage -l HaskellReport haskell2010 1.1.1.0
+%ghc_lib_subpackage haskeline 0.7.1.2
+%ghc_lib_subpackage -l HaskellReport haskell2010 1.1.1.1
 %ghc_lib_subpackage -l HaskellReport haskell98 2.0.0.3
 %ghc_lib_subpackage hoopl 3.10.0.0
 %ghc_lib_subpackage hpc 0.6.0.1
-%ghc_lib_subpackage -l %BSDHaskellReport old-locale 1.0.0.5
-%ghc_lib_subpackage -l %BSDHaskellReport old-time 1.1.0.1
-%ghc_lib_subpackage pretty 1.1.1.0
+%ghc_lib_subpackage -l %BSDHaskellReport old-locale 1.0.0.6
+%ghc_lib_subpackage -l %BSDHaskellReport old-time 1.1.0.2
+%ghc_lib_subpackage pretty 1.1.1.1
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
 %ghc_lib_subpackage -l %BSDHaskellReport process 1.2.0.0
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell 2.9.0.0
-%ghc_lib_subpackage terminfo 0.3.2.5
+%ghc_lib_subpackage terminfo 0.4.0.0
 %ghc_lib_subpackage time 1.4.1
 %ghc_lib_subpackage transformers 0.3.0.0
 %ghc_lib_subpackage unix 2.7.0.0
@@ -324,7 +322,15 @@ mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
 install -p --mode=0755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
 mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
 install -p --mode=0755 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
+
+# generate initial lib doc index
+cd libraries
+sh %{gen_contents_index} --intree --verbose
+cd ..
 %endif
+
+# we package the library license files separately
+find %{buildroot}%ghclibdocdir -name LICENSE -exec rm '{}' ';'
 
 
 %check
@@ -332,6 +338,7 @@ install -p --mode=0755 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
 # Do some very simple tests that the compiler actually works
 rm -rf testghc
 mkdir testghc
+%if 0
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
@@ -342,6 +349,7 @@ echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
+%endif
 %if %{undefined ghc_without_shared}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
@@ -411,6 +419,7 @@ fi
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
 %{ghclibdir}/unlit
+%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
@@ -421,7 +430,6 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
-%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
@@ -452,6 +460,12 @@ fi
 
 
 %changelog
+* Fri Jan 31 2014 Jens Petersen <petersen@redhat.com> - 7.8.20140129-29.1
+- update library versions
+- merge some updates from master
+- handle manpage in filelist whether without_manual or not
+- enable shared on ARM
+
 * Mon Oct  7 2013 Jens Petersen <petersen@redhat.com> - 7.7.20131005-25.4
 - update to latest git
 - update libraries versions
