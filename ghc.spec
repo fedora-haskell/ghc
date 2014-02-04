@@ -2,14 +2,20 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
 ### either:
 #%%{?ghc_bootstrap}
 ### or for shared libs:
-%{?ghc_test}
+#%%{?ghc_test}
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
+
+# no vanilla currently breaks ARM build
+%ifarch %{ix86} x86_64
+# define to disable static libs
+#%%global without_vanilla
+%endif
 
 # hack until ghc-rpm-macros updated
 %ifarch armv7hl armv5tel
@@ -25,12 +31,12 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.20140129
+Version: 7.8.0.20140201
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 29.1%{?dist}
+Release: 30.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -243,7 +249,7 @@ BuildFlavour = perf
 BuildFlavour = perf-llvm
 %endif
 %endif
-GhcLibWays = v dyn %{!?without_prof:p}
+GhcLibWays = %{!?without_vanilla:v} %{!?ghc_without_shared:dyn} %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
@@ -338,7 +344,7 @@ find %{buildroot}%ghclibdocdir -name LICENSE -exec rm '{}' ';'
 # Do some very simple tests that the compiler actually works
 rm -rf testghc
 mkdir testghc
-%if 0
+%if %{undefined without_vanilla}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
@@ -460,7 +466,10 @@ fi
 
 
 %changelog
-* Fri Jan 31 2014 Jens Petersen <petersen@redhat.com> - 7.8.20140129-29.1
+* Tue Feb  4 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-30.1
+- production build
+
+* Mon Feb  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-29.1
 - update library versions
 - merge some updates from master
 - handle manpage in filelist whether without_manual or not
