@@ -2,7 +2,7 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 #%%global without_testsuite 1
 ### either:
 #%%{?ghc_bootstrap}
@@ -31,7 +31,7 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.0.20140201
+Version: 7.8.0.20140226
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
@@ -41,9 +41,9 @@ Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -309,6 +309,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist bin-package-db ghc
 
 # add rts libs
+echo "%dir %{buildroot}%{ghclibdir}/rts-1.0" >> ghc-base.files
 %if %{undefined ghc_without_shared}
 ls %{buildroot}%{ghclibdir}/rts-1.0/libHS*.so >> ghc-base.files
 %endif
@@ -417,6 +418,7 @@ fi
 %{_bindir}/runghc*
 %ghost %{_bindir}/runhaskell
 %{_bindir}/runhaskell-ghc
+%dir %{ghclibdir}/bin
 %{ghclibdir}/bin/ghc
 %{ghclibdir}/bin/ghc-pkg
 %ifnarch %{unregisterised_archs}
@@ -474,6 +476,10 @@ fi
 
 
 %changelog
+* Fri Feb 28 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140226-30.1
+- 7.8.1 RC2 bootstrap
+- use new xz tarballs
+- own libdir/bin/ and libdir/rts-1.0/
 - add without_vanilla
 
 * Mon Feb 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-29.2
