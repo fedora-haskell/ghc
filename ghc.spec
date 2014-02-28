@@ -218,10 +218,8 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
-%if 0%{?fedora} >= 21
 # unversion pkgdoc htmldir
 %patch2 -p1 -b .orig
-%endif
 
 # package xhtml terminfo and haskeline
 %patch3 -p1 -b .orig
@@ -233,8 +231,18 @@ rm -r libffi-tarballs
 %endif
 
 %ifarch armv7hl armv5tel
-# TH loading in dph-lifted-copy fails
-rm -r libraries/dph
+# FIXME - recheck
+## TH loading in dph-lifted-copy fails
+#rm -r libraries/dph
+%endif
+
+
+%global gen_contents_index gen_contents_index.orig
+%if %{undefined without_haddock}
+if [ ! -f "libraries/%{gen_contents_index}" ]; then
+  echo "Missing libraries/%{gen_contents_index}, needed at end of %%install!"
+  exit 1
+fi
 %endif
 
 
@@ -466,8 +474,11 @@ fi
 
 
 %changelog
-* Tue Feb  4 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-30.1
-- production build
+- add without_vanilla
+
+* Mon Feb 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-29.2
+- production build without testsuite
+- unversion pkgdoc htmldir
 
 * Mon Feb  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-29.1
 - update library versions
