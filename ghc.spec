@@ -3,7 +3,13 @@
 
 # To bootstrap build a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
-#%%global without_testsuite 1
+%global without_testsuite 1
+%global without_prof 1
+# no vanilla currently breaks ARM build
+#%ifarch %{ix86} x86_64
+#%%global without_vanilla 1
+#%endif
+
 ### either:
 #%%{?ghc_bootstrap}
 ### or for shared libs:
@@ -11,11 +17,6 @@
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 
-# no vanilla currently breaks ARM build
-%ifarch %{ix86} x86_64
-# define to disable static libs
-#%%global without_vanilla
-%endif
 
 # hack until ghc-rpm-macros updated
 %ifarch armv7hl armv5tel
@@ -31,12 +32,12 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.0.20140226
+Version: 7.8.0.20140228
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 30.1%{?dist}
+Release: 30.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -189,7 +190,7 @@ documention.
 %ghc_lib_subpackage terminfo 0.4.0.0
 %ghc_lib_subpackage time 1.4.1
 %ghc_lib_subpackage transformers 0.3.0.0
-%ghc_lib_subpackage unix 2.7.0.0
+%ghc_lib_subpackage unix 2.7.0.1
 %ghc_lib_subpackage xhtml 3000.2.1
 %endif
 
@@ -309,7 +310,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 %merge_filelist bin-package-db ghc
 
 # add rts libs
-echo "%dir %{buildroot}%{ghclibdir}/rts-1.0" >> ghc-base.files
+echo "%dir %{ghclibdir}/rts-1.0" >> ghc-base.files
 %if %{undefined ghc_without_shared}
 ls %{buildroot}%{ghclibdir}/rts-1.0/libHS*.so >> ghc-base.files
 %endif
@@ -349,6 +350,7 @@ find %{buildroot}%ghclibdocdir -name LICENSE -exec rm '{}' ';'
 
 
 %check
+export LANG=en_US.utf8
 # stolen from ghc6/debian/rules:
 # Do some very simple tests that the compiler actually works
 rm -rf testghc
@@ -421,11 +423,12 @@ fi
 %dir %{ghclibdir}/bin
 %{ghclibdir}/bin/ghc
 %{ghclibdir}/bin/ghc-pkg
-%ifnarch %{unregisterised_archs}
-#%{ghclibdir}/bin/ghc-split
-%endif
+%{ghclibdir}/bin/hpc
 %{ghclibdir}/bin/hsc2hs
 %{ghclibdir}/bin/runghc
+%ifnarch %{unregisterised_archs}
+%{ghclibdir}/ghc-split
+%endif
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
 %{ghclibdir}/mkGmpDerivedConstants
@@ -476,11 +479,18 @@ fi
 
 
 %changelog
+* Sat Mar  1 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140226-30.2
+- 7.8.1 RC2' bootstrap with testsuite
+- unix bumped
+- run check section in utf8 encoding
+
 * Fri Feb 28 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140226-30.1
 - 7.8.1 RC2 bootstrap
 - use new xz tarballs
 - own libdir/bin/ and libdir/rts-1.0/
-- add without_vanilla
+- without_vanilla
+- no prof
+- turn off testsuite
 
 * Mon Feb 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140201-29.2
 - production build without testsuite
