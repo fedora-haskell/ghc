@@ -19,7 +19,7 @@
 
 
 # hack until ghc-rpm-macros updated
-%ifarch armv7hl armv5tel
+%ifarch armv7hl armv5tel ppc ppc64 s390 s390x
 %undefine ghc_without_shared
 %endif
 
@@ -479,6 +479,9 @@ fi
 
 
 %changelog
+* Thu Mar 13 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140228-30.2.1
+- shared libs on all secondary archs too
+
 * Sat Mar  1 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140226-30.2
 - 7.8.1 RC2' bootstrap with testsuite
 - unix bumped
