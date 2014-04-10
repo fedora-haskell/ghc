@@ -29,15 +29,46 @@
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
 
+%global Cabal_ver 1.18.1.3
+%global array_ver 0.5.0.0
+%global base_ver 4.7.0.0
+%global bin_package_db_ver 0.0.0.0
+%global binary_ver 0.7.1.0
+%global bytestring_ver 0.10.4.0
+%global containers_ver 0.5.5.1
+%global deepseq_ver 1.3.0.2
+%global directory_ver 1.2.1.0
+%global filepath_ver 1.3.0.2
+%global ghc_prim_ver 0.3.1.0
+%global haskell2010_ver 1.1.2.0
+%global haskell98_ver 2.0.0.3
+%global hoopl_ver 3.10.0.1
+%global hpc_ver 0.6.0.1
+%global integer_gmp_ver 0.5.1.0
+%global old_locale_ver 1.0.0.6
+%global old_time_ver 1.1.0.2
+%global pretty_ver 1.1.1.1
+%global process_ver 1.2.0.0
+%global template_haskell_ver 2.9.0.0
+%global time_ver 1.4.2
+%global transformers_ver 0.3.0.0
+%global unix_ver 2.7.0.1
+
+# libs not shipped by upstream
+%global haskeline_ver 0.7.1.2
+%global terminfo_ver 0.4.0.0
+%global xhtml_ver 3000.2.1
+
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.0.20140228
+Version: 7.8.1
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 30.2%{?dist}
+# xhtml was part of haskell-platform
+Release: 33.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -162,36 +193,36 @@ documention.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal 1.18.1.3
-%ghc_lib_subpackage -l %BSDHaskellReport array 0.5.0.0
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base 4.7.0.0
-%ghc_lib_subpackage binary 0.7.1.0
-%ghc_lib_subpackage bytestring 0.10.4.0
-%ghc_lib_subpackage -l %BSDHaskellReport containers 0.5.4.0
-%ghc_lib_subpackage -l %BSDHaskellReport deepseq 1.3.0.2
-%ghc_lib_subpackage -l %BSDHaskellReport directory 1.2.0.2
-%ghc_lib_subpackage filepath 1.3.0.2
+%ghc_lib_subpackage Cabal %{Cabal_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport array %{array_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base %{base_ver}
+%ghc_lib_subpackage binary %{binary_ver}
+%ghc_lib_subpackage bytestring %{bytestring_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport containers %{containers_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport deepseq %{deepseq_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport directory %{directory_ver}
+%ghc_lib_subpackage filepath %{filepath_ver}
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage haskeline 0.7.1.2
-%ghc_lib_subpackage -l HaskellReport haskell2010 1.1.1.1
-%ghc_lib_subpackage -l HaskellReport haskell98 2.0.0.3
-%ghc_lib_subpackage hoopl 3.10.0.0
-%ghc_lib_subpackage hpc 0.6.0.1
-%ghc_lib_subpackage -l %BSDHaskellReport old-locale 1.0.0.6
-%ghc_lib_subpackage -l %BSDHaskellReport old-time 1.1.0.2
-%ghc_lib_subpackage pretty 1.1.1.1
+%ghc_lib_subpackage -l HaskellReport haskell2010 %{haskell2010_ver}
+%ghc_lib_subpackage -l HaskellReport haskell98 %{haskell98_ver}
+%ghc_lib_subpackage hoopl %{hoopl_ver}
+%ghc_lib_subpackage hpc %{hpc_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport old-locale %{old_locale_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport old-time %{old_time_ver}
+%ghc_lib_subpackage pretty %{pretty_ver}
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
-%ghc_lib_subpackage -l %BSDHaskellReport process 1.2.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport process %{process_ver}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage template-haskell 2.9.0.0
+%ghc_lib_subpackage template-haskell %{template_haskell_ver}
 %ghc_lib_subpackage terminfo 0.4.0.0
-%ghc_lib_subpackage time 1.4.1
-%ghc_lib_subpackage transformers 0.3.0.0
-%ghc_lib_subpackage unix 2.7.0.1
-%ghc_lib_subpackage xhtml 3000.2.1
+%ghc_lib_subpackage time %{time_ver}
+%ghc_lib_subpackage transformers %{transformers_ver}
+%ghc_lib_subpackage unix %{unix_ver}
+%ghc_lib_subpackage xhtml %{xhtml_ver}
 %endif
 
 %global version %{ghc_version_override}
@@ -294,10 +325,10 @@ done
 # ghc-base should own ghclibdir
 echo "%dir %{ghclibdir}" >> ghc-base.files
 
-%ghc_gen_filelists bin-package-db 0.0.0.0
+%ghc_gen_filelists bin-package-db %{bin_package_db_ver}
 %ghc_gen_filelists ghc %{ghc_version_override}
-%ghc_gen_filelists ghc-prim 0.3.1.0
-%ghc_gen_filelists integer-gmp 0.5.1.0
+%ghc_gen_filelists ghc-prim %{ghc_prim_ver}
+%ghc_gen_filelists integer-gmp %{integer_gmp_ver}
 
 %define merge_filelist()\
 cat ghc-%1.files >> ghc-%2.files\
@@ -479,6 +510,9 @@ fi
 
 
 %changelog
+* Tue Apr  8 2014 Jens Petersen <petersen@redhat.com> - 7.8.1-34
+- 7.8.1 bootstrap
+
 * Thu Mar 13 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140228-30.2.1
 - shared libs on all secondary archs too
 
