@@ -1,13 +1,2 @@
-ghc-6.12.3-src.tar.bz2
-testsuite-6.12.3.tar.bz2
-/ghc-7.0.1-src.tar.bz2
-/testsuite-7.0.1.tar.bz2
-/ghc-7.0.2-src.tar.bz2
-/ghc-7.0.4-src.tar.bz2
-/testsuite-7.0.4.tar.bz2
-/ghc-7.4.1-testsuite.tar.bz2
-/ghc-7.4.1-src.tar.bz2
-/ghc-7.4.2-src.tar.bz2
-/ghc-7.4.2-testsuite.tar.bz2
-/ghc-7.6.3-src.tar.bz2
-/ghc-7.6.3-testsuite.tar.bz2
+/ghc-*-src.tar.*
+/ghc-*-testsuite.tar.*
