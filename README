@@ -6,4 +6,4 @@ https://copr.fedoraproject.org/coprs/petersen/ghc-7.8/
 Changes to ghc packaging may be first tested here
 before getting merged into Fedora Package git,
 and changes from there should also be merged here
-to keep up this repo to date.
+to keep up this repo up to date.

@@ -29,6 +29,34 @@
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
 
+Name: ghc
+# part of haskell-platform
+# ghc must be rebuilt after a version bump to avoid ABI change problems
+Version: 7.8.1
+# Since library subpackages are versioned:
+# - release can only be reset if *all* library versions get bumped simultaneously
+#   (sometimes after a major release)
+# - minor release numbers for a branch should be incremented monotonically
+# xhtml was part of haskell-platform
+Release: 33.1%{?dist}
+Summary: Glasgow Haskell Compiler
+
+License: %BSDHaskellReport
+URL: http://haskell.org/ghc/
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
+%if %{undefined without_testsuite}
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
+%endif
+Source3: ghc-doc-index.cron
+Source4: ghc-doc-index
+# absolute haddock path (was for html/libraries -> libraries)
+Patch1:  ghc-gen_contents_index-haddock-path.patch
+#still needed?# add libffi include dir to ghc wrapper for archs using gcc/llc
+#Patch10: ghc-wrapper-libffi-include.patch
+Patch2:  ghc-7.7-ghc-cabal-pkgdocdir.patch
+Patch3:  ghc-package-xhtml-terminfo-haskeline.patch
+Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
+
 %global Cabal_ver 1.18.1.3
 %global array_ver 0.5.0.0
 %global base_ver 4.7.0.0
@@ -58,33 +86,6 @@
 %global haskeline_ver 0.7.1.2
 %global terminfo_ver 0.4.0.0
 %global xhtml_ver 3000.2.1
-
-Name: ghc
-# part of haskell-platform
-# ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.1
-# Since library subpackages are versioned:
-# - release can only be reset if *all* library versions get bumped simultaneously
-#   (sometimes after a major release)
-# - minor release numbers for a branch should be incremented monotonically
-# xhtml was part of haskell-platform
-Release: 33.1%{?dist}
-Summary: Glasgow Haskell Compiler
-
-License: %BSDHaskellReport
-URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
-%if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
-%endif
-Source3: ghc-doc-index.cron
-Source4: ghc-doc-index
-# absolute haddock path (was for html/libraries -> libraries)
-Patch1:  ghc-gen_contents_index-haddock-path.patch
-#still needed?# add libffi include dir to ghc wrapper for archs using gcc/llc
-#Patch10: ghc-wrapper-libffi-include.patch
-Patch2:  ghc-7.7-ghc-cabal-pkgdocdir.patch
-Patch3:  ghc-package-xhtml-terminfo-haskeline.patch
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -263,6 +264,8 @@ rm -r libffi-tarballs
 %endif
 
 %ifarch armv7hl armv5tel
+# disable dynlinking in build since needs gold linker
+%patch4 -p1 -b .orig -R
 # FIXME - recheck
 ## TH loading in dph-lifted-copy fails
 #rm -r libraries/dph
@@ -510,8 +513,10 @@ fi
 
 
 %changelog
-* Tue Apr  8 2014 Jens Petersen <petersen@redhat.com> - 7.8.1-34
+* Thu Apr 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.1-33.1
 - 7.8.1 bootstrap
+- revert dynlinking in ARM build (upstream abb86ad): it requires gold linker
+  which only works with ghc-7.8 for llvm backend
 
 * Thu Mar 13 2014 Jens Petersen <petersen@redhat.com> - 7.8.0.20140228-30.2.1
 - shared libs on all secondary archs too

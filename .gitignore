@@ -1,2 +1,3 @@
 /ghc-*-src.tar.*
 /ghc-*-testsuite.tar.*
+/ghc-7.*/
