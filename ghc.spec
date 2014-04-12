@@ -32,13 +32,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.1
+Version: 7.8.2
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml was part of haskell-platform
-Release: 33.1%{?dist}
+Release: 33.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -513,8 +513,13 @@ fi
 
 
 %changelog
+* Sat Apr 12 2014 Jens Petersen <petersen@redhat.com> - 7.8.2-33.2
+- 7.8.2 bugfix release
+- https://www.haskell.org/ghc/docs/7.8.2/html/users_guide/release-7-8-2.html
+
 * Thu Apr 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.1-33.1
 - 7.8.1 bootstrap
+  https://www.haskell.org/ghc/docs/7.8.1/html/users_guide/release-7-8-1.html
 - revert dynlinking in ARM build (upstream abb86ad): it requires gold linker
   which only works with ghc-7.8 for llvm backend
 
