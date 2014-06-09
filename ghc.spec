@@ -2,9 +2,9 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
 # no vanilla currently breaks ARM build
 #%ifarch %{ix86} x86_64
 #%%global without_vanilla 1
@@ -38,7 +38,7 @@ Version: 7.8.2
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml was part of haskell-platform
-Release: 33.2%{?dist}
+Release: 33.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -513,6 +513,9 @@ fi
 
 
 %changelog
+* Sat Apr 12 2014 Jens Petersen <petersen@redhat.com> - 7.8.2-33.3
+- production build
+
 * Sat Apr 12 2014 Jens Petersen <petersen@redhat.com> - 7.8.2-33.2
 - 7.8.2 bugfix release
 - https://www.haskell.org/ghc/docs/7.8.2/html/users_guide/release-7-8-2.html
