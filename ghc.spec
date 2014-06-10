@@ -2,9 +2,9 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
 # no vanilla currently breaks ARM build
 #%ifarch %{ix86} x86_64
 #%%global without_vanilla 1
@@ -19,12 +19,10 @@
 
 
 # hack until ghc-rpm-macros updated
+# use %%ifdefined ghc_without_shared ?
 %ifarch armv7hl armv5tel ppc ppc64 s390 s390x
 %undefine ghc_without_shared
 %endif
-
-# unregisterized archs
-%global unregisterised_archs ppc64 s390 s390x
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -32,20 +30,20 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.2
+Version: 7.8.3
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-# xhtml was part of haskell-platform
-Release: 33.3%{?dist}
+# xhtml moved from haskell-platform to ghc
+Release: 36.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -103,6 +101,8 @@ BuildRequires: ghc-compiler = %{version}
 %endif
 %if 0%{?fedora} >= 20
 BuildRequires: ghc-rpm-macros-extra
+%else
+BuildRequires: ghc-rpm-macros
 %endif
 BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
@@ -207,7 +207,7 @@ documention.
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage haskeline 0.7.1.2
+%ghc_lib_subpackage haskeline %{haskeline_ver}
 %ghc_lib_subpackage -l HaskellReport haskell2010 %{haskell2010_ver}
 %ghc_lib_subpackage -l HaskellReport haskell98 %{haskell98_ver}
 %ghc_lib_subpackage hoopl %{hoopl_ver}
@@ -219,7 +219,7 @@ documention.
 %ghc_lib_subpackage -l %BSDHaskellReport process %{process_ver}
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell %{template_haskell_ver}
-%ghc_lib_subpackage terminfo 0.4.0.0
+%ghc_lib_subpackage terminfo %{terminfo_ver}
 %ghc_lib_subpackage time %{time_ver}
 %ghc_lib_subpackage transformers %{transformers_ver}
 %ghc_lib_subpackage unix %{unix_ver}
@@ -386,24 +386,25 @@ find %{buildroot}%ghclibdocdir -name LICENSE -exec rm '{}' ';'
 %check
 export LANG=en_US.utf8
 # stolen from ghc6/debian/rules:
+GHC=inplace/bin/ghc-stage2
 # Do some very simple tests that the compiler actually works
 rm -rf testghc
 mkdir testghc
 %if %{undefined without_vanilla}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
-inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo
+$GHC testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
 # doesn't seem to work inplace:
 #[ "$(inplace/bin/runghc testghc/foo.hs)" = "Foo" ]
 rm testghc/*
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
-inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -O2
+$GHC testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %endif
 %if %{undefined ghc_without_shared}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
-inplace/bin/ghc-stage2 testghc/foo.hs -o testghc/foo -dynamic
+$GHC testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %endif
@@ -460,7 +461,8 @@ fi
 %{ghclibdir}/bin/hpc
 %{ghclibdir}/bin/hsc2hs
 %{ghclibdir}/bin/runghc
-%ifnarch %{unregisterised_archs}
+# unknown (unregisterized) archs
+%ifnarch ppc64 s390 s390x ppc64le aarch64
 %{ghclibdir}/ghc-split
 %endif
 %{ghclibdir}/ghc-usage.txt
@@ -513,6 +515,10 @@ fi
 
 
 %changelog
+* Mon Jun  9 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.1
+- 7.8.3 prerelease snapshot (git aede2d6)
+- bump over haskell-platform xhtml
+
 * Sat Apr 12 2014 Jens Petersen <petersen@redhat.com> - 7.8.2-33.3
 - production build
 
