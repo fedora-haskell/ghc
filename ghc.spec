@@ -2,9 +2,9 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
 # no vanilla currently breaks ARM build
 #%ifarch %{ix86} x86_64
 #%%global without_vanilla 1
@@ -36,7 +36,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc
-Release: 36.1%{?dist}
+Release: 36.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -52,7 +52,6 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 #still needed?# add libffi include dir to ghc wrapper for archs using gcc/llc
 #Patch10: ghc-wrapper-libffi-include.patch
 Patch2:  ghc-7.7-ghc-cabal-pkgdocdir.patch
-Patch3:  ghc-package-xhtml-terminfo-haskeline.patch
 Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
 
 %global Cabal_ver 1.18.1.3
@@ -253,9 +252,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 # unversion pkgdoc htmldir
 %patch2 -p1 -b .orig
-
-# package xhtml terminfo and haskeline
-%patch3 -p1 -b .orig
 
 rm -r libffi-tarballs
 
@@ -515,8 +511,12 @@ fi
 
 
 %changelog
+* Tue Jun 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.2
+- 7.8.3 prerelease snapshot (git 32b4bf3) performance build
+- ghc-package-xhtml-terminfo-haskeline.patch obsolete
+
 * Mon Jun  9 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.1
-- 7.8.3 prerelease snapshot (git aede2d6)
+- 7.8.3 prerelease snapshot (git aede2d6) bootstrap build
 - bump over haskell-platform xhtml
 
 * Sat Apr 12 2014 Jens Petersen <petersen@redhat.com> - 7.8.2-33.3
