@@ -2,9 +2,9 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
 # no vanilla currently breaks ARM build
 #%ifarch %{ix86} x86_64
 #%%global without_vanilla 1
@@ -36,7 +36,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc
-Release: 36.3%{?dist}
+Release: 36.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -510,6 +510,9 @@ fi
 
 
 %changelog
+* Thu Jul 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.4
+- 7.8.3 final: performance build
+
 * Tue Jul  8 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.3
 - 7.8.3 final release: bootstrap build
 - terminfo devel needs ncurses-devel
