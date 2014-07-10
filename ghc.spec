@@ -2,9 +2,9 @@
 # (disabled for other archs in ghc-rpm-macros)
 
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
 # no vanilla currently breaks ARM build
 #%ifarch %{ix86} x86_64
 #%%global without_vanilla 1
@@ -36,7 +36,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc
-Release: 36.2%{?dist}
+Release: 36.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -65,6 +65,7 @@ Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
 %global directory_ver 1.2.1.0
 %global filepath_ver 1.3.0.2
 %global ghc_prim_ver 0.3.1.0
+%global haskeline_ver 0.7.1.2
 %global haskell2010_ver 1.1.2.0
 %global haskell98_ver 2.0.0.3
 %global hoopl_ver 3.10.0.1
@@ -75,14 +76,12 @@ Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
 %global pretty_ver 1.1.1.1
 %global process_ver 1.2.0.0
 %global template_haskell_ver 2.9.0.0
+%global terminfo_ver 0.4.0.0
 %global time_ver 1.4.2
 %global transformers_ver 0.3.0.0
 %global unix_ver 2.7.0.1
-
-# libs not shipped by upstream
-%global haskeline_ver 0.7.1.2
-%global terminfo_ver 0.4.0.0
 %global xhtml_ver 3000.2.1
+
 
 # fedora ghc has been bootstrapped on
 # %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
@@ -218,7 +217,7 @@ documention.
 %ghc_lib_subpackage -l %BSDHaskellReport process %{process_ver}
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage template-haskell %{template_haskell_ver}
-%ghc_lib_subpackage terminfo %{terminfo_ver}
+%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo %{terminfo_ver}
 %ghc_lib_subpackage time %{time_ver}
 %ghc_lib_subpackage transformers %{transformers_ver}
 %ghc_lib_subpackage unix %{unix_ver}
@@ -511,6 +510,10 @@ fi
 
 
 %changelog
+* Tue Jul  8 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.3
+- 7.8.3 final release: bootstrap build
+- terminfo devel needs ncurses-devel
+
 * Tue Jun 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.2
 - 7.8.3 prerelease snapshot (git 32b4bf3) performance build
 - ghc-package-xhtml-terminfo-haskeline.patch obsolete
