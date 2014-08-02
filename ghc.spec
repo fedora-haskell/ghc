@@ -36,14 +36,14 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc
-Release: 36.4%{?dist}
+Release: 36.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -56,7 +56,7 @@ Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
 
 %global Cabal_ver 1.18.1.3
 %global array_ver 0.5.0.0
-%global base_ver 4.7.0.0
+%global base_ver 4.7.0.1
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.1.0
 %global bytestring_ver 0.10.4.0
@@ -250,7 +250,9 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %patch1 -p1 -b .orig
 
 # unversion pkgdoc htmldir
+%if 0%{?fedora} >= 21
 %patch2 -p1 -b .orig
+%endif
 
 rm -r libffi-tarballs
 
@@ -510,6 +512,9 @@ fi
 
 
 %changelog
+* Sat Aug  2 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.5
+- only apply the Cabal unversion docdir patch to F21 and later
+
 * Thu Jul 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.4
 - 7.8.3 final: performance build
 
