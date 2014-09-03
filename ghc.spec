@@ -1,12 +1,12 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
-%if 0%{?fedora} >= 22
-%{?ghc_bootstrap}
-%else
-%{?ghc_test}
-%endif
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
+#%%if 0%{?fedora} >= 22
+#%%{?ghc_bootstrap}
+#%%else
+#%%{?ghc_test}
+#%%endif
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 
@@ -29,7 +29,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 38.1%{?dist}
+Release: 38.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -541,6 +541,9 @@ fi
 
 
 %changelog
+* Wed Sep  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.2
+- 7.8.3 final release performance build
+
 * Wed Sep  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.1
 - 7.8.3 final release: bootstrap build
 - sync with fedora pkg git:
