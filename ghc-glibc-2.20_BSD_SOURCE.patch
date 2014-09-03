@@ -1,0 +1,26 @@
+From 7d738547049e686be4d90a19dcb9520418d5f72d Mon Sep 17 00:00:00 2001
+From: Jens Petersen <petersen@redhat.com>
+Date: Mon, 9 Jun 2014 15:48:41 +0900
+Subject: [PATCH] define _DEFAULT_SOURCE in Stg.h to avoid warnings from glibc
+ 2.20 (#9185)
+
+---
+ includes/Stg.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/includes/Stg.h b/includes/Stg.h
+index 1707c9b..fbcf643 100644
+--- a/includes/Stg.h
++++ b/includes/Stg.h
+@@ -47,6 +47,8 @@
+ // We need _BSD_SOURCE so that math.h defines things like gamma
+ // on Linux
+ # define _BSD_SOURCE
++// glibc 2.20 deprecates _BSD_SOURCE in favour of _DEFAULT_SOURCE
++# define _DEFAULT_SOURCE
+ #endif
+ 
+ #if IN_STG_CODE == 0 || defined(llvm_CC_FLAVOR)
+-- 
+1.9.3
+

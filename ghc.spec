@@ -1,19 +1,12 @@
-# Shared haskell libraries are supported for x86* archs
-# (disabled for other archs in ghc-rpm-macros)
-
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
-# no vanilla currently breaks ARM build
-#%ifarch %{ix86} x86_64
-#%%global without_vanilla 1
-#%endif
-
-### either:
-#%%{?ghc_bootstrap}
-### or for shared libs:
-#%%{?ghc_test}
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
+%if 0%{?fedora} >= 22
+%{?ghc_bootstrap}
+%else
+%{?ghc_test}
+%endif
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 
@@ -35,8 +28,8 @@ Version: 7.8.3
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-# xhtml moved from haskell-platform to ghc
-Release: 36.5%{?dist}
+# xhtml moved from haskell-platform to ghc-7.8.3
+Release: 38.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -49,10 +42,22 @@ Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
-#still needed?# add libffi include dir to ghc wrapper for archs using gcc/llc
+# add libffi include dir to ghc wrapper for archs using gcc/llc
 #Patch10: ghc-wrapper-libffi-include.patch
-Patch2:  ghc-7.7-ghc-cabal-pkgdocdir.patch
-Patch4:  ghc-7.8.1-mk-config.mk.in-ARM-dynlinking.patch
+# stop warnings about unsupported version of llvm
+# NB: value affects ABI hash of libHSghc!
+Patch14: ghc-7.6.3-LlvmCodeGen-llvm-version-warning.patch
+# unversion library html docdirs
+Patch16: ghc-cabal-unversion-docdir.patch
+# changes for ppc64le committed upstream for 7.8.3
+# (https://ghc.haskell.org/trac/ghc/ticket/8965)
+Patch19: ghc-ppc64el.patch
+# warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
+Patch20: ghc-glibc-2.20_BSD_SOURCE.patch
+# Debian patch
+Patch21: ghc-arm64.patch
+Patch22: ghc-7.6.3-armv7-VFPv3D16--NEON.patch
+Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
 %global Cabal_ver 1.18.1.3
 %global array_ver 0.5.0.0
@@ -120,6 +125,14 @@ BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
 BuildRequires: llvm >= 3.0
+%endif
+%ifarch ppc64le aarch64
+# for patch19 and patch21
+BuildRequires: autoconf
+%endif
+%ifarch armv7hl
+# patch22
+BuildRequires: autoconf, automake
 %endif
 Requires: ghc-compiler = %{version}-%{release}
 %if %{undefined without_haddock}
@@ -249,11 +262,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
-# unversion pkgdoc htmldir
-%if 0%{?fedora} >= 21
-%patch2 -p1 -b .orig
-%endif
-
 rm -r libffi-tarballs
 
 %ifnarch %{ix86} x86_64
@@ -261,13 +269,33 @@ rm -r libffi-tarballs
 %endif
 
 %ifarch armv7hl armv5tel
-# disable dynlinking in build since needs gold linker
-%patch4 -p1 -b .orig -R
-# FIXME - recheck
-## TH loading in dph-lifted-copy fails
-#rm -r libraries/dph
+%patch14 -p1 -b .orig
 %endif
 
+%ifarch ppc64 s390x
+%patch15 -p1 -b .orig
+%endif
+
+# unversion pkgdoc htmldir
+%if 0%{?fedora} >= 21
+%patch16 -p1 -b .orig
+%endif
+
+%ifarch ppc64le
+%patch19 -p1 -b .orig
+%endif
+
+%patch20 -p1 -b .orig
+
+%ifarch aarch64
+%patch21 -p1 -b .orig
+%endif
+
+%ifarch armv7hl
+%patch22 -p1 -b .orig
+%endif
+
+%patch23 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
@@ -289,7 +317,7 @@ BuildFlavour = perf
 BuildFlavour = perf-llvm
 %endif
 %endif
-GhcLibWays = %{!?without_vanilla:v} %{!?ghc_without_shared:dyn} %{!?without_prof:p}
+GhcLibWays = v dyn %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
@@ -299,7 +327,14 @@ BUILD_DOCBOOK_HTML = NO
 EOF
 
 export CFLAGS="${CFLAGS:-%optflags}"
-# use --with-gcc=%{_bindir}/gcc when bootstrapping to avoid ccache hardcoding problem
+# * %%configure induces cross-build due to different target/host/build platform names
+# * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
+%ifarch ppc64le aarch64 armv7hl
+for i in $(find . -name config.guess -o -name config.sub) ; do
+    [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i
+done
+autoreconf
+%endif
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
@@ -342,9 +377,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 # add rts libs
 echo "%dir %{ghclibdir}/rts-1.0" >> ghc-base.files
-%if %{undefined ghc_without_shared}
 ls %{buildroot}%{ghclibdir}/rts-1.0/libHS*.so >> ghc-base.files
-%endif
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
@@ -387,7 +420,6 @@ GHC=inplace/bin/ghc-stage2
 # Do some very simple tests that the compiler actually works
 rm -rf testghc
 mkdir testghc
-%if %{undefined without_vanilla}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 $GHC testghc/foo.hs -o testghc/foo
 [ "$(testghc/foo)" = "Foo" ]
@@ -398,13 +430,10 @@ echo 'main = putStrLn "Foo"' > testghc/foo.hs
 $GHC testghc/foo.hs -o testghc/foo -O2
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
-%endif
-%if %{undefined ghc_without_shared}
 echo 'main = putStrLn "Foo"' > testghc/foo.hs
 $GHC testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
-%endif
 %if %{undefined without_testsuite}
 make test
 %endif
@@ -512,14 +541,25 @@ fi
 
 
 %changelog
+* Wed Sep  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.1
+- 7.8.3 final release: bootstrap build
+- sync with fedora pkg git:
+- simpler Cabal PATH warning
+- configure ARM with VFPv3D16 and without NEON (#995419)
+- hide llvm version warning on ARM now up to 3.4
+- add aarch64 with Debian patch by Karel Gardas and Colin Watson
+- patch Stg.h to define _DEFAULT_SOURCE instead of _BSD_SOURCE to quieten
+  glibc 2.20 warnings (see #1067110)
+- add ppc64le support patch from Debian by Colin Watson
+
 * Sat Aug  2 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.5
 - only apply the Cabal unversion docdir patch to F21 and later
 
 * Thu Jul 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.4
-- 7.8.3 final: performance build
+- 7.8.3 almost final: performance build
 
 * Tue Jul  8 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.3
-- 7.8.3 final release: bootstrap build
+- 7.8.3 almost final release: bootstrap build
 - terminfo devel needs ncurses-devel
 
 * Tue Jun 10 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-36.2

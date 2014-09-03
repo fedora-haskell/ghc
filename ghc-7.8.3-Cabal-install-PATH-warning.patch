@@ -1,0 +1,12 @@
+--- ghc-7.8.3/libraries/Cabal/Cabal/Distribution/Simple/Install.hs~	2014-07-10 13:34:21.000000000 +0900
++++ ghc-7.8.3/libraries/Cabal/Cabal/Distribution/Simple/Install.hs	2014-08-29 16:48:12.621694879 +0900
+@@ -148,8 +148,7 @@
+     notice verbosity ("Installing executable(s) in " ++ binPref)
+     inPath <- isInSearchPath binPref
+     when (not inPath) $
+-      warn verbosity ("The directory " ++ binPref
+-                      ++ " is not in the system search path.")
++      warn verbosity ("Executable installed in " ++ binPref)
+ 
+   -- install include files for all compilers - they may be needed to compile
+   -- haskell files (using the CPP extension)

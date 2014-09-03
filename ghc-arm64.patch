@@ -1,0 +1,188 @@
+Description: Add arm64 support
+Author: Karel Gardas <karel.gardas@centrum.cz>
+Author: Colin Watson <cjwatson@ubuntu.com>
+Bug: https://ghc.haskell.org/trac/ghc/ticket/7942
+Last-Update: 2014-04-04
+
+Index: b/aclocal.m4
+===================================================================
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -173,7 +173,7 @@
+             GET_ARM_ISA()
+             test -z "[$]2" || eval "[$]2=\"ArchARM {armISA = \$ARM_ISA, armISAExt = \$ARM_ISA_EXT, armABI = \$ARM_ABI}\""
+             ;;
+-        alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|rs6000|s390|s390x|sparc64|vax)
++        aarch64|alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|rs6000|s390|s390x|sparc64|vax)
+             test -z "[$]2" || eval "[$]2=ArchUnknown"
+             ;;
+         *)
+@@ -1835,6 +1835,9 @@
+ # converts cpu from gnu to ghc naming, and assigns the result to $target_var
+ AC_DEFUN([GHC_CONVERT_CPU],[
+ case "$1" in
++  aarch64*)
++    $2="aarch64"
++    ;;
+   alpha*)
+     $2="alpha"
+     ;;
+Index: b/includes/stg/MachRegs.h
+===================================================================
+--- a/includes/stg/MachRegs.h
++++ b/includes/stg/MachRegs.h
+@@ -43,6 +43,7 @@
+ #define powerpc_REGS  (powerpc_TARGET_ARCH || powerpc64_TARGET_ARCH || rs6000_TARGET_ARCH)
+ #define sparc_REGS    sparc_TARGET_ARCH
+ #define arm_REGS      arm_TARGET_ARCH
++#define aarch64_REGS  aarch64_TARGET_ARCH
+ #define darwin_REGS   darwin_TARGET_OS
+ #else
+ #define i386_REGS     i386_HOST_ARCH
+@@ -50,6 +51,7 @@
+ #define powerpc_REGS  (powerpc_HOST_ARCH || powerpc64_HOST_ARCH || rs6000_HOST_ARCH)
+ #define sparc_REGS    sparc_HOST_ARCH
+ #define arm_REGS      arm_HOST_ARCH
++#define aarch64_REGS  aarch64_HOST_ARCH
+ #define darwin_REGS   darwin_HOST_OS
+ #endif
+ 
+@@ -461,6 +463,63 @@
+ 
+ #endif /* arm */
+ 
++/* -----------------------------------------------------------------------------
++   The ARMv8/AArch64 ABI register mapping
++
++   The AArch64 provides 31 64-bit general purpose registers
++   and 32 128-bit SIMD/floating point registers.
++
++   General purpose registers (see Chapter 5.1.1 in ARM IHI 0055B)
++
++   Register | Special | Role in the procedure call standard
++   ---------+---------+------------------------------------
++     SP     |         | The Stack Pointer
++     r30    |  LR     | The Link Register
++     r29    |  FP     | The Frame Pointer
++   r19-r28  |         | Callee-saved registers
++     r18    |         | The Platform Register, if needed; 
++            |         | or temporary register
++     r17    |  IP1    | The second intra-procedure-call temporary register
++     r16    |  IP0    | The first intra-procedure-call scratch register
++    r9-r15  |         | Temporary registers
++     r8     |         | Indirect result location register
++    r0-r7   |         | Parameter/result registers
++
++
++   FPU/SIMD registers
++
++   s/d/q/v0-v7    Argument / result/ scratch registers
++   s/d/q/v8-v15   callee-saved registers (must be preserved across subrutine calls,
++                  but only bottom 64-bit value needs to be preserved)
++   s/d/q/v16-v31  temporary registers
++
++   ----------------------------------------------------------------------------- */
++
++#if aarch64_REGS
++
++#define REG(x) __asm__(#x)
++
++#define REG_Base        r19
++#define REG_Sp          r20
++#define REG_Hp          r21
++#define REG_R1          r22
++#define REG_R2          r23
++#define REG_R3          r24
++#define REG_R4          r25
++#define REG_R5          r26
++#define REG_R6          r27
++#define REG_SpLim       r28
++
++#define REG_F1          s8
++#define REG_F2          s9
++#define REG_F3          s10
++#define REG_F4          s11
++
++#define REG_D1          d12
++#define REG_D2          d13
++
++#endif /* aarch64 */
++
+ #endif /* NO_REGS */
+ 
+ /* -----------------------------------------------------------------------------
+Index: b/rts/StgCRun.c
+===================================================================
+--- a/rts/StgCRun.c
++++ b/rts/StgCRun.c
+@@ -725,4 +725,70 @@
+ }
+ #endif
+ 
++#ifdef aarch64_HOST_ARCH
++
++StgRegTable *
++StgRun(StgFunPtr f, StgRegTable *basereg) {
++    StgRegTable * r;
++    __asm__ volatile (
++        /*
++         * save callee-saves registers on behalf of the STG code.
++         */
++        "stp x19, x20, [sp, #-16]!\n\t"
++        "stp x21, x22, [sp, #-16]!\n\t"
++        "stp x23, x24, [sp, #-16]!\n\t"
++        "stp x25, x26, [sp, #-16]!\n\t"
++        "stp x27, x28, [sp, #-16]!\n\t" 
++        "stp ip0, ip1, [sp, #-16]!\n\t"
++        "str lr, [sp, #-8]!\n\t"
++
++        /*
++         * allocate some space for Stg machine's temporary storage.
++         * Note: RESERVER_C_STACK_BYTES has to be a round number here or
++         * the assembler can't assemble it.
++         */
++        "str lr, [sp, %3]"
++        /* "sub sp, sp, %3\n\t" */
++        /*
++         * Set BaseReg
++         */
++        "mov x19, %2\n\t"
++        /*
++         * Jump to function argument.
++         */
++        "bx %1\n\t"
++
++        ".globl " STG_RETURN "\n\t"
++        ".type " STG_RETURN ", %%function\n"
++        STG_RETURN ":\n\t"
++        /*
++         * Free the space we allocated
++         */
++        "ldr lr, [sp], %3\n\t"
++        /* "add sp, sp, %3\n\t" */
++        /*
++         * Return the new register table, taking it from Stg's R1 (ARM64's R22).
++         */
++        "mov %0, x22\n\t"
++        /*
++         * restore callee-saves registers.
++         */
++        "ldr lr, [sp], #8\n\t"
++        "ldp ip0, ip1, [sp], #16\n\t"
++        "ldp x27, x28, [sp], #16\n\t"
++        "ldp x25, x26, [sp], #16\n\t"
++        "ldp x23, x24, [sp], #16\n\t"
++        "ldp x21, x22, [sp], #16\n\t"
++        "ldp x19, x20, [sp], #16\n\t"
++
++      : "=r" (r)
++      : "r" (f), "r" (basereg), "i" (RESERVED_C_STACK_BYTES)
++        : "%x19", "%x20", "%x21", "%x22", "%x23", "%x24", "%x25", "%x26", "%x27", "%x28",
++          "%ip0", "%ip1", "%lr"
++    );
++    return r;
++}
++
++#endif
++
+ #endif /* !USE_MINIINTERPRETER */

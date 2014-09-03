@@ -1,0 +1,41 @@
+Description: Add ppc64el support
+Author: Colin Watson <cjwatson@ubuntu.com>
+Bug: https://ghc.haskell.org/trac/ghc/ticket/8965
+Last-Update: 2014-04-12
+
+Index: b/aclocal.m4
+===================================================================
+--- a/aclocal.m4
++++ b/aclocal.m4
+@@ -173,7 +173,7 @@
+             GET_ARM_ISA()
+             test -z "[$]2" || eval "[$]2=\"ArchARM {armISA = \$ARM_ISA, armISAExt = \$ARM_ISA_EXT, armABI = \$ARM_ABI}\""
+             ;;
+-        alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|rs6000|s390|s390x|sparc64|vax)
++        alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|powerpc64le|rs6000|s390|s390x|sparc64|vax)
+             test -z "[$]2" || eval "[$]2=ArchUnknown"
+             ;;
+         *)
+@@ -1868,6 +1868,9 @@
+   mips*)
+     $2="mips"
+     ;;
++  powerpc64le*)
++    $2="powerpc64le"
++    ;;
+   powerpc64*)
+     $2="powerpc64"
+     ;;
+Index: b/includes/Stg.h
+===================================================================
+--- a/includes/Stg.h
++++ b/includes/Stg.h
+@@ -213,7 +213,7 @@
+ #define II_(X)          static StgWordArray (X) GNU_ATTRIBUTE(aligned (8))
+ #define IF_(f)    static StgFunPtr GNUC3_ATTRIBUTE(used) f(void)
+ #define FN_(f)    StgFunPtr f(void)
+-#define EF_(f)    extern StgFunPtr f(void)
++#define EF_(f)    extern StgFunPtr f()
+ 
+ /* -----------------------------------------------------------------------------
+    Tail calls
