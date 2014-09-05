@@ -29,7 +29,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 38.2%{?dist}
+Release: 38.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -194,13 +194,16 @@ The package provides a cronjob for re-indexing installed library development
 documention.
 %endif
 
+# ghclibdir also needs ghc_version_override for bootstrapping (ghc-deps.sh)
 %global ghc_version_override %{version}
 
+# currently only F22 ghc-rpm-macros has ghc.attr
+%if 0%{?fedora} < 22
 # needs ghc_version_override for bootstrapping
 %global _use_internal_dependency_generator 0
 %global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
 %global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
-
+%endif
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
@@ -541,6 +544,9 @@ fi
 
 
 %changelog
+* Fri Sep  5 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.3
+- use rpm internal dependency generator with ghc.attr on F22
+
 * Wed Sep  3 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.2
 - 7.8.3 final release performance build
 
