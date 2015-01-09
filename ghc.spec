@@ -1,12 +1,12 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
-#%%if 0%{?fedora} >= 22
-#%%{?ghc_bootstrap}
-#%%else
-#%%{?ghc_test}
-#%%endif
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
+%if 0%{?fedora} >= 22
+%{?ghc_bootstrap}
+%else
+%{?ghc_test}
+%endif
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 
@@ -21,13 +21,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.8.3
+Version: 7.8.4
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 38.4%{?dist}
+Release: 38%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -55,9 +55,9 @@ Patch21: ghc-arm64.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
-%global Cabal_ver 1.18.1.3
+%global Cabal_ver 1.18.1.5
 %global array_ver 0.5.0.0
-%global base_ver 4.7.0.1
+%global base_ver 4.7.0.2
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.1.0
 %global bytestring_ver 0.10.4.0
@@ -549,6 +549,9 @@ fi
 
 
 %changelog
+* Fri Jan  9 2015 Jens Petersen <petersen@redhat.com> - 7.8.4-38
+- update to 7.8.4 bugfix release bootstrap
+
 * Fri Jan  9 2015 Jens Petersen <petersen@redhat.com> - 7.8.3-38.4
 - sync with latest changes from rawhide 7.8.3 for arm and secondary archs
 
