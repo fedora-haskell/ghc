@@ -34,5 +34,5 @@ if [ -x "gen_contents_index" -a ! -r "$PKGDIRCACHE.new" -o -n "$DIR_DIFF" ]; the
 fi
 
 if [ -f $PKGDIRCACHE.new ]; then
-  mv -f $PKGDIRCACHE{.new,}
+  mv -f $PKGDIRCACHE.new $PKGDIRCACHE
 fi

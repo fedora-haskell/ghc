@@ -1,23 +1,27 @@
-Description: Add arm64 support
-Author: Karel Gardas <karel.gardas@centrum.cz>
-Author: Colin Watson <cjwatson@ubuntu.com>
+commit c29bf984dd20431cd4344e8a5c444d7a5be08389
+Author: Colin Watson <cjwatson@debian.org>
+Date:   Mon Apr 21 22:26:56 2014 -0500
 Bug: https://ghc.haskell.org/trac/ghc/ticket/7942
-Last-Update: 2014-04-04
 
-Index: b/aclocal.m4
+    ghc: initial AArch64 patches
+    
+    Signed-off-by: Austin Seipp <austin@well-typed.com>
+
+Index: ghc-7.8.3/aclocal.m4
 ===================================================================
---- a/aclocal.m4
-+++ b/aclocal.m4
-@@ -173,7 +173,7 @@
+--- ghc-7.8.3.orig/aclocal.m4	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/aclocal.m4	2014-07-10 10:16:42.529187516 +0200
+@@ -197,6 +197,9 @@
              GET_ARM_ISA()
              test -z "[$]2" || eval "[$]2=\"ArchARM {armISA = \$ARM_ISA, armISAExt = \$ARM_ISA_EXT, armABI = \$ARM_ABI}\""
              ;;
--        alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|rs6000|s390|s390x|sparc64|vax)
-+        aarch64|alpha|mips|mipseb|mipsel|hppa|hppa1_1|ia64|m68k|rs6000|s390|s390x|sparc64|vax)
-             test -z "[$]2" || eval "[$]2=ArchUnknown"
++        aarch64)
++            test -z "[$]2" || eval "[$]2=ArchARM64"
++            ;;
+         alpha)
+             test -z "[$]2" || eval "[$]2=ArchAlpha"
              ;;
-         *)
-@@ -1835,6 +1835,9 @@
+@@ -1862,6 +1865,9 @@
  # converts cpu from gnu to ghc naming, and assigns the result to $target_var
  AC_DEFUN([GHC_CONVERT_CPU],[
  case "$1" in
@@ -27,29 +31,161 @@ Index: b/aclocal.m4
    alpha*)
      $2="alpha"
      ;;
-Index: b/includes/stg/MachRegs.h
+Index: ghc-7.8.3/compiler/nativeGen/AsmCodeGen.lhs
 ===================================================================
---- a/includes/stg/MachRegs.h
-+++ b/includes/stg/MachRegs.h
-@@ -43,6 +43,7 @@
- #define powerpc_REGS  (powerpc_TARGET_ARCH || powerpc64_TARGET_ARCH || rs6000_TARGET_ARCH)
- #define sparc_REGS    sparc_TARGET_ARCH
- #define arm_REGS      arm_TARGET_ARCH
-+#define aarch64_REGS  aarch64_TARGET_ARCH
- #define darwin_REGS   darwin_TARGET_OS
- #else
- #define i386_REGS     i386_HOST_ARCH
-@@ -50,6 +51,7 @@
- #define powerpc_REGS  (powerpc_HOST_ARCH || powerpc64_HOST_ARCH || rs6000_HOST_ARCH)
- #define sparc_REGS    sparc_HOST_ARCH
- #define arm_REGS      arm_HOST_ARCH
-+#define aarch64_REGS  aarch64_HOST_ARCH
- #define darwin_REGS   darwin_HOST_OS
+--- ghc-7.8.3.orig/compiler/nativeGen/AsmCodeGen.lhs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/nativeGen/AsmCodeGen.lhs	2014-07-10 10:16:42.529187516 +0200
+@@ -166,6 +166,7 @@
+       ArchPPC     -> nCG' (ppcNcgImpl    dflags)
+       ArchSPARC   -> nCG' (sparcNcgImpl  dflags)
+       ArchARM {}  -> panic "nativeCodeGen: No NCG for ARM"
++      ArchARM64   -> panic "nativeCodeGen: No NCG for ARM64"
+       ArchPPC_64  -> panic "nativeCodeGen: No NCG for PPC 64"
+       ArchAlpha   -> panic "nativeCodeGen: No NCG for Alpha"
+       ArchMipseb  -> panic "nativeCodeGen: No NCG for mipseb"
+Index: ghc-7.8.3/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs
+===================================================================
+--- ghc-7.8.3.orig/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/nativeGen/RegAlloc/Graph/TrivColorable.hs	2014-07-10 10:16:42.529187516 +0200
+@@ -113,6 +113,7 @@
+                             ArchSPARC     -> 14
+                             ArchPPC_64    -> panic "trivColorable ArchPPC_64"
+                             ArchARM _ _ _ -> panic "trivColorable ArchARM"
++                            ArchARM64     -> panic "trivColorable ArchARM64"
+                             ArchAlpha     -> panic "trivColorable ArchAlpha"
+                             ArchMipseb    -> panic "trivColorable ArchMipseb"
+                             ArchMipsel    -> panic "trivColorable ArchMipsel"
+@@ -137,6 +138,7 @@
+                             ArchSPARC     -> 22
+                             ArchPPC_64    -> panic "trivColorable ArchPPC_64"
+                             ArchARM _ _ _ -> panic "trivColorable ArchARM"
++                            ArchARM64     -> panic "trivColorable ArchARM64"
+                             ArchAlpha     -> panic "trivColorable ArchAlpha"
+                             ArchMipseb    -> panic "trivColorable ArchMipseb"
+                             ArchMipsel    -> panic "trivColorable ArchMipsel"
+@@ -161,6 +163,7 @@
+                             ArchSPARC     -> 11
+                             ArchPPC_64    -> panic "trivColorable ArchPPC_64"
+                             ArchARM _ _ _ -> panic "trivColorable ArchARM"
++                            ArchARM64     -> panic "trivColorable ArchARM64"
+                             ArchAlpha     -> panic "trivColorable ArchAlpha"
+                             ArchMipseb    -> panic "trivColorable ArchMipseb"
+                             ArchMipsel    -> panic "trivColorable ArchMipsel"
+@@ -185,6 +188,7 @@
+                             ArchSPARC     -> 0
+                             ArchPPC_64    -> panic "trivColorable ArchPPC_64"
+                             ArchARM _ _ _ -> panic "trivColorable ArchARM"
++                            ArchARM64     -> panic "trivColorable ArchARM64"
+                             ArchAlpha     -> panic "trivColorable ArchAlpha"
+                             ArchMipseb    -> panic "trivColorable ArchMipseb"
+                             ArchMipsel    -> panic "trivColorable ArchMipsel"
+Index: ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/FreeRegs.hs
+===================================================================
+--- ghc-7.8.3.orig/compiler/nativeGen/RegAlloc/Linear/FreeRegs.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/FreeRegs.hs	2014-07-10 10:16:42.529187516 +0200
+@@ -74,6 +74,7 @@
+                 ArchPPC       -> PPC.Instr.maxSpillSlots dflags
+                 ArchSPARC     -> SPARC.Instr.maxSpillSlots dflags
+                 ArchARM _ _ _ -> panic "maxSpillSlots ArchARM"
++                ArchARM64     -> panic "maxSpillSlots ArchARM64"
+                 ArchPPC_64    -> panic "maxSpillSlots ArchPPC_64"
+                 ArchAlpha     -> panic "maxSpillSlots ArchAlpha"
+                 ArchMipseb    -> panic "maxSpillSlots ArchMipseb"
+Index: ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/Main.hs
+===================================================================
+--- ghc-7.8.3.orig/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.529187516 +0200
+@@ -207,6 +207,7 @@
+       ArchSPARC     -> linearRegAlloc' dflags (frInitFreeRegs platform :: SPARC.FreeRegs)  first_id block_live sccs
+       ArchPPC       -> linearRegAlloc' dflags (frInitFreeRegs platform :: PPC.FreeRegs)    first_id block_live sccs
+       ArchARM _ _ _ -> panic "linearRegAlloc ArchARM"
++      ArchARM64     -> panic "linearRegAlloc ArchARM64"
+       ArchPPC_64    -> panic "linearRegAlloc ArchPPC_64"
+       ArchAlpha     -> panic "linearRegAlloc ArchAlpha"
+       ArchMipseb    -> panic "linearRegAlloc ArchMipseb"
+Index: ghc-7.8.3/compiler/nativeGen/TargetReg.hs
+===================================================================
+--- ghc-7.8.3.orig/compiler/nativeGen/TargetReg.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/nativeGen/TargetReg.hs	2014-07-10 10:16:42.529187516 +0200
+@@ -54,6 +54,7 @@
+       ArchSPARC     -> SPARC.virtualRegSqueeze
+       ArchPPC_64    -> panic "targetVirtualRegSqueeze ArchPPC_64"
+       ArchARM _ _ _ -> panic "targetVirtualRegSqueeze ArchARM"
++      ArchARM64     -> panic "targetVirtualRegSqueeze ArchARM64"
+       ArchAlpha     -> panic "targetVirtualRegSqueeze ArchAlpha"
+       ArchMipseb    -> panic "targetVirtualRegSqueeze ArchMipseb"
+       ArchMipsel    -> panic "targetVirtualRegSqueeze ArchMipsel"
+@@ -70,6 +71,7 @@
+       ArchSPARC     -> SPARC.realRegSqueeze
+       ArchPPC_64    -> panic "targetRealRegSqueeze ArchPPC_64"
+       ArchARM _ _ _ -> panic "targetRealRegSqueeze ArchARM"
++      ArchARM64     -> panic "targetRealRegSqueeze ArchARM64"
+       ArchAlpha     -> panic "targetRealRegSqueeze ArchAlpha"
+       ArchMipseb    -> panic "targetRealRegSqueeze ArchMipseb"
+       ArchMipsel    -> panic "targetRealRegSqueeze ArchMipsel"
+@@ -85,6 +87,7 @@
+       ArchSPARC     -> SPARC.classOfRealReg
+       ArchPPC_64    -> panic "targetClassOfRealReg ArchPPC_64"
+       ArchARM _ _ _ -> panic "targetClassOfRealReg ArchARM"
++      ArchARM64     -> panic "targetClassOfRealReg ArchARM64"
+       ArchAlpha     -> panic "targetClassOfRealReg ArchAlpha"
+       ArchMipseb    -> panic "targetClassOfRealReg ArchMipseb"
+       ArchMipsel    -> panic "targetClassOfRealReg ArchMipsel"
+@@ -100,6 +103,7 @@
+       ArchSPARC     -> SPARC.mkVirtualReg
+       ArchPPC_64    -> panic "targetMkVirtualReg ArchPPC_64"
+       ArchARM _ _ _ -> panic "targetMkVirtualReg ArchARM"
++      ArchARM64     -> panic "targetMkVirtualReg ArchARM64"
+       ArchAlpha     -> panic "targetMkVirtualReg ArchAlpha"
+       ArchMipseb    -> panic "targetMkVirtualReg ArchMipseb"
+       ArchMipsel    -> panic "targetMkVirtualReg ArchMipsel"
+@@ -115,6 +119,7 @@
+       ArchSPARC     -> SPARC.regDotColor
+       ArchPPC_64    -> panic "targetRegDotColor ArchPPC_64"
+       ArchARM _ _ _ -> panic "targetRegDotColor ArchARM"
++      ArchARM64     -> panic "targetRegDotColor ArchARM64"
+       ArchAlpha     -> panic "targetRegDotColor ArchAlpha"
+       ArchMipseb    -> panic "targetRegDotColor ArchMipseb"
+       ArchMipsel    -> panic "targetRegDotColor ArchMipsel"
+Index: ghc-7.8.3/compiler/utils/Platform.hs
+===================================================================
+--- ghc-7.8.3.orig/compiler/utils/Platform.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/compiler/utils/Platform.hs	2014-07-10 10:16:42.529187516 +0200
+@@ -52,6 +52,7 @@
+           , armISAExt :: [ArmISAExt]
+           , armABI    :: ArmABI
+           }
++        | ArchARM64
+         | ArchAlpha
+         | ArchMipseb
+         | ArchMipsel
+Index: ghc-7.8.3/includes/stg/HaskellMachRegs.h
+===================================================================
+--- ghc-7.8.3.orig/includes/stg/HaskellMachRegs.h	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/includes/stg/HaskellMachRegs.h	2014-07-10 10:16:42.533187516 +0200
+@@ -38,6 +38,7 @@
+ #define MACHREGS_powerpc  (powerpc_TARGET_ARCH || powerpc64_TARGET_ARCH || rs6000_TARGET_ARCH)
+ #define MACHREGS_sparc    sparc_TARGET_ARCH
+ #define MACHREGS_arm      arm_TARGET_ARCH
++#define MACHREGS_aarch64  aarch64_TARGET_ARCH
+ #define MACHREGS_darwin   darwin_TARGET_OS
+ 
  #endif
- 
-@@ -461,6 +463,63 @@
- 
- #endif /* arm */
+Index: ghc-7.8.3/includes/stg/MachRegs.h
+===================================================================
+--- ghc-7.8.3.orig/includes/stg/MachRegs.h	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/includes/stg/MachRegs.h	2014-07-10 10:16:42.533187516 +0200
+@@ -1,6 +1,6 @@
+ /* -----------------------------------------------------------------------------
+  *
+- * (c) The GHC Team, 1998-2011
++ * (c) The GHC Team, 1998-2014
+  *
+  * Registers used in STG code.  Might or might not correspond to
+  * actual machine registers.
+@@ -531,6 +531,61 @@
+ #define REG_D2    d11
+ #endif
  
 +/* -----------------------------------------------------------------------------
 +   The ARMv8/AArch64 ABI register mapping
@@ -83,7 +219,7 @@ Index: b/includes/stg/MachRegs.h
 +
 +   ----------------------------------------------------------------------------- */
 +
-+#if aarch64_REGS
++#elif MACHREGS_aarch64
 +
 +#define REG(x) __asm__(#x)
 +
@@ -106,16 +242,14 @@ Index: b/includes/stg/MachRegs.h
 +#define REG_D1          d12
 +#define REG_D2          d13
 +
-+#endif /* aarch64 */
-+
- #endif /* NO_REGS */
+ #else
  
- /* -----------------------------------------------------------------------------
-Index: b/rts/StgCRun.c
+ #error Cannot find platform to give register info for
+Index: ghc-7.8.3/rts/StgCRun.c
 ===================================================================
---- a/rts/StgCRun.c
-+++ b/rts/StgCRun.c
-@@ -725,4 +725,70 @@
+--- ghc-7.8.3.orig/rts/StgCRun.c	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.3/rts/StgCRun.c	2014-07-10 10:16:42.533187516 +0200
+@@ -748,4 +748,70 @@
  }
  #endif
  

@@ -10,10 +10,8 @@
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 
-
-# hack until ghc-rpm-macros updated
-# use %%ifdefined ghc_without_shared ?
-%ifarch armv7hl armv5tel ppc ppc64 s390 s390x
+# need to enable shared libs for all arches
+%if %{defined ghc_without_shared}
 %undefine ghc_without_shared
 %endif
 
@@ -29,7 +27,7 @@ Version: 7.8.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 38.3%{?dist}
+Release: 38.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -46,17 +44,15 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 #Patch10: ghc-wrapper-libffi-include.patch
 # stop warnings about unsupported version of llvm
 # NB: value affects ABI hash of libHSghc!
-Patch14: ghc-7.6.3-LlvmCodeGen-llvm-version-warning.patch
+# will probably be needed again for llvm-3.5
+#Patch14: ghc-7.6.3-LlvmCodeGen-llvm-version-warning.patch
 # unversion library html docdirs
 Patch16: ghc-cabal-unversion-docdir.patch
-# changes for ppc64le committed upstream for 7.8.3
-# (https://ghc.haskell.org/trac/ghc/ticket/8965)
-Patch19: ghc-ppc64el.patch
 # warning "_BSD_SOURCE and _SVID_SOURCE are deprecated, use _DEFAULT_SOURCE"
 Patch20: ghc-glibc-2.20_BSD_SOURCE.patch
 # Debian patch
 Patch21: ghc-arm64.patch
-Patch22: ghc-7.6.3-armv7-VFPv3D16--NEON.patch
+Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
 %global Cabal_ver 1.18.1.3
@@ -89,7 +85,8 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
 
 # fedora ghc has been bootstrapped on
-# %{ix86} x86_64 ppc alpha sparcv9 ppc64 armv7hl armv5tel s390 s390x
+# %{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
+# and retired arches: alpha sparcv9 armv5tel
 # see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 ExcludeArch: sparc64
 Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
@@ -102,7 +99,7 @@ Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-f
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
-%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
+%if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
 BuildRequires: ghc-rpm-macros-extra
 %else
 BuildRequires: ghc-rpm-macros
@@ -124,13 +121,9 @@ BuildRequires: libxslt, docbook-style-xsl
 BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: llvm >= 3.0
+BuildRequires: llvm34
 %endif
-%ifarch ppc64le aarch64
-# for patch19 and patch21
-BuildRequires: autoconf
-%endif
-%ifarch armv7hl
+%ifarch armv7hl aarch64
 # patch22
 BuildRequires: autoconf, automake
 %endif
@@ -172,7 +165,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl armv5tel
-Requires: llvm >= 3.0
+Requires: llvm34
 %endif
 
 %description compiler
@@ -197,8 +190,8 @@ documention.
 # ghclibdir also needs ghc_version_override for bootstrapping (ghc-deps.sh)
 %global ghc_version_override %{version}
 
-# currently only F22 ghc-rpm-macros has ghc.attr
-%if 0%{?fedora} < 22
+# currently only F21+ ghc-rpm-macros has ghc.attr
+%if 0%{?fedora} < 21
 # needs ghc_version_override for bootstrapping
 %global _use_internal_dependency_generator 0
 %global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
@@ -272,20 +265,12 @@ rm -r libffi-tarballs
 %endif
 
 %ifarch armv7hl armv5tel
-%patch14 -p1 -b .orig
-%endif
-
-%ifarch ppc64 s390x
-%patch15 -p1 -b .orig
+#%%patch14 -p1 -b .orig
 %endif
 
 # unversion pkgdoc htmldir
 %if 0%{?fedora} >= 21
 %patch16 -p1 -b .orig
-%endif
-
-%ifarch ppc64le
-%patch19 -p1 -b .orig
 %endif
 
 %patch20 -p1 -b .orig
@@ -319,6 +304,12 @@ BuildFlavour = perf
 %else
 BuildFlavour = perf-llvm
 %endif
+%else
+%ifnarch armv7hl armv5tel
+BuildFlavour = quick-llvm
+%else
+BuildFlavour = quick
+%endif
 %endif
 GhcLibWays = v dyn %{!?without_prof:p}
 %if %{defined without_haddock}
@@ -327,23 +318,35 @@ HADDOCK_DOCS = NO
 %if %{defined without_manual}
 BUILD_DOCBOOK_HTML = NO
 %endif
+## for verbose build output
+#GhcStage1HcOpts=-v4
+## enable RTS debugging:
+## (http://ghc.haskell.org/trac/ghc/wiki/Debugging/RuntimeSystem)
+#EXTRA_HC_OPTS=-debug
 EOF
 
-export CFLAGS="${CFLAGS:-%optflags}"
-# * %%configure induces cross-build due to different target/host/build platform names
-# * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
-%ifarch ppc64le aarch64 armv7hl
+%ifarch aarch64
 for i in $(find . -name config.guess -o -name config.sub) ; do
     [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i
 done
+%endif
+%ifarch aarch64 armv7hl
 autoreconf
 %endif
+export CFLAGS="${CFLAGS:-%optflags}"
+export LDFLAGS="${LDFLAGS:-%__global_ldflags}"
+# * %%configure induces cross-build due to different target/host/build platform names
+# * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc --with-system-libffi
+  --with-gcc=%{_bindir}/gcc --with-system-libffi \
+%ifarch armv7hl armv5tel
+  --with-llc=%{_bindir}/llc-3.4 --with-opt=%{_bindir}/opt-3.4 \
+%endif
+%{nil}
 
 # avoid "ghc: hGetContents: invalid argument (invalid byte sequence)"
 export LANG=en_US.utf8
@@ -475,8 +478,10 @@ fi
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
+%ifarch %ghc_arches_with_ghci
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
+%endif
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
@@ -544,6 +549,9 @@ fi
 
 
 %changelog
+* Fri Jan  9 2015 Jens Petersen <petersen@redhat.com> - 7.8.3-38.4
+- sync with latest changes from rawhide 7.8.3 for arm and secondary archs
+
 * Fri Sep  5 2014 Jens Petersen <petersen@redhat.com> - 7.8.3-38.3
 - use rpm internal dependency generator with ghc.attr on F22
 
