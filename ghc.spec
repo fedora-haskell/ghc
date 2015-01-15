@@ -28,7 +28,7 @@ Version: 7.10.0.20141222
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 40%{?dist}
+Release: 0.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -542,10 +542,11 @@ fi
 
 
 %changelog
-* Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-40
+* Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-0.1
 - 7.10.1 RC1
 - haskell2010, haskell98, old-locale, and old-time libraries gone
 - xhtml not built
+- all libraries bumped wrt 7.8.4
 
 * Fri Jan  9 2015 Jens Petersen <petersen@redhat.com> - 7.8.4-38.1
 - production build
