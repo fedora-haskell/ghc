@@ -1,12 +1,12 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
-%if 0%{?fedora} >= 22
-%{?ghc_bootstrap}
-%else
-%{?ghc_test}
-%endif
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
+#%%if 0%{?fedora} >= 22
+#%%{?ghc_bootstrap}
+#%%else
+#%%{?ghc_test}
+#%%endif
 
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
@@ -28,7 +28,7 @@ Version: 7.10.0.20141222
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -105,7 +105,6 @@ BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
 BuildRequires: ghc-containers-devel
 BuildRequires: ghc-directory-devel
-BuildRequires: ghc-haskell98-devel
 BuildRequires: ghc-pretty-devel
 BuildRequires: ghc-process-devel
 BuildRequires: gmp-devel
@@ -542,6 +541,10 @@ fi
 
 
 %changelog
+* Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-0.2
+- production build
+- no longer BR haskell98
+
 * Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-0.1
 - 7.10.1 RC1
 - haskell2010, haskell98, old-locale, and old-time libraries gone
