@@ -1,12 +1,12 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
-#%%if 0%{?fedora} >= 22
-#%%{?ghc_bootstrap}
-#%%else
-#%%{?ghc_test}
-#%%endif
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
+%if 0%{?fedora} >= 22
+%{?ghc_bootstrap}
+%else
+%{?ghc_test}
+%endif
 
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
@@ -22,20 +22,19 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.0.20141222
+Version: 7.10.0.20150116
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-# xhtml moved from haskell-platform to ghc-7.8.3
-Release: 0.2%{?dist}
+Release: 0.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -52,7 +51,7 @@ Patch21: ghc-arm64.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
-%global Cabal_ver 1.22.0.0
+%global Cabal_ver 1.22.0.1
 %global array_ver 0.5.0.1
 %global base_ver 4.8.0.0
 %global bin_package_db_ver 0.0.0.0
@@ -60,25 +59,21 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 %global bytestring_ver 0.10.6.0
 %global containers_ver 0.5.6.2
 %global deepseq_ver 1.4.0.0
-%global directory_ver 1.2.1.1
+%global directory_ver 1.2.2.0
 %global filepath_ver 1.3.1.0
 %global ghc_prim_ver 0.3.1.0
 %global haskeline_ver 0.7.2.0
-#%%global haskell2010_ver 1.1.2.0
-#%%global haskell98_ver 2.0.0.3
 %global hoopl_ver 3.10.0.2
 %global hpc_ver 0.6.0.2
 %global integer_gmp_ver 1.0.0.0
-#%%global old_locale_ver 1.0.0.6
-#%%global old_time_ver 1.1.0.2
-%global pretty_ver 1.1.1.3
-%global process_ver 1.2.1.0
+%global pretty_ver 1.1.2.0
+%global process_ver 1.2.2.0
 %global template_haskell_ver 2.10.0.0
 %global terminfo_ver 0.4.0.1
 %global time_ver 1.5.0.1
 %global transformers_ver 0.4.2.0
 %global unix_ver 2.7.1.0
-#%%global xhtml_ver 3000.2.1
+%global xhtml_ver 3000.2.1
 
 
 # fedora ghc has been bootstrapped on
@@ -211,12 +206,8 @@ documention.
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage haskeline %{haskeline_ver}
-#%%ghc_lib_subpackage -l HaskellReport haskell2010 %{haskell2010_ver}
-#%%ghc_lib_subpackage -l HaskellReport haskell98 %{haskell98_ver}
 %ghc_lib_subpackage hoopl %{hoopl_ver}
 %ghc_lib_subpackage hpc %{hpc_ver}
-#%%ghc_lib_subpackage -l %BSDHaskellReport old-locale %{old_locale_ver}
-#%%ghc_lib_subpackage -l %BSDHaskellReport old-time %{old_time_ver}
 %ghc_lib_subpackage pretty %{pretty_ver}
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
 %ghc_lib_subpackage -l %BSDHaskellReport process %{process_ver}
@@ -226,7 +217,9 @@ documention.
 %ghc_lib_subpackage time %{time_ver}
 %ghc_lib_subpackage transformers %{transformers_ver}
 %ghc_lib_subpackage unix %{unix_ver}
-#%%ghc_lib_subpackage xhtml %{xhtml_ver}
+%if %{undefined without_haddock}
+%ghc_lib_subpackage xhtml %{xhtml_ver}
+%endif
 %endif
 
 %global version %{ghc_version_override}
@@ -541,14 +534,12 @@ fi
 
 
 %changelog
-* Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-0.2
-- production build
-- no longer BR haskell98
+* Sat Jan 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150116-0.1
+- update to latest ghc-7.10 git snapshot
 
 * Thu Jan 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20141222-0.1
 - 7.10.1 RC1
 - haskell2010, haskell98, old-locale, and old-time libraries gone
-- xhtml not built
 - all libraries bumped wrt 7.8.4
 
 * Fri Jan  9 2015 Jens Petersen <petersen@redhat.com> - 7.8.4-38.1
