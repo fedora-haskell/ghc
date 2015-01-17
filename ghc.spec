@@ -1,20 +1,15 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
-%global without_testsuite 1
-%global without_prof 1
-%if 0%{?fedora} >= 22
-%{?ghc_bootstrap}
-%else
-%{?ghc_test}
-%endif
+#%%global ghc_bootstrapping 1
+#%%global without_testsuite 1
+#%%global without_prof 1
+#%%if 0%{?fedora} >= 22
+#%%{?ghc_bootstrap}
+#%%else
+#%%{?ghc_test}
+#%%endif
 
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
-
-# need to enable shared libs for all arches
-%if %{defined ghc_without_shared}
-%undefine ghc_without_shared
-%endif
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -27,7 +22,7 @@ Version: 7.10.0.20150116
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 0.1%{?dist}
+Release: 0.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -534,6 +529,9 @@ fi
 
 
 %changelog
+* Sat Jan 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150116-0.2
+- production build
+
 * Sat Jan 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150116-0.1
 - update to latest ghc-7.10 git snapshot
 
