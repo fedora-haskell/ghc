@@ -1,0 +1,17 @@
+Patch by nomeata: https://ghc.haskell.org/trac/ghc/ticket/8976#comment:12
+
+Index: ghc-7.8.3.20141119/aclocal.m4
+===================================================================
+--- ghc-7.8.3.20141119.orig/aclocal.m4	2014-12-08 18:49:28.207171714 +0100
++++ ghc-7.8.3.20141119/aclocal.m4	2014-12-08 19:03:06.815522917 +0100
+@@ -553,6 +553,10 @@
+         $3="$$3 -D_HPUX_SOURCE"
+         $5="$$5 -D_HPUX_SOURCE"
+         ;;
++    arm*)
++        # On arm, link using gold
++        $3="$$3 -fuse-ld=gold"
++        ;;
+     esac
+ 
+     # If gcc knows about the stack protector, turn it off.
