@@ -1,12 +1,12 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
-#%%if 0%{?fedora} >= 22
-#%%{?ghc_bootstrap}
-#%%else
-#%%{?ghc_test}
-#%%endif
+%global ghc_bootstrapping 1
+%global without_testsuite 1
+%global without_prof 1
+%if 0%{?fedora} >= 22
+%{?ghc_bootstrap}
+%else
+%{?ghc_test}
+%endif
 
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
@@ -17,19 +17,19 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.0.20150116
+Version: 7.10.0.20150123
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 0.2%{?dist}
+Release: 0.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.bz2
+Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -46,11 +46,11 @@ Patch21: ghc-arm64.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
-%global Cabal_ver 1.22.0.1
+%global Cabal_ver 1.22.1.0
 %global array_ver 0.5.0.1
 %global base_ver 4.8.0.0
 %global bin_package_db_ver 0.0.0.0
-%global binary_ver 0.7.2.3
+%global binary_ver 0.7.3.0
 %global bytestring_ver 0.10.6.0
 %global containers_ver 0.5.6.2
 %global deepseq_ver 1.4.0.0
@@ -529,6 +529,10 @@ fi
 
 
 %changelog
+* Mon Feb  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150123-0.3
+- RC2 bootstrap
+- Cabal and binary bumped
+
 * Sat Jan 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150116-0.2
 - production build
 
