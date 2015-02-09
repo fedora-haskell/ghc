@@ -1,15 +1,25 @@
 # To bootstrap build a new version of ghc, uncomment the following:
 #%%global ghc_bootstrapping 1
-#%%global without_testsuite 1
-#%%global without_prof 1
-#%%if 0%{?fedora} >= 22
-#%%{?ghc_bootstrap}
-#%%else
-#%%{?ghc_test}
-#%%endif
 
+%if %{defined ghc_bootstrapping}
+%global without_testsuite 1
+%global without_prof 1
+%if 0%{?fedora} >= 22
+%{?ghc_bootstrap}
+%else
+%{?ghc_test}
+%endif
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
+%endif
+
+# make sure to turn on shared libs for all arches
+# (for building on releases earlier than F22)
+%if %{defined ghc_without_shared}
+%undefine ghc_without_shared
+%endif
+
+%global llvm_version 3.5
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -37,10 +47,6 @@ Source4: ghc-doc-index
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 # add libffi include dir to ghc wrapper for archs using gcc/llc
 #Patch10: ghc-wrapper-libffi-include.patch
-# stop warnings about unsupported version of llvm
-# NB: value affects ABI hash of libHSghc!
-# will probably be needed again for llvm-3.5
-#Patch14: ghc-7.6.3-LlvmCodeGen-llvm-version-warning.patch
 # Debian patch
 Patch21: ghc-arm64.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
@@ -86,7 +92,7 @@ Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-f
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
-%if 0%{?fedora} >= 19 || 0%{?rhel} >= 7
+%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
 BuildRequires: ghc-rpm-macros-extra
 %else
 BuildRequires: ghc-rpm-macros
@@ -107,7 +113,7 @@ BuildRequires: libxslt, docbook-style-xsl
 BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: llvm34
+BuildRequires: llvm %{llvm_version}
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -151,7 +157,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl armv5tel
-Requires: llvm34
+Requires: llvm = %{llvm_version}
 %endif
 
 %description compiler
@@ -246,10 +252,6 @@ rm -r libffi-tarballs
 
 %ifnarch %{ix86} x86_64
 #%%patch10 -p1 -b .10-ffi
-%endif
-
-%ifarch armv7hl armv5tel
-#%%patch14 -p1 -b .orig
 %endif
 
 %ifarch aarch64
@@ -458,10 +460,8 @@ fi
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
-%ifarch %ghc_arches_with_ghci
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
-%endif
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
