@@ -48,7 +48,6 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 # add libffi include dir to ghc wrapper for archs using gcc/llc
 #Patch10: ghc-wrapper-libffi-include.patch
 # Debian patch
-Patch21: ghc-arm64.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
@@ -112,8 +111,8 @@ BuildRequires: libxslt, docbook-style-xsl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
-%ifarch armv7hl armv5tel
-BuildRequires: llvm %{llvm_version}
+%ifarch armv7hl armv5tel aarch64
+BuildRequires: llvm = %{llvm_version}
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -156,7 +155,7 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
-%ifarch armv7hl armv5tel
+%ifarch armv7hl armv5tel aarch64
 Requires: llvm = %{llvm_version}
 %endif
 
@@ -254,10 +253,6 @@ rm -r libffi-tarballs
 #%%patch10 -p1 -b .10-ffi
 %endif
 
-%ifarch aarch64
-%patch21 -p1 -b .orig
-%endif
-
 %ifarch armv7hl
 %patch22 -p1 -b .orig
 %endif
@@ -281,13 +276,13 @@ ln -s integer-gmp2 libraries/integer-gmp
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
 %if %{undefined ghc_bootstrapping}
-%ifnarch armv7hl armv5tel
-BuildFlavour = perf
-%else
+%ifarch armv7hl armv5tel aarch64
 BuildFlavour = perf-llvm
+%else
+BuildFlavour = perf
 %endif
 %else
-%ifnarch armv7hl armv5tel
+%ifarch armv7hl armv5tel aarch64
 BuildFlavour = quick-llvm
 %else
 BuildFlavour = quick
@@ -529,6 +524,9 @@ fi
 
 
 %changelog
+* Sun Mar  1 2015 Jens Petersen <petersen@fedoraproject.org>
+- build with llvm on aarch64
+
 * Mon Feb  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150123-0.4
 - RC2 production
 
