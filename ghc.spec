@@ -19,7 +19,7 @@
 %undefine ghc_without_shared
 %endif
 
-%global llvm_version 3.5
+%global llvm_version 3.5.0
 
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
@@ -303,11 +303,12 @@ BUILD_DOCBOOK_HTML = NO
 EOF
 
 %ifarch aarch64
-for i in $(find . -name config.guess -o -name config.sub) ; do
-    [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i
-done
+#for i in $(find . -name config.guess -o -name config.sub) ; do
+#    [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i
+#done
 %endif
-%ifarch aarch64 armv7hl
+#%%ifarch aarch64 armv7hl
+%ifarch armv7hl
 autoreconf
 %endif
 export CFLAGS="${CFLAGS:-%optflags}"
