@@ -45,8 +45,6 @@ Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
-# add libffi include dir to ghc wrapper for archs using gcc/llc
-#Patch10: ghc-wrapper-libffi-include.patch
 # Debian patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
