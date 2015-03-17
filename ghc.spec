@@ -111,10 +111,10 @@ BuildRequires: libxslt, docbook-style-xsl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
-%ifarch armv7hl armv5tel aarch64
+%ifarch armv7hl armv5tel
 BuildRequires: llvm = %{llvm_version}
 %endif
-%ifarch armv7hl aarch64
+%ifarch armv7hl
 # patch22
 BuildRequires: autoconf, automake
 %endif
@@ -155,7 +155,7 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
-%ifarch armv7hl armv5tel aarch64
+%ifarch armv7hl armv5tel
 Requires: llvm = %{llvm_version}
 %endif
 
@@ -276,13 +276,13 @@ ln -s integer-gmp2 libraries/integer-gmp
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
 %if %{undefined ghc_bootstrapping}
-%ifarch armv7hl armv5tel aarch64
+%ifarch armv7hl armv5tel
 BuildFlavour = perf-llvm
 %else
 BuildFlavour = perf
 %endif
 %else
-%ifarch armv7hl armv5tel aarch64
+%ifarch armv7hl armv5tel
 BuildFlavour = quick-llvm
 %else
 BuildFlavour = quick
@@ -302,12 +302,6 @@ BUILD_DOCBOOK_HTML = NO
 #EXTRA_HC_OPTS=-debug
 EOF
 
-%ifarch aarch64
-#for i in $(find . -name config.guess -o -name config.sub) ; do
-#    [ -f /usr/lib/rpm/redhat/$(basename $i) ] && %{__rm} -f $i && %{__cp} -fv /usr/lib/rpm/redhat/$(basename $i) $i
-#done
-%endif
-#%%ifarch aarch64 armv7hl
 %ifarch armv7hl
 autoreconf
 %endif
