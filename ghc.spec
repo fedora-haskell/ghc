@@ -295,6 +295,11 @@ HADDOCK_DOCS = NO
 %if %{defined without_manual}
 BUILD_DOCBOOK_HTML = NO
 %endif
+%ifarch aarch64
+# aarch64 dynlinking causing runtime IO problems
+# https://ghc.haskell.org/trac/ghc/ticket/9673
+DYNAMIC_GHC_PROGRAMS=NO
+%endif
 ## for verbose build output
 #GhcStage1HcOpts=-v4
 ## enable RTS debugging:
@@ -522,6 +527,7 @@ fi
 * Tue Mar 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150316-0.5
 - RC3 bootstrap
 - Cabal, deepseq, filepath, and process bumped
+- on aarch64 link ghc programs statically
 
 * Mon Feb  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150123-0.4
 - RC2 production
