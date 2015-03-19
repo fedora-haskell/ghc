@@ -50,7 +50,7 @@ Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
 %global Cabal_ver 1.22.1.2
-%global array_ver 0.5.0.1
+%global array_ver 0.5.1.0
 %global base_ver 4.8.0.0
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.3.0
@@ -477,7 +477,6 @@ fi
 %endif
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
-#%{ghclibdir}/mkGmpDerivedConstants
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
 %{ghclibdir}/platformConstants
@@ -527,7 +526,7 @@ fi
 %changelog
 * Tue Mar 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150316-0.5
 - RC3 bootstrap
-- Cabal, deepseq, filepath, and process bumped
+- Cabal, array, deepseq, filepath, and process bumped
 - on aarch64 link ghc programs statically
 - disabling ld hardening (for F23)
 
