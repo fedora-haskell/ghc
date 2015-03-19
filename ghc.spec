@@ -308,6 +308,9 @@ EOF
 %ifarch armv7hl
 autoreconf
 %endif
+# x86_64: /usr/bin/ld: utils/ghc-pwd/dist-boot/Main.o: relocation R_X86_64_32S against `.text' can not be used when making a shared object; recompile with -fPIC
+# aarch64: /usr/bin/ld: /usr/lib64/ghc-7.6.3/libHSrts.a(RtsFlags.o)(.text+0x578): unresolvable R_AARCH64_ADR_PREL_PG_HI21 relocation against symbol `stdout@@GLIBC_2.17'
+%global _hardened_ldflags %{nil}
 export CFLAGS="${CFLAGS:-%optflags}"
 export LDFLAGS="${LDFLAGS:-%__global_ldflags}"
 # * %%configure induces cross-build due to different target/host/build platform names
@@ -526,6 +529,7 @@ fi
 - RC3 bootstrap
 - Cabal, deepseq, filepath, and process bumped
 - on aarch64 link ghc programs statically
+- disabling ld hardening (for F23)
 
 * Mon Feb  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150123-0.4
 - RC2 production
