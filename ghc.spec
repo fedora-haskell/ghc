@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -32,7 +32,7 @@ Version: 7.10.0.20150316
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 0.5%{?dist}
+Release: 0.6%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -528,6 +528,9 @@ fi
 
 
 %changelog
+* Fri Mar 20 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150316-0.6
+- production
+
 * Tue Mar 17 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150316-0.5
 - RC3 bootstrap
 - Cabal, array, deepseq, filepath, and process bumped
