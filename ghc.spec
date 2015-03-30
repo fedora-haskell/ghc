@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -27,12 +27,12 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.0.20150316
+Version: 7.10.1
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 0.6%{?dist}
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -49,18 +49,18 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
-%global Cabal_ver 1.22.1.2
+%global Cabal_ver 1.22.2.0
 %global array_ver 0.5.1.0
 %global base_ver 4.8.0.0
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.3.0
 %global bytestring_ver 0.10.6.0
 %global containers_ver 0.5.6.2
-%global deepseq_ver 1.4.1.0
+%global deepseq_ver 1.4.1.1
 %global directory_ver 1.2.2.0
 %global filepath_ver 1.4.0.0
-%global ghc_prim_ver 0.3.1.0
-%global haskeline_ver 0.7.2.0
+%global ghc_prim_ver 0.4.0.0
+%global haskeline_ver 0.7.2.1
 %global hoopl_ver 3.10.0.2
 %global hpc_ver 0.6.0.2
 %global integer_gmp_ver 1.0.0.0
@@ -528,6 +528,10 @@ fi
 
 
 %changelog
+* Mon Mar 30 2015 Jens Petersen <petersen@redhat.com> - 7.10.1-1
+- 7.10.1 bootstrap
+- bump Cabal, deepseq, ghc-prim, haskeline
+
 * Fri Mar 20 2015 Jens Petersen <petersen@redhat.com> - 7.10.0.20150316-0.6
 - production
 
