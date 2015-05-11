@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -32,7 +32,7 @@ Version: 7.10.1
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -176,16 +176,8 @@ The package provides a cronjob for re-indexing installed library development
 documention.
 %endif
 
-# ghclibdir also needs ghc_version_override for bootstrapping (ghc-deps.sh)
+# ghclibdir also needs ghc_version_override for bootstrapping
 %global ghc_version_override %{version}
-
-# currently only F21+ ghc-rpm-macros has ghc.attr
-%if 0%{?fedora} < 21
-# needs ghc_version_override for bootstrapping
-%global _use_internal_dependency_generator 0
-%global __find_provides %{_rpmconfigdir}/ghc-deps.sh --provides %{buildroot}%{ghclibdir}
-%global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
-%endif
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
@@ -528,10 +520,7 @@ fi
 
 
 %changelog
-* Fri May  1 2015 Jens Petersen <petersen@redhat.com> - 7.10.1-2
-- production build
-
-* Mon Mar 30 2015 Jens Petersen <petersen@redhat.com> - 7.10.1-1
+* Mon May 11 2015 Jens Petersen <petersen@redhat.com> - 7.10.1-1
 - 7.10.1 bootstrap
 - bump Cabal, deepseq, ghc-prim, haskeline
 
