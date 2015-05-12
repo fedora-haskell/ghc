@@ -413,6 +413,8 @@ $GHC testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %if %{undefined without_testsuite}
+# 7.10.1 testsuite contains a ghc-config executable!
+rm -f testsuite/mk/ghc-config
 make test
 %endif
 
