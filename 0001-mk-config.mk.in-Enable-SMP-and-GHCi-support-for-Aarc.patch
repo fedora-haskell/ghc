@@ -1,0 +1,34 @@
+From 44cee4852282f63393d532aad59c5cd865ff3ed6 Mon Sep 17 00:00:00 2001
+From: Erik de Castro Lopo <erikd@mega-nerd.com>
+Date: Wed, 1 Apr 2015 04:46:01 +0000
+Subject: [PATCH] mk/config.mk.in : Enable SMP and GHCi support for Aarch64.
+
+---
+ mk/config.mk.in | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/mk/config.mk.in b/mk/config.mk.in
+index f4cb52b..d6831c9 100644
+--- a/mk/config.mk.in
++++ b/mk/config.mk.in
+@@ -172,7 +172,7 @@ HaveLibDL = @HaveLibDL@
+ 
+ # ArchSupportsSMP should be set iff there is support for that arch in
+ # includes/stg/SMP.h
+-ArchSupportsSMP=$(strip $(patsubst $(TargetArch_CPP), YES, $(findstring $(TargetArch_CPP), i386 x86_64 sparc powerpc arm)))
++ArchSupportsSMP=$(strip $(patsubst $(TargetArch_CPP), YES, $(findstring $(TargetArch_CPP), i386 x86_64 sparc powerpc arm aarch64)))
+ 
+ GhcWithSMP := $(strip $(if $(filter YESNO, $(ArchSupportsSMP)$(GhcUnregisterised)),YES,NO))
+ 
+@@ -180,7 +180,7 @@ GhcWithSMP := $(strip $(if $(filter YESNO, $(ArchSupportsSMP)$(GhcUnregisterised
+ # has support for this OS/ARCH combination.
+ 
+ OsSupportsGHCi=$(strip $(patsubst $(TargetOS_CPP), YES, $(findstring $(TargetOS_CPP), mingw32 cygwin32 linux solaris2 freebsd dragonfly netbsd openbsd darwin kfreebsdgnu)))
+-ArchSupportsGHCi=$(strip $(patsubst $(TargetArch_CPP), YES, $(findstring $(TargetArch_CPP), i386 x86_64 powerpc sparc sparc64 arm)))
++ArchSupportsGHCi=$(strip $(patsubst $(TargetArch_CPP), YES, $(findstring $(TargetArch_CPP), i386 x86_64 powerpc sparc sparc64 arm aarch64)))
+ 
+ ifeq "$(OsSupportsGHCi)$(ArchSupportsGHCi)" "YESYES"
+ GhcWithInterpreter=YES
+-- 
+2.1.4
+

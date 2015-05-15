@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -27,17 +27,17 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.1
+Version: 7.10.1.20150511
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 2%{?dist}
+Release: 1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
@@ -49,9 +49,11 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
+Patch31: 0001-mk-config.mk.in-Enable-SMP-and-GHCi-support-for-Aarc.patch
+
 %global Cabal_ver 1.22.2.0
 %global array_ver 0.5.1.0
-%global base_ver 4.8.0.0
+%global base_ver 4.8.1.0
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.3.0
 %global bytestring_ver 0.10.6.0
@@ -112,7 +114,7 @@ BuildRequires: python
 %ifarch armv7hl armv5tel
 BuildRequires: llvm = %{llvm_version}
 %endif
-%ifarch armv7hl
+%ifarch armv7hl aarch64
 # patch22
 BuildRequires: autoconf, automake
 %endif
@@ -249,6 +251,8 @@ rm -r libffi-tarballs
 
 %patch23 -p1 -b .orig
 
+%patch31 -p1
+
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
 if [ ! -f "libraries/%{gen_contents_index}" ]; then
@@ -297,7 +301,7 @@ DYNAMIC_GHC_PROGRAMS=NO
 #EXTRA_HC_OPTS=-debug
 EOF
 
-%ifarch armv7hl
+%ifarch armv7hl aarch64
 autoreconf
 %endif
 # x86_64: /usr/bin/ld: utils/ghc-pwd/dist-boot/Main.o: relocation R_X86_64_32S against `.text' can not be used when making a shared object; recompile with -fPIC
@@ -522,6 +526,11 @@ fi
 
 
 %changelog
+* Fri May 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150511-1
+- 7.10.2 snapshot: quick build
+- bump base
+- enable ghci and smp on aarch64
+
 * Mon May 11 2015 Jens Petersen <petersen@redhat.com> - 7.10.1-2
 - production build
 
