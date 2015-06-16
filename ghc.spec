@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -32,7 +32,7 @@ Version: 7.10.1.20150612
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -526,6 +526,9 @@ fi
 
 
 %changelog
+* Tue Jun 16 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150612-4
+- perf build
+
 * Mon Jun 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150612-3
 - 7.10.2 RC1
 - bump Cabal and binary
