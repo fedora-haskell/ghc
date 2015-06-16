@@ -27,17 +27,17 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.1.20150511
+Version: 7.10.1.20150612
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 1%{?dist}
+Release: 3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.bz2
+Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
 Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
@@ -51,11 +51,11 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 
 Patch31: 0001-mk-config.mk.in-Enable-SMP-and-GHCi-support-for-Aarc.patch
 
-%global Cabal_ver 1.22.2.0
+%global Cabal_ver 1.22.3.0
 %global array_ver 0.5.1.0
 %global base_ver 4.8.1.0
 %global bin_package_db_ver 0.0.0.0
-%global binary_ver 0.7.3.0
+%global binary_ver 0.7.5.0
 %global bytestring_ver 0.10.6.0
 %global containers_ver 0.5.6.2
 %global deepseq_ver 1.4.1.1
@@ -292,7 +292,7 @@ BUILD_DOCBOOK_HTML = NO
 %ifarch aarch64
 # aarch64 dynlinking causing runtime IO problems
 # https://ghc.haskell.org/trac/ghc/ticket/9673
-DYNAMIC_GHC_PROGRAMS=NO
+#DYNAMIC_GHC_PROGRAMS=NO
 %endif
 ## for verbose build output
 #GhcStage1HcOpts=-v4
@@ -526,6 +526,13 @@ fi
 
 
 %changelog
+* Mon Jun 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150612-3
+- 7.10.2 RC1
+- bump Cabal and binary
+
+* Thu Jun 11 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150511-2
+- reenable dynamic linking of the ghc programs
+
 * Fri May 15 2015 Jens Petersen <petersen@redhat.com> - 7.10.1.20150511-1
 - 7.10.2 snapshot: quick build
 - bump base
