@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -32,7 +32,7 @@ Version: 7.10.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 7%{?dist}
+Release: 8%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -48,6 +48,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 # Debian patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
+Patch24: buildpath-abi-stability.patch
 
 %global Cabal_ver 1.22.4.0
 %global array_ver 0.5.1.0
@@ -248,6 +249,7 @@ rm -r libffi-tarballs
 %endif
 
 %patch23 -p1 -b .orig
+%patch24 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
@@ -522,6 +524,9 @@ fi
 
 
 %changelog
+* Fri Jul 31 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-8
+- perf build
+
 * Fri Jul 31 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-7
 - 7.10.2
 
