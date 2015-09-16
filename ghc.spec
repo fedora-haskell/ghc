@@ -76,7 +76,7 @@ Patch24: buildpath-abi-stability.patch
 
 
 # fedora ghc has been bootstrapped on
-# %{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
+# %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
 # see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 ExcludeArch: sparc64
@@ -239,10 +239,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %patch1 -p1 -b .orig
 
 rm -r libffi-tarballs
-
-%ifnarch %{ix86} x86_64
-#%%patch10 -p1 -b .10-ffi
-%endif
 
 %ifarch armv7hl
 %patch22 -p1 -b .orig
@@ -495,7 +491,7 @@ fi
 %{ghclibdir}/latex
 %if %{undefined without_manual}
 ## needs pandoc
-#%{ghcdocbasedir}/Cabal
+#%%{ghcdocbasedir}/Cabal
 %{ghcdocbasedir}/haddock
 %{ghcdocbasedir}/users_guide
 %endif
