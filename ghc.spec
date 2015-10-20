@@ -331,7 +331,7 @@ done
 autoreconf
 %endif
 export CFLAGS="${CFLAGS:-%optflags}"
-export LDFLAGS="${LDFLAGS:-%__global_ldflags}"
+export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
 # * %%configure induces cross-build due to different target/host/build platform names
 # * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
