@@ -28,7 +28,7 @@ Version: 7.8.4
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # xhtml moved from haskell-platform to ghc-7.8.3
-Release: 38.1%{?dist}
+Release: 38.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -257,7 +257,9 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
+%if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
+%endif
 
 %ifnarch %{ix86} x86_64
 #%%patch10 -p1 -b .10-ffi
@@ -339,7 +341,10 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc --with-system-libffi \
+  --with-gcc=%{_bindir}/gcc \
+%if 0%{?fedora} || 0%{?rhel} > 6
+  --with-system-libffi \
+%endif
 %ifarch armv7hl armv5tel
   --with-llc=%{_bindir}/llc-3.4 --with-opt=%{_bindir}/opt-3.4 \
 %endif
@@ -381,10 +386,12 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 # add rts libs
 echo "%dir %{ghclibdir}/rts-1.0" >> ghc-base.files
 ls %{buildroot}%{ghclibdir}/rts-1.0/libHS*.so >> ghc-base.files
+ls %{buildroot}%{ghclibdir}/rts-1.0/libffi.so.* >> ghc-base.files
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
 ls -d %{buildroot}%{ghclibdir}/rts-1.0/lib*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
+ls %{buildroot}%{ghclibdir}/rts-1.0/libffi.so >> ghc-base-devel.files
 
 sed -i -e "s|^%{buildroot}||g" ghc-base-devel.files
 
@@ -546,6 +553,9 @@ fi
 
 
 %changelog
+* Tue Oct 20 2015 Jens Petersen <petersen@redhat.com> - 7.8.4-38.2
+- build tweaks for el6: use bundled libffi and no __global_ldflags
+
 * Sun Jan 18 2015 Jens Petersen <petersen@redhat.com>
 - use ld.gold on ARMv7 (see https://ghc.haskell.org/trac/ghc/ticket/8976)
   [thanks to nomeata for workaround patches posted upstream]
