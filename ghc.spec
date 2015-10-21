@@ -382,14 +382,14 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 # add rts libs
 echo "%dir %{ghclibdir}/rts-1.0" >> ghc-base.files
 ls %{buildroot}%{ghclibdir}/rts-1.0/libHS*.so >> ghc-base.files
-%if 0%{?fedora} || 0%{?rhel} > 6
+%if 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts-1.0/libffi.so.* >> ghc-base.files
 %endif
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
 ls -d %{buildroot}%{ghclibdir}/rts-1.0/lib*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
-%if 0%{?fedora} || 0%{?rhel} > 6
+%if 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts-1.0/libffi.so >> ghc-base-devel.files
 %endif
 
