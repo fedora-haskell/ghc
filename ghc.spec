@@ -98,11 +98,7 @@ Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-f
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
-%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
 BuildRequires: ghc-rpm-macros-extra
-%else
-BuildRequires: ghc-rpm-macros
-%endif
 BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
 BuildRequires: ghc-containers-devel
@@ -559,6 +555,7 @@ fi
 %changelog
 * Tue Oct 20 2015 Jens Petersen <petersen@redhat.com> - 7.8.4-38.2
 - build tweaks for el6: use bundled libffi and no __global_ldflags
+- also use ghc-rpm-macros-extra for el6 build
 
 * Sun Jan 18 2015 Jens Petersen <petersen@redhat.com>
 - use ld.gold on ARMv7 (see https://ghc.haskell.org/trac/ghc/ticket/8976)
