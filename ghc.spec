@@ -30,7 +30,8 @@ Version: 7.10.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 9%{?dist}
+# ghc-xhtml version not bumped
+Release: 47%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
