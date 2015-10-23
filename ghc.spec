@@ -19,8 +19,6 @@
 %undefine ghc_without_shared
 %endif
 
-%global llvm_version 3.5.0
-
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
 
@@ -32,7 +30,7 @@ Version: 7.10.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 8%{?dist}
+Release: 9%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -90,11 +88,7 @@ Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-f
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
-%if 0%{?fedora} >= 20 || 0%{?rhel} >= 7
 BuildRequires: ghc-rpm-macros-extra
-%else
-BuildRequires: ghc-rpm-macros
-%endif
 BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
 BuildRequires: ghc-containers-devel
@@ -111,7 +105,7 @@ BuildRequires: libxslt, docbook-style-xsl
 BuildRequires: python
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: llvm = %{llvm_version}
+BuildRequires: llvm35
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -155,7 +149,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl armv5tel
-Requires: llvm = %{llvm_version}
+Requires: llvm35
 %endif
 
 %description compiler
@@ -179,6 +173,14 @@ documention.
 
 # ghclibdir also needs ghc_version_override for bootstrapping
 %global ghc_version_override %{version}
+
+# currently only F21+ ghc-rpm-macros has ghc.attr
+%if 0%{?fedora} < 21 || 0%{?rhel} < 7
+# needs ghc_version_override for bootstrapping
+%global _use_internal_dependency_generator 0
+%global __find_provides /usr/lib/rpm/rpmdeps --provides
+%global __find_requires %{_rpmconfigdir}/ghc-deps.sh %{buildroot}%{ghclibdir}
+%endif
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
@@ -238,7 +240,9 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
+%if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
+%endif
 
 %ifarch armv7hl
 %patch22 -p1 -b .orig
@@ -304,7 +308,7 @@ autoreconf
 %global _hardened_ldflags %{nil}
 %endif
 export CFLAGS="${CFLAGS:-%optflags}"
-export LDFLAGS="${LDFLAGS:-%__global_ldflags}"
+export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
 # * %%configure induces cross-build due to different target/host/build platform names
 # * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
@@ -312,7 +316,10 @@ export LDFLAGS="${LDFLAGS:-%__global_ldflags}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc --with-system-libffi \
+  --with-gcc=%{_bindir}/gcc \
+%if 0%{?fedora} || 0%{?rhel} > 6
+  --with-system-libffi \
+%endif
 %ifarch armv7hl armv5tel
   --with-llc=%{_bindir}/llc-3.4 --with-opt=%{_bindir}/opt-3.4 \
 %endif
@@ -354,10 +361,16 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 # add rts libs
 echo "%dir %{ghclibdir}/rts" >> ghc-base.files
 ls %{buildroot}%{ghclibdir}/rts/libHS*.so >> ghc-base.files
+%if 0%{?rhel} < 7
+ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
+%endif
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
 ls -d %{buildroot}%{ghclibdir}/rts/lib*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
+%if 0%{?rhel} < 7
+ls %{buildroot}%{ghclibdir}/rts/libffi.so >> ghc-base-devel.files
+%endif
 
 sed -i -e "s|^%{buildroot}||g" ghc-base-devel.files
 
@@ -411,8 +424,6 @@ $GHC testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
 %if %{undefined without_testsuite}
-# 7.10.1 testsuite contains a ghc-config executable!
-rm -f testsuite/mk/ghc-config
 make test
 %endif
 
@@ -520,6 +531,9 @@ fi
 
 
 %changelog
+* Fri Oct 23 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-9
+- forward port el6 tweaks from 7.8.4 branch
+
 * Fri Jul 31 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-8
 - perf build
 
