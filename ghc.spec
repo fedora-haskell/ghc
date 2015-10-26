@@ -532,6 +532,9 @@ fi
 
 
 %changelog
+* Mon Oct 26 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-47
+- bump release over xhtml
+
 * Fri Oct 23 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-9
 - forward port el6 tweaks from 7.8.4 branch
 
