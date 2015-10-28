@@ -175,8 +175,8 @@ documention.
 # ghclibdir also needs ghc_version_override for bootstrapping
 %global ghc_version_override %{version}
 
-# currently only F21+ ghc-rpm-macros has ghc.attr
-%if 0%{?fedora} < 21 || 0%{?rhel} < 7
+# EL7 rpm supports fileattrs ghc.attr
+%if 0%{?rhel} && 0%{?rhel} < 7
 # needs ghc_version_override for bootstrapping
 %global _use_internal_dependency_generator 0
 %global __find_provides /usr/lib/rpm/rpmdeps --provides
@@ -362,14 +362,14 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 # add rts libs
 echo "%dir %{ghclibdir}/rts" >> ghc-base.files
 ls %{buildroot}%{ghclibdir}/rts/libHS*.so >> ghc-base.files
-%if 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
 %endif
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
 ls -d %{buildroot}%{ghclibdir}/rts/lib*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
-%if 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so >> ghc-base-devel.files
 %endif
 
