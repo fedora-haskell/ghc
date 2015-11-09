@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.2
+Version: 7.10.2.20151105
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 47%{?dist}
+Release: 48%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -49,9 +49,10 @@ Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
+# use "./libraries-versions.sh" to check versions
 %global Cabal_ver 1.22.4.0
 %global array_ver 0.5.1.0
-%global base_ver 4.8.1.0
+%global base_ver 4.8.2.0
 %global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.7.5.0
 %global bytestring_ver 0.10.6.0
@@ -532,6 +533,10 @@ fi
 
 
 %changelog
+* Mon Nov  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.2.20151105-48
+- 7.10.3 RC2 bootstrap
+- base bump
+
 * Mon Oct 26 2015 Jens Petersen <petersen@redhat.com> - 7.10.2-47
 - bump release over xhtml
 

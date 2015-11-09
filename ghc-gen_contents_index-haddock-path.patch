@@ -1,7 +1,6 @@
 --- ghc-7.6.3/libraries/gen_contents_index~	2013-04-19 06:22:46.000000000 +0900
 +++ ghc-7.6.3/libraries/gen_contents_index	2013-04-22 12:07:48.922152864 +0900
-@@ -60,7 +60,7 @@
-         done
+@@ -60,6 +60,6 @@
      done
  else
 -    HADDOCK=../../../../../bin/haddock
