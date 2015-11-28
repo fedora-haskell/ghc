@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.2.20151105
+Version: 7.10.2.20151114
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 48%{?dist}
+Release: 49%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -533,6 +533,10 @@ fi
 
 
 %changelog
+* Sat Nov 28 2015 Jens Petersen <petersen@fedoraproject.org> - 7.10.2.20151114-49
+- 7.10.3 RC3
+- bootstrap build
+
 * Mon Nov  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.2.20151105-48
 - 7.10.3 RC2 bootstrap
 - base bump
