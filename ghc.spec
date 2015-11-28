@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -31,7 +31,7 @@ Version: 7.10.2.20151114
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 49%{?dist}
+Release: 50%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -533,6 +533,9 @@ fi
 
 
 %changelog
+* Sat Nov 28 2015 Jens Petersen <petersen@fedoraproject.org> - 7.10.2.20151114-50
+- perf build
+
 * Sat Nov 28 2015 Jens Petersen <petersen@fedoraproject.org> - 7.10.2.20151114-49
 - 7.10.3 RC3
 - bootstrap build
