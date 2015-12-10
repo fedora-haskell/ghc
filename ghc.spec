@@ -42,6 +42,7 @@ Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
+Patch0:  http://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3a.patch
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 # Debian patch
@@ -238,6 +239,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
+%patch0 -p1
 
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
