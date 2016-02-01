@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 7.10.3
+Version: 8.0.0.20160111
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 52%{?dist}
+Release: 52.0%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -42,7 +42,6 @@ Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
-Patch0:  http://downloads.haskell.org/~ghc/7.10.3/ghc-7.10.3a.patch
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 # Debian patch
@@ -51,28 +50,29 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
 # use "./libraries-versions.sh" to check versions
-%global Cabal_ver 1.22.5.0
+%global Cabal_ver 1.23.0.0
 %global array_ver 0.5.1.0
-%global base_ver 4.8.2.0
+%global base_ver 4.9.0.0
 %global bin_package_db_ver 0.0.0.0
-%global binary_ver 0.7.5.0
-%global bytestring_ver 0.10.6.0
-%global containers_ver 0.5.6.2
-%global deepseq_ver 1.4.1.1
-%global directory_ver 1.2.2.0
-%global filepath_ver 1.4.0.0
-%global ghc_prim_ver 0.4.0.0
-%global haskeline_ver 0.7.2.1
-%global hoopl_ver 3.10.0.2
-%global hpc_ver 0.6.0.2
-%global integer_gmp_ver 1.0.0.0
-%global pretty_ver 1.1.2.0
-%global process_ver 1.2.3.0
-%global template_haskell_ver 2.10.0.0
-%global terminfo_ver 0.4.0.1
-%global time_ver 1.5.0.1
-%global transformers_ver 0.4.2.0
-%global unix_ver 2.7.1.0
+%global binary_ver 0.8.0.0
+%global bytestring_ver 0.10.7.0
+%global containers_ver 0.5.7.1
+%global deepseq_ver 1.4.2.0
+%global directory_ver 1.2.5.0
+%global filepath_ver 1.4.1.0
+# ghc_boot_ver 8.0.0.20160111
+%global ghc_prim_ver 0.5.0.0
+%global haskeline_ver 0.7.2.2
+%global hoopl_ver 3.10.2.1
+%global hpc_ver 0.6.0.3
+%global integer_gmp_ver 1.0.0.1
+%global pretty_ver 1.1.3.2
+%global process_ver 1.4.1.0
+%global template_haskell_ver 2.11.0.0
+%global terminfo_ver 0.4.0.2
+%global time_ver 1.6
+%global transformers_ver 0.5.0.0
+%global unix_ver 2.7.1.1
 %global xhtml_ver 3000.2.1
 
 
@@ -239,7 +239,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
-%patch0 -p1
 
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
@@ -262,9 +261,6 @@ if [ ! -f "libraries/%{gen_contents_index}" ]; then
   exit 1
 fi
 %endif
-
-mv libraries/integer-gmp{,.old}
-ln -s integer-gmp2 libraries/integer-gmp
 
 
 %build
@@ -347,7 +343,7 @@ done
 # ghc-base should own ghclibdir
 echo "%dir %{ghclibdir}" >> ghc-base.files
 
-%ghc_gen_filelists bin-package-db %{bin_package_db_ver}
+%ghc_gen_filelists ghc-boot %{bin_package_db_ver}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghc-prim %{ghc_prim_ver}
 %ghc_gen_filelists integer-gmp %{integer_gmp_ver}
@@ -360,7 +356,7 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
-%merge_filelist bin-package-db ghc
+%merge_filelist ghc-boot ghc
 
 # add rts libs
 echo "%dir %{ghclibdir}/rts" >> ghc-base.files
@@ -535,6 +531,9 @@ fi
 
 
 %changelog
+* Mon Feb  1 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160111-52.0
+- 8.0.1 RC1
+
 * Wed Dec  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.3-52
 - 7.30.3 perf build
 
