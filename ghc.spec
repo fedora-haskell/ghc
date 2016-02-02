@@ -53,14 +53,12 @@ Patch24: buildpath-abi-stability.patch
 %global Cabal_ver 1.23.0.0
 %global array_ver 0.5.1.0
 %global base_ver 4.9.0.0
-%global bin_package_db_ver 0.0.0.0
 %global binary_ver 0.8.0.0
 %global bytestring_ver 0.10.7.0
 %global containers_ver 0.5.7.1
 %global deepseq_ver 1.4.2.0
 %global directory_ver 1.2.5.0
 %global filepath_ver 1.4.1.0
-# ghc_boot_ver 8.0.0.20160111
 %global ghc_prim_ver 0.5.0.0
 %global haskeline_ver 0.7.2.2
 %global hoopl_ver 3.10.2.1
@@ -201,6 +199,8 @@ documention.
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
+%ghc_lib_subpackage ghc-boot %{ghc_version_override}
+%ghc_lib_subpackage -x ghci %{ghc_version_override}
 %ghc_lib_subpackage haskeline %{haskeline_ver}
 %ghc_lib_subpackage hoopl %{hoopl_ver}
 %ghc_lib_subpackage hpc %{hpc_ver}
@@ -343,8 +343,8 @@ done
 # ghc-base should own ghclibdir
 echo "%dir %{ghclibdir}" >> ghc-base.files
 
-%ghc_gen_filelists ghc-boot %{bin_package_db_ver}
 %ghc_gen_filelists ghc %{ghc_version_override}
+%ghc_gen_filelists ghci %{ghc_version_override}
 %ghc_gen_filelists ghc-prim %{ghc_prim_ver}
 %ghc_gen_filelists integer-gmp %{integer_gmp_ver}
 
@@ -356,7 +356,6 @@ echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
-%merge_filelist ghc-boot ghc
 
 # add rts libs
 echo "%dir %{ghclibdir}/rts" >> ghc-base.files
@@ -367,7 +366,7 @@ ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
-ls -d %{buildroot}%{ghclibdir}/rts/lib*.a  %{buildroot}%{ghclibdir}/package.conf.d/builtin_*.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
+ls -d %{buildroot}%{ghclibdir}/rts/lib*.a %{buildroot}%{ghclibdir}/package.conf.d/rts.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so >> ghc-base-devel.files
 %endif
@@ -477,11 +476,14 @@ fi
 %{ghclibdir}/bin/ghc-pkg
 %{ghclibdir}/bin/hpc
 %{ghclibdir}/bin/hsc2hs
+%{ghclibdir}/bin/ghc-iserv
+%{ghclibdir}/bin/ghc-iserv-dyn
 %{ghclibdir}/bin/runghc
 # unknown (unregisterized) archs
 %ifnarch ppc64 s390 s390x ppc64le aarch64
-%{ghclibdir}/ghc-split
+%{ghclibdir}/bin/ghc-split
 %endif
+%{ghclibdir}/bin/unlit
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
 %dir %{ghclibdir}/package.conf.d
@@ -489,8 +491,7 @@ fi
 %{ghclibdir}/platformConstants
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
-%{ghclibdir}/unlit
-%{_mandir}/man1/ghc.*
+#%%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghcdocbasedir}
 %if %{undefined without_haddock}
