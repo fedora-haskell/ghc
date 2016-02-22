@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.0.20160111
+Version: 8.0.0.20160204
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 52.0%{?dist}
+Release: 52.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -50,10 +50,10 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
 # use "./libraries-versions.sh" to check versions
-%global Cabal_ver 1.23.0.0
+%global Cabal_ver 1.23.1.0
 %global array_ver 0.5.1.0
 %global base_ver 4.9.0.0
-%global binary_ver 0.8.0.0
+%global binary_ver 0.8.2.0
 %global bytestring_ver 0.10.7.0
 %global containers_ver 0.5.7.1
 %global deepseq_ver 1.4.2.0
@@ -65,12 +65,12 @@ Patch24: buildpath-abi-stability.patch
 %global hpc_ver 0.6.0.3
 %global integer_gmp_ver 1.0.0.1
 %global pretty_ver 1.1.3.2
-%global process_ver 1.4.1.0
+%global process_ver 1.4.2.0
 %global template_haskell_ver 2.11.0.0
 %global terminfo_ver 0.4.0.2
 %global time_ver 1.6
-%global transformers_ver 0.5.0.0
-%global unix_ver 2.7.1.1
+%global transformers_ver 0.5.1.0
+%global unix_ver 2.7.2.0
 %global xhtml_ver 3000.2.1
 
 
@@ -532,8 +532,8 @@ fi
 
 
 %changelog
-* Mon Feb  1 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160111-52.0
-- 8.0.1 RC1
+* Mon Feb 22 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160204-52.1
+- 8.0.1 RC2 bootstrap
 
 * Wed Dec  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.3-52
 - 7.30.3 perf build
