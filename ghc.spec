@@ -105,6 +105,9 @@ BuildRequires: libxslt, docbook-style-xsl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
+%if %{defined without_manual}
+BuildRequires: python2-sphinx
+%endif
 %ifarch armv7hl armv5tel
 BuildRequires: llvm35
 %endif
@@ -533,7 +536,9 @@ fi
 
 %changelog
 * Tue Feb 23 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160204-52.2
+- https://ghc.haskell.org/trac/ghc/wiki/Status/GHC-8.0.1
 - perf build
+- BR sphinx for manual
 
 * Mon Feb 22 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160204-52.1
 - 8.0.1 RC2 bootstrap
