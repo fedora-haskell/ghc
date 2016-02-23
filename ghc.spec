@@ -316,7 +316,7 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc \
+  --with-gcc=%{_bindir}/gcc --docdir=%{_docdir}/ghc \
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
 %endif
@@ -398,7 +398,7 @@ cd ..
 %endif
 
 # we package the library license files separately
-find %{buildroot}%ghclibdocdir -name LICENSE -exec rm '{}' ';'
+find %{buildroot}%{ghc_html_libraries_dir} -name LICENSE -exec rm '{}' ';'
 
 
 %check
