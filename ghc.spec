@@ -100,8 +100,6 @@ BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
-# for man and docs (probably no longer needed?)
-BuildRequires: libxslt, docbook-style-xsl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
@@ -295,12 +293,12 @@ BUILD_DOCBOOK_HTML = NO
 # https://ghc.haskell.org/trac/ghc/ticket/9673
 #DYNAMIC_GHC_PROGRAMS=NO
 %endif
+EOF
 ## for verbose build output
 #GhcStage1HcOpts=-v4
 ## enable RTS debugging:
 ## (http://ghc.haskell.org/trac/ghc/wiki/Debugging/RuntimeSystem)
 #EXTRA_HC_OPTS=-debug
-EOF
 
 %ifarch armv7hl aarch64
 autoreconf
@@ -507,7 +505,7 @@ fi
 %if %{undefined without_manual}
 ## needs pandoc
 #%%{ghcdocbasedir}/Cabal
-%{ghcdocbasedir}/haddock
+#%%{ghcdocbasedir}/haddock
 %{ghcdocbasedir}/users_guide
 %endif
 %dir %{ghcdocbasedir}/libraries
