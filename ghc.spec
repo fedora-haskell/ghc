@@ -100,12 +100,12 @@ BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
-# for man and docs
+# for man and docs (probably no longer needed?)
 BuildRequires: libxslt, docbook-style-xsl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
-%if %{defined without_manual}
+%if %{undefined without_manual}
 BuildRequires: python2-sphinx
 %endif
 %ifarch armv7hl armv5tel
