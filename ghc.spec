@@ -479,6 +479,9 @@ fi
 %{ghclibdir}/bin/hsc2hs
 %{ghclibdir}/bin/ghc-iserv
 %{ghclibdir}/bin/ghc-iserv-dyn
+%if %{undefined without_prof}
+%{ghclibdir}/bin/ghc-iserv-prof
+%endif
 %{ghclibdir}/bin/runghc
 # unknown (unregisterized) archs
 %ifnarch ppc64 s390 s390x ppc64le aarch64
@@ -492,9 +495,9 @@ fi
 %{ghclibdir}/platformConstants
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
-#%%{_mandir}/man1/ghc.*
+%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
-%dir %{ghcdocbasedir}
+%dir %{ghc_html_dir}
 %if %{undefined without_haddock}
 %{_bindir}/ghc-doc-index
 %{_bindir}/haddock
@@ -504,23 +507,25 @@ fi
 %{ghclibdir}/latex
 %if %{undefined without_manual}
 ## needs pandoc
-#%%{ghcdocbasedir}/Cabal
-#%%{ghcdocbasedir}/haddock
-%{ghcdocbasedir}/users_guide
+#%%{ghc_html_dir}/Cabal
+#%%{ghc_html_dir}/haddock
+%{ghc_html_dir}/users_guide
+%{ghc_html_dir}/_sources
+%{ghc_html_dir}/_static
 %endif
-%dir %{ghcdocbasedir}/libraries
-%{ghcdocbasedir}/libraries/frames.html
-%{ghcdocbasedir}/libraries/gen_contents_index
-%{ghcdocbasedir}/libraries/hslogo-16.png
-%{ghcdocbasedir}/libraries/ocean.css
-%{ghcdocbasedir}/libraries/prologue.txt
-%{ghcdocbasedir}/libraries/synopsis.png
-%{ghcdocbasedir}/index.html
-%ghost %{ghcdocbasedir}/libraries/doc-index*.html
-%ghost %{ghcdocbasedir}/libraries/haddock-util.js
-%ghost %{ghcdocbasedir}/libraries/index*.html
-%ghost %{ghcdocbasedir}/libraries/minus.gif
-%ghost %{ghcdocbasedir}/libraries/plus.gif
+%dir %{ghc_html_dir}/libraries
+%{ghc_html_dir}/libraries/frames.html
+%{ghc_html_dir}/libraries/gen_contents_index
+%{ghc_html_dir}/libraries/hslogo-16.png
+%{ghc_html_dir}/libraries/ocean.css
+%{ghc_html_dir}/libraries/prologue.txt
+%{ghc_html_dir}/libraries/synopsis.png
+%{ghc_html_dir}/index.html
+%ghost %{ghc_html_dir}/libraries/doc-index*.html
+%ghost %{ghc_html_dir}/libraries/haddock-util.js
+%ghost %{ghc_html_dir}/libraries/index*.html
+%ghost %{ghc_html_dir}/libraries/minus.gif
+%ghost %{ghc_html_dir}/libraries/plus.gif
 %{_localstatedir}/lib/ghc
 %endif
 
