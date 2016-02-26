@@ -104,7 +104,7 @@ BuildRequires: ncurses-devel
 BuildRequires: python
 %endif
 %if %{undefined without_manual}
-BuildRequires: python2-sphinx
+BuildRequires: python-sphinx
 %endif
 %ifarch armv7hl armv5tel
 BuildRequires: llvm35
