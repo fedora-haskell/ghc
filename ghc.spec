@@ -510,8 +510,8 @@ fi
 #%%{ghc_html_dir}/Cabal
 #%%{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
-%{ghc_html_dir}/_sources
-%{ghc_html_dir}/_static
+#%%{ghc_html_dir}/_sources
+#%%{ghc_html_dir}/_static
 %endif
 %dir %{ghc_html_dir}/libraries
 %{ghc_html_dir}/libraries/frames.html
