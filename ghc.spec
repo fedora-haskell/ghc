@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.0.20160411
+Version: 8.0.0.20160421
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 52.4%{?dist}
+Release: 52.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -50,17 +50,17 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
 # use "./libraries-versions.sh" to check versions
-%global Cabal_ver 1.24.0.0
-%global array_ver 0.5.1.0
+%global Cabal_ver 1.24.1.0
+%global array_ver 0.5.1.1
 %global base_ver 4.9.0.0
-%global binary_ver 0.8.2.1
-%global bytestring_ver 0.10.7.0
+%global binary_ver 0.8.3.0
+%global bytestring_ver 0.10.8.0
 %global containers_ver 0.5.7.1
 %global deepseq_ver 1.4.2.0
-%global directory_ver 1.2.5.1
+%global directory_ver 1.2.6.2
 %global filepath_ver 1.4.1.0
 %global ghc_prim_ver 0.5.0.0
-%global haskeline_ver 0.7.2.2
+%global haskeline_ver 0.7.2.3
 %global hoopl_ver 3.10.2.1
 %global hpc_ver 0.6.0.3
 %global integer_gmp_ver 1.0.0.1
@@ -538,6 +538,9 @@ fi
 
 
 %changelog
+* Mon Apr 25 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160421-52.5
+- RC4 quick
+
 * Thu Apr 21 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160411-52.4
 - RC3 perf
 
