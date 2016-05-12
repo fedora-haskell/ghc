@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -25,13 +25,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.0.20160421
+Version: 8.0.1
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 52.6%{?dist}
+Release: 53.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -50,7 +50,7 @@ Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
 # use "./libraries-versions.sh" to check versions
-%global Cabal_ver 1.24.1.0
+%global Cabal_ver 1.24.0.0
 %global array_ver 0.5.1.1
 %global base_ver 4.9.0.0
 %global binary_ver 0.8.3.0
@@ -68,7 +68,7 @@ Patch24: buildpath-abi-stability.patch
 %global process_ver 1.4.2.0
 %global template_haskell_ver 2.11.0.0
 %global terminfo_ver 0.4.0.2
-%global time_ver 1.6
+%global time_ver 1.6.0.1
 %global transformers_ver 0.5.2.0
 %global unix_ver 2.7.2.0
 %global xhtml_ver 3000.2.1
@@ -538,6 +538,9 @@ fi
 
 
 %changelog
+* Thu May 12 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.1
+- 8.0.1 quick build
+
 * Thu Apr 28 2016 Jens Petersen <petersen@redhat.com> - 8.0.0.20160421-52.6
 - RC4 perf
 
