@@ -31,7 +31,7 @@ Version: 8.0.1
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 53.1%{?dist}
+Release: 53.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -538,6 +538,9 @@ fi
 
 
 %changelog
+* Fri May 13 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.2
+- 8.0.1 respin
+
 * Thu May 12 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.1
 - 8.0.1 quick build
 
