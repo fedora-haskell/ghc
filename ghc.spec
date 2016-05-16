@@ -105,6 +105,10 @@ BuildRequires: python
 %endif
 %if %{undefined without_manual}
 BuildRequires: python-sphinx
+# should not be needed for 8.0.2
+%if 0%{?rhel}
+BuildRequires: python-sphinx-theme-alabaster
+%endif
 %endif
 %ifarch armv7hl armv5tel
 BuildRequires: llvm35
