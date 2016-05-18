@@ -31,7 +31,7 @@ Version: 8.0.1
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 53.2%{?dist}
+Release: 53.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -54,7 +54,7 @@ Patch24: buildpath-abi-stability.patch
 %global array_ver 0.5.1.1
 %global base_ver 4.9.0.0
 %global binary_ver 0.8.3.0
-%global bytestring_ver 0.10.8.0
+%global bytestring_ver 0.10.8.1
 %global containers_ver 0.5.7.1
 %global deepseq_ver 1.4.2.0
 %global directory_ver 1.2.6.2
@@ -201,6 +201,7 @@ documention.
 %ghc_lib_subpackage -x ghc %{ghc_version_override}
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage ghc-boot %{ghc_version_override}
+%ghc_lib_subpackage ghc-boot-th %{ghc_version_override}
 %ghc_lib_subpackage -x ghci %{ghc_version_override}
 %ghc_lib_subpackage haskeline %{haskeline_ver}
 %ghc_lib_subpackage hoopl %{hoopl_ver}
@@ -538,6 +539,9 @@ fi
 
 
 %changelog
+* Wed May 18 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.3
+- 8.0.1 respin 3
+
 * Fri May 13 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.2
 - 8.0.1 respin
 
