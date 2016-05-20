@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -31,7 +31,7 @@ Version: 8.0.1
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 53.3%{?dist}
+Release: 53.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -509,7 +509,7 @@ fi
 %if %{undefined without_manual}
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
-#%%{ghc_html_dir}/haddock
+%{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
 #%%{ghc_html_dir}/_sources
 #%%{ghc_html_dir}/_static
@@ -539,6 +539,9 @@ fi
 
 
 %changelog
+* Thu May 19 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.4
+- 8.0.1 perf
+
 * Wed May 18 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.3
 - 8.0.1 respin 3
 
