@@ -4,11 +4,7 @@
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
 %global without_prof 1
-%if 0%{?fedora} >= 22
 %{?ghc_bootstrap}
-%else
-%{?ghc_test}
-%endif
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 %endif
