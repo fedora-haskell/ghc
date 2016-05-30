@@ -1,0 +1,43 @@
+This is an attempt to make GHC build reproducible. The name of .c files may end
+up in the resulting binary (in the debug section), but not the directory.
+
+Instead of using the process id, create a hash from the command line arguments,
+and assume that is going to be unique.
+
+Index: ghc/compiler/main/SysTools.hs
+===================================================================
+--- ghc.orig/compiler/main/SysTools.hs	2015-11-02 17:23:05.410365013 +0100
++++ ghc/compiler/main/SysTools.hs	2015-11-02 17:23:05.410365013 +0100
+@@ -66,6 +66,7 @@
+ import Util
+ import DynFlags
+ import Exception
++import Fingerprint
+ 
+ import Data.IORef
+ import Control.Monad
+@@ -1152,8 +1153,8 @@
+     mapping <- readIORef dir_ref
+     case Map.lookup tmp_dir mapping of
+         Nothing -> do
+-            pid <- getProcessID
+-            let prefix = tmp_dir </> "ghc" ++ show pid ++ "_"
++            pid <- getStableProcessID
++            let prefix = tmp_dir </> "ghc" ++ pid ++ "_"
+             mask_ $ mkTempDir prefix
+         Just dir -> return dir
+   where
+@@ -1531,6 +1532,13 @@
+ getProcessID = System.Posix.Internals.c_getpid >>= return . fromIntegral
+ #endif
+ 
++-- Debian-specific hack to get reproducible output, by not using the "random"
++-- pid, but rather something determinisic
++getStableProcessID :: IO String
++getStableProcessID = do
++    args <- getArgs
++    return $ take 4 $ show $ fingerprintString $ unwords args
++
+ -- Divvy up text stream into lines, taking platform dependent
+ -- line termination into account.
+ linesPlatform :: String -> [String]
