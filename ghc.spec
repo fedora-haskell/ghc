@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -27,7 +27,7 @@ Version: 8.0.1
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 53.4%{?dist}
+Release: 53.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -44,6 +44,9 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
+
+# 8.0.1 needs llvm-3.7
+%global llvm_major 3.7
 
 # use "./libraries-versions.sh" to check versions
 %global Cabal_ver 1.24.0.0
@@ -103,7 +106,7 @@ BuildRequires: python
 BuildRequires: python-sphinx
 %endif
 %ifarch armv7hl armv5tel
-BuildRequires: llvm35
+BuildRequires: llvm >= %{llvm_major}
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -147,7 +150,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl armv5tel
-Requires: llvm35
+Requires: llvm
 %endif
 
 %description compiler
@@ -319,7 +322,7 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --with-system-libffi \
 %endif
 %ifarch armv7hl armv5tel
-  --with-llc=%{_bindir}/llc-3.4 --with-opt=%{_bindir}/opt-3.4 \
+  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %endif
 %{nil}
 
@@ -535,6 +538,9 @@ fi
 
 
 %changelog
+* Tue May 31 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.5
+- use llvm-3.7 (needed for armv7hl)
+
 * Thu May 19 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.4
 - 8.0.1 perf
 
