@@ -49,7 +49,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: ghc-Debian-buildpath-abi-stability.patch
-Patch25: ghc-Debian-armel-revert-ghci-fixes.patch
+#Patch25: ghc-Debian-armel-revert-ghci-fixes.patch
 Patch26: ghc-Debian-no-missing-haddock-file-warning.patch
 Patch27: ghc-Debian-reproducible-tmp-names.patch
 
@@ -256,7 +256,7 @@ rm -r libffi-tarballs
 
 %ifarch armv7hl
 %patch22 -p1 -b .orig
-%patch25 -p1 -b .25~
+#%%patch25 -p1 -b .25~
 %endif
 
 %patch23 -p1 -b .orig
@@ -547,13 +547,12 @@ fi
 %changelog
 * Mon May 30 2016 Jens Petersen <petersen@redhat.com> - 7.10.3-52.1
 - add some more Debian patches:
-  - armel-revert-ghci-fixes
   - no-missing-haddock-file-warning
   - reproducible-tmp-names
 - configure llvm-3.5 correctly
 
 * Wed Dec  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.3-52
-- 7.30.3 perf build
+- 7.10.3 perf build
 
 * Wed Dec  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.3-51
 - 7.10.3 quick build
