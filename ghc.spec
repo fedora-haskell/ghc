@@ -53,6 +53,9 @@ Patch25: ghc-Debian-armel-revert-ghci-fixes.patch
 Patch26: ghc-Debian-no-missing-haddock-file-warning.patch
 Patch27: ghc-Debian-reproducible-tmp-names.patch
 
+# 7.10.3 needs llvm-3.5
+%global llvm_major 3.5
+
 # use "./libraries-versions.sh" to check versions
 %global Cabal_ver 1.22.5.0
 %global array_ver 0.5.1.0
@@ -332,7 +335,7 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --with-system-libffi \
 %endif
 %ifarch armv7hl armv5tel
-  --with-llc=%{_bindir}/llc-3.4 --with-opt=%{_bindir}/opt-3.4 \
+  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %endif
 %{nil}
 
@@ -547,6 +550,7 @@ fi
   - armel-revert-ghci-fixes
   - no-missing-haddock-file-warning
   - reproducible-tmp-names
+- configure llvm-3.5 correctly
 
 * Wed Dec  9 2015 Jens Petersen <petersen@redhat.com> - 7.10.3-52
 - 7.30.3 perf build
