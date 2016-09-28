@@ -105,8 +105,8 @@ BuildRequires: python
 %if %{undefined without_manual}
 BuildRequires: python-sphinx
 %endif
-%ifarch armv7hl armv5tel
-BuildRequires: llvm >= %{llvm_major}
+%ifarch armv7hl aarch64
+BuildRequires: llvm37
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -149,8 +149,8 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
-%ifarch armv7hl armv5tel
-Requires: llvm
+%ifarch armv7hl aarch64
+Requires: llvm37
 %endif
 
 %description compiler
@@ -269,13 +269,13 @@ fi
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
 %if %{undefined ghc_bootstrapping}
-%ifarch armv7hl armv5tel
+%ifarch armv7hl aarch64
 BuildFlavour = perf-llvm
 %else
 BuildFlavour = perf
 %endif
 %else
-%ifarch armv7hl armv5tel
+%ifarch armv7hl aarch64
 BuildFlavour = quick-llvm
 %else
 BuildFlavour = quick
@@ -321,7 +321,7 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
 %endif
-%ifarch armv7hl armv5tel
+%ifarch armv7hl aarch64
   --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %endif
 %{nil}
