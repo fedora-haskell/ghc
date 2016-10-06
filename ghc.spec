@@ -540,6 +540,7 @@ fi
 %changelog
 * Tue May 31 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.5
 - use llvm-3.7 (needed for armv7hl)
+- quick build
 
 * Thu May 19 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.4
 - 8.0.1 perf
