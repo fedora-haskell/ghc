@@ -106,7 +106,7 @@ BuildRequires: python
 BuildRequires: python-sphinx
 %endif
 %ifarch armv7hl aarch64
-BuildRequires: llvm37
+BuildRequires: llvm3.7
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -150,7 +150,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl aarch64
-Requires: llvm37
+Requires: llvm3.7
 %endif
 
 %description compiler
@@ -484,7 +484,7 @@ fi
 %endif
 %{ghclibdir}/bin/runghc
 # unknown (unregisterized) archs
-%ifnarch ppc64 s390 s390x ppc64le aarch64
+%ifnarch ppc64 s390 s390x ppc64le
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/unlit
