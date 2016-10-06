@@ -186,36 +186,36 @@ documention.
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal %{Cabal_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport array %{array_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base %{base_ver}
-%ghc_lib_subpackage binary %{binary_ver}
-%ghc_lib_subpackage bytestring %{bytestring_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport containers %{containers_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport deepseq %{deepseq_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport directory %{directory_ver}
+%ghc_lib_subpackage Cabal-%{Cabal_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport array-%{array_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-%{base_ver}
+%ghc_lib_subpackage binary-%{binary_ver}
+%ghc_lib_subpackage bytestring-%{bytestring_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport containers-%{containers_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport deepseq-%{deepseq_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport directory-%{directory_ver}
 %ghc_lib_subpackage filepath %{filepath_ver}
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
-%ghc_lib_subpackage -x ghc %{ghc_version_override}
+%ghc_lib_subpackage -x ghc-%{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage ghc-boot %{ghc_version_override}
-%ghc_lib_subpackage ghc-boot-th %{ghc_version_override}
-%ghc_lib_subpackage -x ghci %{ghc_version_override}
-%ghc_lib_subpackage haskeline %{haskeline_ver}
-%ghc_lib_subpackage hoopl %{hoopl_ver}
-%ghc_lib_subpackage hpc %{hpc_ver}
-%ghc_lib_subpackage pretty %{pretty_ver}
+%ghc_lib_subpackage ghc-boot-%{ghc_version_override}
+%ghc_lib_subpackage ghc-boot-th-%{ghc_version_override}
+%ghc_lib_subpackage -x ghci-%{ghc_version_override}
+%ghc_lib_subpackage haskeline-%{haskeline_ver}
+%ghc_lib_subpackage hoopl-%{hoopl_ver}
+%ghc_lib_subpackage hpc-%{hpc_ver}
+%ghc_lib_subpackage pretty-%{pretty_ver}
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
-%ghc_lib_subpackage -l %BSDHaskellReport process %{process_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport process-%{process_ver}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage template-haskell %{template_haskell_ver}
-%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo %{terminfo_ver}
-%ghc_lib_subpackage time %{time_ver}
-%ghc_lib_subpackage transformers %{transformers_ver}
-%ghc_lib_subpackage unix %{unix_ver}
+%ghc_lib_subpackage template-haskell-%{template_haskell_ver}
+%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-%{terminfo_ver}
+%ghc_lib_subpackage time-%{time_ver}
+%ghc_lib_subpackage transformers-%{transformers_ver}
+%ghc_lib_subpackage unix-%{unix_ver}
 %if %{undefined without_haddock}
-%ghc_lib_subpackage xhtml %{xhtml_ver}
+%ghc_lib_subpackage xhtml-%{xhtml_ver}
 %endif
 %endif
 
