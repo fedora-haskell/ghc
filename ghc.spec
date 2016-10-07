@@ -81,7 +81,7 @@ BuildRequires: python
 BuildRequires: python-sphinx
 %endif
 %ifarch armv7hl aarch64
-BuildRequires: llvm3.7
+BuildRequires: llvm%{llvm_major}
 %endif
 %ifarch armv7hl aarch64
 # patch22
@@ -125,7 +125,7 @@ Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %ifarch armv7hl aarch64
-Requires: llvm3.7
+Requires: llvm%{llvm_major}
 %endif
 
 %description compiler
@@ -514,8 +514,10 @@ fi
 
 
 %changelog
-* Tue May 31 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.5
-- use llvm-3.7 (needed for armv7hl)
+* Fri Oct  7 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.5
+- use llvm3.7 (needed for armv7hl)
+- drop armv5tel
+- update for latest ghc-rpm-macros
 - quick build
 
 * Thu May 19 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.4
