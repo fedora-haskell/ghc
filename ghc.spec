@@ -461,7 +461,7 @@ fi
 %endif
 %{ghclibdir}/bin/runghc
 # unknown (unregisterized) archs
-%ifnarch ppc64 s390 s390x ppc64le %{mips}
+%ifnarch ppc64 s390 s390x ppc64le aarch64 %{mips}
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/unlit
