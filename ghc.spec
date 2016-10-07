@@ -48,31 +48,6 @@ Patch24: buildpath-abi-stability.patch
 # 8.0.1 needs llvm-3.7
 %global llvm_major 3.7
 
-# use "./libraries-versions.sh" to check versions
-%global Cabal_ver 1.24.0.0
-%global array_ver 0.5.1.1
-%global base_ver 4.9.0.0
-%global binary_ver 0.8.3.0
-%global bytestring_ver 0.10.8.1
-%global containers_ver 0.5.7.1
-%global deepseq_ver 1.4.2.0
-%global directory_ver 1.2.6.2
-%global filepath_ver 1.4.1.0
-%global ghc_prim_ver 0.5.0.0
-%global haskeline_ver 0.7.2.3
-%global hoopl_ver 3.10.2.1
-%global hpc_ver 0.6.0.3
-%global integer_gmp_ver 1.0.0.1
-%global pretty_ver 1.1.3.3
-%global process_ver 1.4.2.0
-%global template_haskell_ver 2.11.0.0
-%global terminfo_ver 0.4.0.2
-%global time_ver 1.6.0.1
-%global transformers_ver 0.5.2.0
-%global unix_ver 2.7.2.0
-%global xhtml_ver 3000.2.1
-
-
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
@@ -185,16 +160,17 @@ documention.
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
+# use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal-%{Cabal_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport array-%{array_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-%{base_ver}
-%ghc_lib_subpackage binary-%{binary_ver}
-%ghc_lib_subpackage bytestring-%{bytestring_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport containers-%{containers_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport deepseq-%{deepseq_ver}
-%ghc_lib_subpackage -l %BSDHaskellReport directory-%{directory_ver}
-%ghc_lib_subpackage filepath-%{filepath_ver}
+%ghc_lib_subpackage Cabal-1.24.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport array-0.5.1.1
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.0.0
+%ghc_lib_subpackage binary-0.8.3.0
+%ghc_lib_subpackage bytestring-0.10.8.1
+%ghc_lib_subpackage -l %BSDHaskellReport containers-0.5.7.1
+%ghc_lib_subpackage -l %BSDHaskellReport deepseq-1.4.2.0
+%ghc_lib_subpackage -l %BSDHaskellReport directory-1.2.6.2
+%ghc_lib_subpackage filepath-1.4.1.0
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc-%{ghc_version_override}
@@ -202,20 +178,20 @@ documention.
 %ghc_lib_subpackage ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage haskeline-%{haskeline_ver}
-%ghc_lib_subpackage hoopl-%{hoopl_ver}
-%ghc_lib_subpackage hpc-%{hpc_ver}
-%ghc_lib_subpackage pretty-%{pretty_ver}
+%ghc_lib_subpackage haskeline-0.7.2.3
+%ghc_lib_subpackage hoopl-3.10.2.1
+%ghc_lib_subpackage hpc-0.6.0.3
+%ghc_lib_subpackage pretty-1.1.3.3
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
-%ghc_lib_subpackage -l %BSDHaskellReport process-%{process_ver}
+%ghc_lib_subpackage -l %BSDHaskellReport process-1.4.2.0
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage template-haskell-%{template_haskell_ver}
-%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-%{terminfo_ver}
-%ghc_lib_subpackage time-%{time_ver}
-%ghc_lib_subpackage transformers-%{transformers_ver}
-%ghc_lib_subpackage unix-%{unix_ver}
+%ghc_lib_subpackage template-haskell-2.11.0.0
+%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-0.4.0.2
+%ghc_lib_subpackage time-1.6.0.1
+%ghc_lib_subpackage transformers-0.5.2.0
+%ghc_lib_subpackage unix-2.7.2.0
 %if %{undefined without_haddock}
-%ghc_lib_subpackage xhtml-%{xhtml_ver}
+%ghc_lib_subpackage xhtml-3000.2.1
 %endif
 %endif
 
@@ -346,8 +322,8 @@ echo "%dir %{ghclibdir}" >> ghc-base.files
 
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
-%ghc_gen_filelists ghc-prim %{ghc_prim_ver}
-%ghc_gen_filelists integer-gmp %{integer_gmp_ver}
+%ghc_gen_filelists ghc-prim 0.5.0.0
+%ghc_gen_filelists integer-gmp 1.0.0.1
 
 %define merge_filelist()\
 cat ghc-%1.files >> ghc-%2.files\
