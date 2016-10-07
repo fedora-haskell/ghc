@@ -194,7 +194,7 @@ documention.
 %ghc_lib_subpackage -l %BSDHaskellReport containers-%{containers_ver}
 %ghc_lib_subpackage -l %BSDHaskellReport deepseq-%{deepseq_ver}
 %ghc_lib_subpackage -l %BSDHaskellReport directory-%{directory_ver}
-%ghc_lib_subpackage filepath %{filepath_ver}
+%ghc_lib_subpackage filepath-%{filepath_ver}
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc-%{ghc_version_override}
