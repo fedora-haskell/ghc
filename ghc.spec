@@ -34,7 +34,7 @@ License: %BSDHaskellReport
 URL: http://haskell.org/ghc/
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source2: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
+Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -215,7 +215,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 
 %prep
-%setup -q -n %{name}-%{version} %{!?without_testsuite:-b2}
+%setup -q -n %{name}-%{version} %{!?without_testsuite:-b1}
 
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
@@ -314,7 +314,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-echo "%doc libraries/$name/LICENSE" >> ghc-$name.files
+echo "%license libraries/$name/LICENSE" >> ghc-$name.files
 done
 
 # ghc-base should own ghclibdir
@@ -329,7 +329,7 @@ echo "%dir %{ghclibdir}" >> ghc-base.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-echo "%doc libraries/LICENSE.%1" >> ghc-%2.files
+echo "%license libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
@@ -432,7 +432,8 @@ fi
 %files
 
 %files compiler
-%doc ANNOUNCE LICENSE
+%license LICENSE
+%doc ANNOUNCE
 %{_bindir}/ghc
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
@@ -460,7 +461,7 @@ fi
 %endif
 %{ghclibdir}/bin/runghc
 # unknown (unregisterized) archs
-%ifnarch ppc64 s390 s390x ppc64le
+%ifnarch ppc64 s390 s390x ppc64le %{mips}
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/unlit
