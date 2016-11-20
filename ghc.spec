@@ -21,13 +21,13 @@
 Name: ghc
 # part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.1
+Version: 8.0.1.20161117
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 53.5%{?dist}
+Release: 54.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -162,15 +162,15 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal-1.24.0.0
+%ghc_lib_subpackage Cabal-1.24.1.0
 %ghc_lib_subpackage -l %BSDHaskellReport array-0.5.1.1
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.0.0
+%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.1.0
 %ghc_lib_subpackage binary-0.8.3.0
 %ghc_lib_subpackage bytestring-0.10.8.1
 %ghc_lib_subpackage -l %BSDHaskellReport containers-0.5.7.1
 %ghc_lib_subpackage -l %BSDHaskellReport deepseq-1.4.2.0
 %ghc_lib_subpackage -l %BSDHaskellReport directory-1.2.6.2
-%ghc_lib_subpackage filepath-1.4.1.0
+%ghc_lib_subpackage filepath-1.4.1.1
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -x ghc-%{ghc_version_override}
@@ -185,11 +185,11 @@ documention.
 %define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
 %ghc_lib_subpackage -l %BSDHaskellReport process-1.4.2.0
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage template-haskell-2.11.0.0
+%ghc_lib_subpackage template-haskell-2.11.1.0
 %ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-0.4.0.2
 %ghc_lib_subpackage time-1.6.0.1
 %ghc_lib_subpackage transformers-0.5.2.0
-%ghc_lib_subpackage unix-2.7.2.0
+%ghc_lib_subpackage unix-2.7.2.1
 %if %{undefined without_haddock}
 %ghc_lib_subpackage xhtml-3000.2.1
 %endif
@@ -261,8 +261,9 @@ GhcLibWays = v dyn %{!?without_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
-%if %{defined without_manual}
-BUILD_DOCBOOK_HTML = NO
+EXTRA_HADDOCK_OPTS += --hyperlinked-source
+%if %{undefined without_manual}
+BUILD_MAN = yes
 %endif
 %ifarch aarch64
 # aarch64 dynlinking causing runtime IO problems
@@ -438,10 +439,8 @@ fi
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
-%ifarch %ghc_arches_with_ghci
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
-%endif
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
@@ -472,7 +471,6 @@ fi
 %{ghclibdir}/platformConstants
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
-%{_mandir}/man1/ghc.*
 %dir %{_docdir}/ghc
 %dir %{ghc_html_dir}
 %if %{undefined without_haddock}
@@ -485,6 +483,7 @@ fi
 %if %{undefined without_manual}
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
+%{_mandir}/man1/ghc.*
 %{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
 #%%{ghc_html_dir}/_sources
@@ -515,6 +514,10 @@ fi
 
 
 %changelog
+* Sun Nov 20 2016 Jens Petersen <petersen@fedoraproject.org> - 8.0.1.20161117-54.1
+- 8.0.2 RC1 quick build
+- Cabal, base, filepath, template-haskell, unix bumped
+
 * Fri Oct  7 2016 Jens Petersen <petersen@redhat.com> - 8.0.1-53.5
 - use llvm3.7 (needed for armv7hl)
 - drop armv5tel
