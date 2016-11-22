@@ -473,15 +473,14 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
-%{_mandir}/man1/ghc.*
+#%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
-%{_mandir}/man1/ghc.*
 %{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
 %endif
 %dir %{ghc_html_dir}/libraries
-%{ghc_html_dir}/libraries/frames.html
+#%{ghc_html_dir}/libraries/frames.html
 %{ghc_html_dir}/libraries/gen_contents_index
 %{ghc_html_dir}/libraries/hslogo-16.png
 %{ghc_html_dir}/libraries/ocean.css
@@ -507,8 +506,9 @@ fi
 %changelog
 * Tue Nov 22 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161117-54.2
 - 8.0.2 RC1 perf build
+- no manpage installed
 
-* Sun Nov 20 2016 Jens Petersen <petersen@fedoraproject.org> - 8.0.1.20161117-54.1
+* Sun Nov 20 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161117-54.1
 - 8.0.2 RC1 quick build
 - Cabal, base, filepath, template-haskell, unix bumped
 
