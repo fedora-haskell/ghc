@@ -258,12 +258,10 @@ HADDOCK_DOCS = NO
 EXTRA_HADDOCK_OPTS += --hyperlinked-source
 %if %{undefined without_manual}
 BUILD_MAN = yes
+%else
+BUILD_MAN = no
 %endif
-%ifarch aarch64
-# aarch64 dynlinking causing runtime IO problems
-# https://ghc.haskell.org/trac/ghc/ticket/9673
-#DYNAMIC_GHC_PROGRAMS=NO
-%endif
+BUILD_SPHINX_PDF=no
 EOF
 ## for verbose build output
 #GhcStage1HcOpts=-v4
