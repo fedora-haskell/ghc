@@ -9,17 +9,10 @@
 #%%undefine without_haddock
 %endif
 
-# make sure to turn on shared libs for all arches
-# (for building on releases earlier than F22)
-%if %{defined ghc_without_shared}
-%undefine ghc_without_shared
-%endif
-
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
 
 Name: ghc
-# part of haskell-platform
 # ghc must be rebuilt after a version bump to avoid ABI change problems
 Version: 8.0.1.20161117
 # Since library subpackages are versioned:
@@ -31,7 +24,7 @@ Release: 54.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
-URL: http://haskell.org/ghc/
+URL: https://haskell.org/ghc/
 Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
 Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
@@ -45,21 +38,14 @@ Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
 
-# 8.0.1 needs llvm-3.7
+# 8.0 needs llvm-3.7
 %global llvm_major 3.7
 
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
-# see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
-ExcludeArch: sparc64
-Obsoletes: ghc-dph-base < 0.5, ghc-dph-base-devel < 0.5, ghc-dph-base-prof < 0.5
-Obsoletes: ghc-dph-par < 0.5, ghc-dph-par-devel < 0.5, ghc-dph-par-prof < 0.5
-Obsoletes: ghc-dph-prim-interface < 0.5, ghc-dph-prim-interface-devel < 0.5, ghc-dph-interface-prim-prof < 0.5
-Obsoletes: ghc-dph-prim-par < 0.5, ghc-dph-prim-par-devel < 0.5, ghc-dph-prim-par-prof < 0.5
-Obsoletes: ghc-dph-prim-seq < 0.5, ghc-dph-prim-seq-devel < 0.5, ghc-dph-prim-seq-prof < 0.5
-Obsoletes: ghc-dph-seq < 0.5, ghc-dph-seq-devel < 0.5, ghc-dph-seq-prof < 0.5
-Obsoletes: ghc-feldspar-language < 0.4, ghc-feldspar-language-devel < 0.4, ghc-feldspar-language-prof < 0.4
+# see also deprecated ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
+
 %if %{undefined ghc_bootstrapping}
 BuildRequires: ghc-compiler = %{version}
 %endif
@@ -98,21 +84,24 @@ Requires: ghc-ghc-devel = %{version}-%{release}
 GHC is a state-of-the-art, open source, compiler and interactive environment
 for the functional language Haskell. Highlights:
 
-- GHC supports the entire Haskell 2010 language plus various extensions.
+- GHC supports the entire Haskell 2010 language plus a wide variety of
+  extensions.
 - GHC has particularly good support for concurrency and parallelism,
   including support for Software Transactional Memory (STM).
-- GHC generates fast code, particularly for concurrent programs
-  (check the results on the "Computer Language Benchmarks Game").
+- GHC generates fast code, particularly for concurrent programs.
+  Take a look at GHC's performance on The Computer Language Benchmarks Game.
 - GHC works on several platforms including Windows, Mac, Linux,
   most varieties of Unix, and several different processor architectures.
-- GHC has extensive optimisation capabilities,
-  including inter-module optimisation.
+- GHC has extensive optimisation capabilities, including inter-module
+  optimisation.
 - GHC compiles Haskell code either directly to native code or using LLVM
   as a back-end. GHC can also generate C code as an intermediate target for
   porting to new platforms. The interactive environment compiles Haskell to
   bytecode, and supports execution of mixed bytecode/compiled programs.
-- Profiling is supported, both by time/allocation and heap profiling.
-- GHC comes with core libraries, and thousands more are available on Hackage.
+- Profiling is supported, both by time/allocation and various kinds of heap
+  profiling.
+- GHC comes with several libraries, and thousands more are available on Hackage.
+
 
 %package compiler
 Summary: GHC compiler and utilities
@@ -124,6 +113,9 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
+%if %{defined without_haddock}
+Obsoletes: ghc-doc-index < %{version}-%{release}
+%endif
 %ifarch armv7hl aarch64
 Requires: llvm%{llvm_major}
 %endif
@@ -134,6 +126,7 @@ The package contains the GHC compiler, tools and utilities.
 The ghc libraries are provided by ghc-libraries.
 To install all of ghc (including the ghc library),
 install the main ghc package.
+
 
 %if %{undefined without_haddock}
 %package doc-index
@@ -146,6 +139,7 @@ Requires: crontabs
 The package provides a cronjob for re-indexing installed library development
 documention.
 %endif
+
 
 # ghclibdir also needs ghc_version_override for bootstrapping
 %global ghc_version_override %{version}
@@ -315,7 +309,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-echo "%license libraries/$name/LICENSE" >> ghc-$name.files
+echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
 done
 
 # ghc-base should own ghclibdir
@@ -330,13 +324,13 @@ echo "%dir %{ghclibdir}" >> ghc-base.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-echo "%license libraries/LICENSE.%1" >> ghc-%2.files
+echo "%%license libraries/LICENSE.%1" >> ghc-%2.files
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
 
 # add rts libs
-echo "%dir %{ghclibdir}/rts" >> ghc-base.files
+echo "%%dir %{ghclibdir}/rts" >> ghc-base.files
 ls %{buildroot}%{ghclibdir}/rts/libHS*.so >> ghc-base.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
@@ -481,13 +475,12 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
+%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
 %{_mandir}/man1/ghc.*
 %{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
-#%%{ghc_html_dir}/_sources
-#%%{ghc_html_dir}/_static
 %endif
 %dir %{ghc_html_dir}/libraries
 %{ghc_html_dir}/libraries/frames.html
