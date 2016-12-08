@@ -20,7 +20,7 @@ Version: 8.0.1.20161117
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 54.2%{?dist}
+Release: 54.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -37,6 +37,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
+Patch25: ghc-8.0.1.20161117-Cabal-dynlibdir.patch
 
 # 8.0 needs llvm-3.7
 %global llvm_major 3.7
@@ -224,6 +225,8 @@ rm -r libffi-tarballs
 
 %patch23 -p1 -b .orig
 %patch24 -p1 -b .orig
+
+%patch25 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
@@ -504,6 +507,9 @@ fi
 
 
 %changelog
+* Wed Dec  7 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161117-54.3
+- patch Cabal to install dynlibs in libdir itself instead of abi dir
+
 * Tue Nov 22 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161117-54.2
 - 8.0.2 RC1 perf build
 - no manpage installed

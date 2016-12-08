@@ -1,0 +1,11 @@
+--- ghc-8.0.1.20161117/libraries/Cabal/Cabal/Distribution/Simple/InstallDirs.hs~	2016-11-18 07:08:46.000000000 +0900
++++ ghc-8.0.1.20161117/libraries/Cabal/Cabal/Distribution/Simple/InstallDirs.hs	2016-12-07 18:19:02.670468156 +0900
+@@ -186,7 +186,7 @@
+            JHC    -> "$compiler"
+            LHC    -> "$compiler"
+            UHC    -> "$pkgid"
+-           _other -> "$abi",
++           _other -> "",
+       libexecdir   = case buildOS of
+         Windows   -> "$prefix" </> "$libname"
+         _other    -> "$prefix" </> "libexec",
