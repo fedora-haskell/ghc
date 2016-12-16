@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -14,13 +14,13 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.1.20161117
+Version: 8.0.1.20161213
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 54.3%{?dist}
+Release: 54.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -157,14 +157,14 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal-1.24.1.0
+%ghc_lib_subpackage Cabal-1.24.2.0
 %ghc_lib_subpackage -l %BSDHaskellReport array-0.5.1.1
 %ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.1.0
 %ghc_lib_subpackage binary-0.8.3.0
 %ghc_lib_subpackage bytestring-0.10.8.1
 %ghc_lib_subpackage -l %BSDHaskellReport containers-0.5.7.1
 %ghc_lib_subpackage -l %BSDHaskellReport deepseq-1.4.2.0
-%ghc_lib_subpackage -l %BSDHaskellReport directory-1.2.6.2
+%ghc_lib_subpackage -l %BSDHaskellReport directory-1.3.0.0
 %ghc_lib_subpackage filepath-1.4.1.1
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
@@ -173,13 +173,11 @@ documention.
 %ghc_lib_subpackage ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage haskeline-0.7.2.3
+%ghc_lib_subpackage haskeline-0.7.3.0
 %ghc_lib_subpackage hoopl-3.10.2.1
 %ghc_lib_subpackage hpc-0.6.0.3
 %ghc_lib_subpackage pretty-1.1.3.3
-%define ghc_pkg_obsoletes ghc-process-leksah-devel < 1.0.1.4-14
-%ghc_lib_subpackage -l %BSDHaskellReport process-1.4.2.0
-%undefine ghc_pkg_obsoletes
+%ghc_lib_subpackage -l %BSDHaskellReport process-1.4.3.0
 %ghc_lib_subpackage template-haskell-2.11.1.0
 %ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-0.4.0.2
 %ghc_lib_subpackage time-1.6.0.1
@@ -507,6 +505,10 @@ fi
 
 
 %changelog
+* Fri Dec 16 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161213-54.4
+- 8.0.2 RC2 quick build
+- Cabal, directory, haskeline, process bumped
+
 * Wed Dec  7 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161117-54.3
 - patch Cabal to install dynlibs in libdir itself instead of abi dir
 
