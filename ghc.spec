@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -14,13 +14,13 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.1.20161213
+Version: 8.0.2
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 54.5%{?dist}
+Release: 55.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -505,6 +505,9 @@ fi
 
 
 %changelog
+* Thu Jan  5 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.1
+- 8.0.2 quick build
+
 * Fri Dec 16 2016 Jens Petersen <petersen@redhat.com> - 8.0.1.20161213-54.5
 - 8.0.2 RC2 perf build
 
