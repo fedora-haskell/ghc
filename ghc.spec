@@ -37,7 +37,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch22: ghc-armv7-VFPv3D16--NEON.patch
 Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
 Patch24: buildpath-abi-stability.patch
-Patch25: ghc-8.0.1.20161117-Cabal-dynlibdir.patch
+Patch25: ghc-8.0.2-Cabal-dynlibdir.patch
 
 # 8.0 needs llvm-3.7
 %global llvm_major 3.7
