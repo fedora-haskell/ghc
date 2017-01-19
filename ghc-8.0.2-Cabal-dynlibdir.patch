@@ -5,7 +5,7 @@
             LHC    -> "$compiler"
             UHC    -> "$pkgid"
 -           _other -> "$abi",
-+           _other -> "",
++           _other -> "$compiler/$pkgkey",
        libexecdir   = case buildOS of
          Windows   -> "$prefix" </> "$libname"
          _other    -> "$prefix" </> "libexec",

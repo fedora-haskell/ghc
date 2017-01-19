@@ -20,7 +20,7 @@ Version: 8.0.2
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 55.3%{?dist}
+Release: 55.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -505,6 +505,9 @@ fi
 
 
 %changelog
+* Thu Jan 19 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.4
+- Cabal: install dynlibs next to static libs to simplify packaging
+
 * Fri Jan  6 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.3
 - 8.0.2 perf build
 
