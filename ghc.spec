@@ -279,7 +279,13 @@ autoreconf
 %ifarch x86_64 armv7hl aarch64 s390x ppc64 ppc64le
 %global _hardened_ldflags %{nil}
 %endif
+%ifnarch aarch64 ppc64 ppc64le
 export CFLAGS="${CFLAGS:-%optflags}"
+%else
+%if %{undefined ghc_bootstrapping}
+export CFLAGS="${CFLAGS:-%optflags}"
+%endif
+%endif
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
 # * %%configure induces cross-build due to different target/host/build platform names
 # * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
