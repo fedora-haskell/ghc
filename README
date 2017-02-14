@@ -1,9 +1,11 @@
 This repo is for experimental or unofficial builds of ghc for Fedora.
 
 You can find some corresponding builds currently in
-https://copr.fedoraproject.org/coprs/petersen/ghc-7.8/
+https://copr.fedoraproject.org/coprs/petersen/ghc-8.0.2/
 
 Changes to ghc packaging may be first tested here
 before getting merged into Fedora Package git,
 and changes from there should also be merged here
 to keep up this repo up to date.
+
+Typically this needs fedora-haskell/ghc-rpm-macros installed to build.

@@ -20,7 +20,7 @@ Version: 8.0.2
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 55.4%{?dist}
+Release: 55.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -157,34 +157,34 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage Cabal-1.24.2.0
-%ghc_lib_subpackage -l %BSDHaskellReport array-0.5.1.1
-%ghc_lib_subpackage -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.1.0
-%ghc_lib_subpackage binary-0.8.3.0
-%ghc_lib_subpackage bytestring-0.10.8.1
-%ghc_lib_subpackage -l %BSDHaskellReport containers-0.5.7.1
-%ghc_lib_subpackage -l %BSDHaskellReport deepseq-1.4.2.0
-%ghc_lib_subpackage -l %BSDHaskellReport directory-1.3.0.0
-%ghc_lib_subpackage filepath-1.4.1.1
+%ghc_lib_subpackage -d Cabal-1.24.2.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.1.1
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.1.0
+%ghc_lib_subpackage -d binary-0.8.3.0
+%ghc_lib_subpackage -d bytestring-0.10.8.1
+%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.7.1
+%ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.2.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.0
+%ghc_lib_subpackage -d filepath-1.4.1.1
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
-%ghc_lib_subpackage -x ghc-%{ghc_version_override}
+%ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage ghc-boot-%{ghc_version_override}
-%ghc_lib_subpackage ghc-boot-th-%{ghc_version_override}
-%ghc_lib_subpackage -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage haskeline-0.7.3.0
-%ghc_lib_subpackage hoopl-3.10.2.1
-%ghc_lib_subpackage hpc-0.6.0.3
-%ghc_lib_subpackage pretty-1.1.3.3
-%ghc_lib_subpackage -l %BSDHaskellReport process-1.4.3.0
-%ghc_lib_subpackage template-haskell-2.11.1.0
-%ghc_lib_subpackage -c ncurses-devel%{?_isa} terminfo-0.4.0.2
-%ghc_lib_subpackage time-1.6.0.1
-%ghc_lib_subpackage transformers-0.5.2.0
-%ghc_lib_subpackage unix-2.7.2.1
+%ghc_lib_subpackage -d ghc-boot-%{ghc_version_override}
+%ghc_lib_subpackage -d ghc-boot-th-%{ghc_version_override}
+%ghc_lib_subpackage -d -x ghci-%{ghc_version_override}
+%ghc_lib_subpackage -d haskeline-0.7.3.0
+%ghc_lib_subpackage -d hoopl-3.10.2.1
+%ghc_lib_subpackage -d hpc-0.6.0.3
+%ghc_lib_subpackage -d pretty-1.1.3.3
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.4.3.0
+%ghc_lib_subpackage -d template-haskell-2.11.1.0
+%ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.0.2
+%ghc_lib_subpackage -d time-1.6.0.1
+%ghc_lib_subpackage -d transformers-0.5.2.0
+%ghc_lib_subpackage -d unix-2.7.2.1
 %if %{undefined without_haddock}
-%ghc_lib_subpackage xhtml-3000.2.1
+%ghc_lib_subpackage -d xhtml-3000.2.1
 %endif
 %endif
 
@@ -288,11 +288,9 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --with-gcc=%{_bindir}/gcc --docdir=%{_docdir}/ghc \
+  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
-%endif
-%ifarch armv7hl aarch64
-  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %endif
 %{nil}
 
@@ -312,7 +310,7 @@ echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
 done
 
 # ghc-base should own ghclibdir
-echo "%dir %{ghclibdir}" >> ghc-base.files
+echo "%%dir %{ghclibdir}" >> ghc-base.files
 
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
@@ -505,6 +503,10 @@ fi
 
 
 %changelog
+* Tue Feb 14 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.5
+- config versioned llc and opt for all archs
+- use ghc_lib_subpackage -d to find .files
+
 * Thu Jan 19 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.4
 - Cabal: install dynlibs next to static libs to simplify packaging
 
