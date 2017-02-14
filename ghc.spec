@@ -61,6 +61,7 @@ BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
+BuildRequires: perl
 %if %{undefined without_testsuite}
 BuildRequires: python
 %endif
