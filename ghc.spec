@@ -33,11 +33,16 @@ Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
-# Debian patch
-Patch22: ghc-armv7-VFPv3D16--NEON.patch
-Patch23: ghc-7.8.3-Cabal-install-PATH-warning.patch
+Patch2:  ghc-7.8.3-Cabal-install-PATH-warning.patch
+Patch3: ghc-8.0.2-Cabal-dynlibdir.patch
+
+# Debian patches:
+Patch22: ARM-VFPv3D16--NEON.patch
 Patch24: buildpath-abi-stability.patch
-Patch25: ghc-8.0.2-Cabal-dynlibdir.patch
+Patch26: no-missing-haddock-file-warning.patch
+Patch27: reproducible-tmp-names.patch
+Patch28: x32-use-native-x86_64-insn.patch
+Patch29: osdecommitmemory-compat.patch
 
 # 8.0 needs llvm-3.7
 %global llvm_major 3.7
@@ -214,6 +219,9 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 # gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
+%patch2 -p1 -b .orig
+%patch3 -p1 -b .orig
+
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
 %endif
@@ -222,10 +230,11 @@ rm -r libffi-tarballs
 %patch22 -p1 -b .orig
 %endif
 
-%patch23 -p1 -b .orig
 %patch24 -p1 -b .orig
-
-%patch25 -p1 -b .orig
+%patch26 -p1 -b .orig
+%patch27 -p1 -b .orig
+%patch28 -p1 -b .orig
+%patch29 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
@@ -457,8 +466,7 @@ fi
 %{ghclibdir}/bin/ghc-iserv-prof
 %endif
 %{ghclibdir}/bin/runghc
-# unknown (unregisterized) archs
-%ifnarch ppc64 s390 s390x ppc64le aarch64 %{mips}
+%ifnarch s390 s390x aarch64 %{mips}
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/unlit
@@ -510,9 +518,11 @@ fi
 
 
 %changelog
-* Tue Feb 14 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.5
+* Fri Feb 17 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.5
 - config versioned llc and opt for all archs
 - use ghc_lib_subpackage -d to find .files
+- add Debian patches: no-missing-haddock-file-warning, reproducible-tmp-names,
+  x32-use-native-x86_64-insn, osdecommitmemory-compat
 
 * Thu Jan 19 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.4
 - Cabal: install dynlibs next to static libs to simplify packaging
