@@ -34,10 +34,11 @@ Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-7.8.3-Cabal-install-PATH-warning.patch
-Patch3: ghc-8.0.2-Cabal-dynlibdir.patch
+Patch3:  ghc-8.0.2-Cabal-dynlibdir.patch
+
+Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
 # Debian patches:
-Patch22: ARM-VFPv3D16--NEON.patch
 Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
@@ -77,7 +78,7 @@ BuildRequires: python-sphinx
 BuildRequires: llvm%{llvm_major}
 %endif
 %ifarch armv7hl aarch64
-# patch22
+# patch12
 BuildRequires: autoconf, automake
 %endif
 Requires: ghc-compiler = %{version}-%{release}
@@ -216,7 +217,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b1}
 
-# gen_contents_index: use absolute path for haddock
 %patch1 -p1 -b .orig
 
 %patch2 -p1 -b .orig
@@ -227,7 +227,7 @@ rm -r libffi-tarballs
 %endif
 
 %ifarch armv7hl
-%patch22 -p1 -b .orig
+%patch12 -p1 -b .orig
 %endif
 
 %patch24 -p1 -b .orig
@@ -487,6 +487,7 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{undefined without_manual}
+# https://ghc.haskell.org/trac/ghc/ticket/12939
 #%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
@@ -494,7 +495,6 @@ fi
 %{ghc_html_dir}/users_guide
 %endif
 %dir %{ghc_html_dir}/libraries
-#%{ghc_html_dir}/libraries/frames.html
 %{ghc_html_dir}/libraries/gen_contents_index
 %{ghc_html_dir}/libraries/hslogo-16.png
 %{ghc_html_dir}/libraries/ocean.css
