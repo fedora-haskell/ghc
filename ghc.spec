@@ -1,8 +1,9 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
-%if %{defined ghc_bootstrapping}
+# https://ghc.haskell.org/trac/ghc/ticket/13534
 %global without_testsuite 1
+%if %{defined ghc_bootstrapping}
 %global without_prof 1
 %{?ghc_bootstrap}
 ### uncomment to generate haddocks for bootstrap
@@ -20,7 +21,7 @@ Version: 8.2.0.20170404
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 58.1%{?dist}
+Release: 58.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -525,6 +526,10 @@ fi
 
 
 %changelog
+* Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.2
+- 8.2.1 rc1 perf build
+- disable testsuite due to https://ghc.haskell.org/trac/ghc/ticket/13534
+
 * Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.1
 - 8.2.1 rc1
 - bootstrap
