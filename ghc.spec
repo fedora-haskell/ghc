@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -14,13 +14,13 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.0.2
+Version: 8.2.0.20170404
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 55.5%{?dist}
+Release: 58.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -33,17 +33,16 @@ Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
-Patch2:  ghc-7.8.3-Cabal-install-PATH-warning.patch
-Patch3:  ghc-8.0.2-Cabal-dynlibdir.patch
+#Patch2:  ghc-7.8.3-Cabal-install-PATH-warning.patch
+#Patch3:  ghc-8.0.2-Cabal-dynlibdir.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
 # Debian patches:
-Patch24: buildpath-abi-stability.patch
+#Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
-Patch29: osdecommitmemory-compat.patch
 
 # 8.0 needs llvm-3.7
 %global llvm_major 3.7
@@ -165,14 +164,14 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d Cabal-1.24.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.1.1
-%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.9.1.0
-%ghc_lib_subpackage -d binary-0.8.3.0
-%ghc_lib_subpackage -d bytestring-0.10.8.1
-%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.7.1
-%ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.0
+%ghc_lib_subpackage -d Cabal-2.0.0.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.1.2
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
+%ghc_lib_subpackage -d binary-0.8.4.1
+%ghc_lib_subpackage -d bytestring-0.10.8.2
+%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.10.2
+%ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.3.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.2
 %ghc_lib_subpackage -d filepath-1.4.1.1
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
@@ -180,15 +179,16 @@ documention.
 %undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage -d -x ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage -d ghc-boot-th-%{ghc_version_override}
+%ghc_lib_subpackage -d ghc-compact-0.1.0.0
 %ghc_lib_subpackage -d -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage -d haskeline-0.7.3.0
-%ghc_lib_subpackage -d hoopl-3.10.2.1
+%ghc_lib_subpackage -d haskeline-0.7.3.1
+%ghc_lib_subpackage -d hoopl-3.10.2.2
 %ghc_lib_subpackage -d hpc-0.6.0.3
 %ghc_lib_subpackage -d pretty-1.1.3.3
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.4.3.0
-%ghc_lib_subpackage -d template-haskell-2.11.1.0
+%ghc_lib_subpackage -d template-haskell-2.12.0.0
 %ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.0.2
-%ghc_lib_subpackage -d time-1.6.0.1
+%ghc_lib_subpackage -d time-1.8.0.1
 %ghc_lib_subpackage -d transformers-0.5.2.0
 %ghc_lib_subpackage -d unix-2.7.2.1
 %if %{undefined without_haddock}
@@ -220,8 +220,8 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %patch1 -p1 -b .orig
 
-%patch2 -p1 -b .orig
-%patch3 -p1 -b .orig
+#%%patch2 -p1 -b .orig
+#%%patch3 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -231,11 +231,10 @@ rm -r libffi-tarballs
 %patch12 -p1 -b .orig
 %endif
 
-%patch24 -p1 -b .orig
+#%%patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
 %patch27 -p1 -b .orig
 %patch28 -p1 -b .orig
-%patch29 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
 %if %{undefined without_haddock}
@@ -300,6 +299,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
 %endif
 %endif
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
+export CC=%{_bindir}/gcc
 # * %%configure induces cross-build due to different target/host/build platform names
 # * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
@@ -307,7 +307,7 @@ export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
-  --with-gcc=%{_bindir}/gcc --docdir=%{_docdir}/ghc \
+  --docdir=%{_docdir}/ghc \
   --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
@@ -332,6 +332,7 @@ done
 # ghc-base should own ghclibdir
 echo "%%dir %{ghclibdir}" >> ghc-base.files
 
+%ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
 %ghc_gen_filelists ghc-prim 0.5.0.0
@@ -473,11 +474,13 @@ fi
 %ifnarch s390 s390x aarch64 %{mips}
 %{ghclibdir}/bin/ghc-split
 %endif
+%{ghclibdir}/bin/hp2ps
 %{ghclibdir}/bin/unlit
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
+%{ghclibdir}/package.conf.d/package.cache.lock
 %{ghclibdir}/platformConstants
 %{ghclibdir}/settings
 %{ghclibdir}/template-hsc.h
@@ -522,6 +525,12 @@ fi
 
 
 %changelog
+* Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.1
+- 8.2.1 rc1
+- bootstrap
+- new ghc-compact library
+- exclude ghc-boot for ghc-libraries
+
 * Fri Feb 17 2017 Jens Petersen <petersen@redhat.com> - 8.0.2-55.5
 - config versioned llc and opt for all archs
 - use ghc_lib_subpackage -d to find .files

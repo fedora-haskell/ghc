@@ -1,4 +1,4 @@
-COPR_REPO = ghc-8.0.1
+COPR_REPO = ghc-8.2.1
 
 TARBALL = ghc-$(VERSION)-src.tar.xz
 
