@@ -67,6 +67,7 @@ BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
+# for man and docs
 BuildRequires: perl
 %if %{undefined without_testsuite}
 BuildRequires: python
@@ -177,7 +178,7 @@ documention.
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage -d ghc-boot-%{ghc_version_override}
+%ghc_lib_subpackage -d -x ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage -d ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -d -x ghci-%{ghc_version_override}
 %ghc_lib_subpackage -d haskeline-0.7.3.0
@@ -283,11 +284,14 @@ EOF
 %ifarch armv7hl aarch64
 autoreconf
 %endif
+
+# still happens when bootstrapping 8.0 with 7.10:
 # x86_64: /usr/bin/ld: utils/ghc-pwd/dist-boot/Main.o: relocation R_X86_64_32S against `.text' can not be used when making a shared object; recompile with -fPIC
 # aarch64: /usr/bin/ld: /usr/lib64/ghc-7.6.3/libHSrts.a(RtsFlags.o)(.text+0x578): unresolvable R_AARCH64_ADR_PREL_PG_HI21 relocation against symbol `stdout@@GLIBC_2.17'
 %ifarch x86_64 armv7hl aarch64 s390x ppc64 ppc64le
 %global _hardened_ldflags %{nil}
 %endif
+
 %ifnarch aarch64 ppc64 ppc64le
 export CFLAGS="${CFLAGS:-%optflags}"
 %else
