@@ -14,13 +14,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.0.20170404
+Version: 8.2.0.20170507
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-# ghc-xhtml version not bumped
-Release: 58.2%{?dist}
+Release: 58.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -43,8 +42,6 @@ Patch12: ghc-armv7-VFPv3D16--NEON.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
-
-Patch50: 7cd919f4af0ad05f89391616d940268fb71cb65e.patch
 
 # 8.2 needs llvm-3.9
 %global llvm_major 3.9
@@ -169,12 +166,12 @@ documention.
 %ghc_lib_subpackage -d Cabal-2.0.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.1.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
-%ghc_lib_subpackage -d binary-0.8.4.1
+%ghc_lib_subpackage -d binary-0.8.5.1
 %ghc_lib_subpackage -d bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.10.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.3.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.2
-%ghc_lib_subpackage -d filepath-1.4.1.1
+%ghc_lib_subpackage -d filepath-1.4.1.2
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
@@ -183,18 +180,18 @@ documention.
 %ghc_lib_subpackage -d ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -d ghc-compact-0.1.0.0
 %ghc_lib_subpackage -d -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage -d haskeline-0.7.3.1
+%ghc_lib_subpackage -d haskeline-0.7.4.0
 %ghc_lib_subpackage -d hoopl-3.10.2.2
 %ghc_lib_subpackage -d hpc-0.6.0.3
 %ghc_lib_subpackage -d pretty-1.1.3.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.4.3.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.0.0
 %ghc_lib_subpackage -d template-haskell-2.12.0.0
-%ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.0.2
+%ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.1.0
 %ghc_lib_subpackage -d time-1.8.0.1
 %ghc_lib_subpackage -d transformers-0.5.2.0
-%ghc_lib_subpackage -d unix-2.7.2.1
+%ghc_lib_subpackage -d unix-2.7.2.2
 %if %{undefined without_haddock}
-%ghc_lib_subpackage -d xhtml-3000.2.1
+%ghc_lib_subpackage -d xhtml-3000.2.2
 %endif
 %endif
 
@@ -219,7 +216,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b1}
-%patch50 -p1 -b .orig
 
 %patch1 -p1 -b .orig
 
@@ -528,6 +524,9 @@ fi
 
 
 %changelog
+* Mon May 22 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170507-58.3
+- 8.2.1 rc2 bootstrap
+
 * Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.2
 - 8.2.1 rc1 perf build
 - patch testsuite for https://ghc.haskell.org/trac/ghc/ticket/13534
