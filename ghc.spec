@@ -1,9 +1,8 @@
 # To bootstrap build a new version of ghc, uncomment the following:
 #%%global ghc_bootstrapping 1
 
-# https://ghc.haskell.org/trac/ghc/ticket/13534
-%global without_testsuite 1
 %if %{defined ghc_bootstrapping}
+%global without_testsuite 1
 %global without_prof 1
 %{?ghc_bootstrap}
 ### uncomment to generate haddocks for bootstrap
@@ -45,8 +44,10 @@ Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
 
-# 8.0 needs llvm-3.7
-%global llvm_major 3.7
+Patch50: 7cd919f4af0ad05f89391616d940268fb71cb65e.patch
+
+# 8.2 needs llvm-3.9
+%global llvm_major 3.9
 
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
@@ -218,6 +219,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %prep
 %setup -q -n %{name}-%{version} %{!?without_testsuite:-b1}
+%patch50 -p1 -b .orig
 
 %patch1 -p1 -b .orig
 
@@ -528,7 +530,7 @@ fi
 %changelog
 * Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.2
 - 8.2.1 rc1 perf build
-- disable testsuite due to https://ghc.haskell.org/trac/ghc/ticket/13534
+- patch testsuite for https://ghc.haskell.org/trac/ghc/ticket/13534
 
 * Wed Apr  5 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170404-58.1
 - 8.2.1 rc1
