@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -19,7 +19,7 @@ Version: 8.2.0.20170507
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 58.3%{?dist}
+Release: 58.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -524,6 +524,9 @@ fi
 
 
 %changelog
+* Tue May 23 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170507-58.4
+- 8.2.1 rc2 perf
+
 * Mon May 22 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170507-58.3
 - 8.2.1 rc2 bootstrap
 
