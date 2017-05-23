@@ -71,6 +71,8 @@ BuildRequires: ncurses-devel
 BuildRequires: perl
 %if %{undefined without_testsuite}
 BuildRequires: python
+# needed for F25
+BuildRequires: python3
 %endif
 %if %{undefined without_manual}
 BuildRequires: python-sphinx
