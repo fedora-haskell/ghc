@@ -1,6 +1,8 @@
 # To bootstrap build a new version of ghc, uncomment the following:
 #%%global ghc_bootstrapping 1
 
+%global ghc_release 8.2.1-rc2
+
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
 %global without_prof 1
@@ -24,9 +26,9 @@ Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
 URL: https://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-src.tar.xz
+Source0: http://www.haskell.org/ghc/dist/%{ghc_release}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source1: http://www.haskell.org/ghc/dist/%{version}/ghc-%{version}-testsuite.tar.xz
+Source1: http://www.haskell.org/ghc/dist/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
