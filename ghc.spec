@@ -1,7 +1,7 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+%global ghc_bootstrapping 1
 
-%global ghc_release 8.2.1-rc2
+%global ghc_release 8.2.1-rc3
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -16,12 +16,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.0.20170507
+Version: 8.2.0.20170704
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 58.4%{?dist}
+Release: 58.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
@@ -168,7 +168,7 @@ documention.
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
 %ghc_lib_subpackage -d Cabal-2.0.0.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.1.2
+%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
 %ghc_lib_subpackage -d binary-0.8.5.1
 %ghc_lib_subpackage -d bytestring-0.10.8.2
@@ -191,7 +191,7 @@ documention.
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.0.0
 %ghc_lib_subpackage -d template-haskell-2.12.0.0
 %ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.1.0
-%ghc_lib_subpackage -d time-1.8.0.1
+%ghc_lib_subpackage -d time-1.8.0.2
 %ghc_lib_subpackage -d transformers-0.5.2.0
 %ghc_lib_subpackage -d unix-2.7.2.2
 %if %{undefined without_haddock}
@@ -528,6 +528,9 @@ fi
 
 
 %changelog
+* Thu Jul  6 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170704-58.5
+- 8.2.1 rc3 bootstrap
+
 * Tue May 23 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170507-58.4
 - 8.2.1 rc2 perf
 
