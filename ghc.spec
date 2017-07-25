@@ -1,7 +1,7 @@
 # To bootstrap build a new version of ghc, uncomment the following:
 %global ghc_bootstrapping 1
 
-%global ghc_release 8.2.1-rc3
+%global ghc_release 8.2.1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -16,7 +16,7 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.0.20170704
+Version: 8.2.1
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
@@ -188,7 +188,7 @@ documention.
 %ghc_lib_subpackage -d hoopl-3.10.2.2
 %ghc_lib_subpackage -d hpc-0.6.0.3
 %ghc_lib_subpackage -d pretty-1.1.3.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.0.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.1.0
 %ghc_lib_subpackage -d template-haskell-2.12.0.0
 %ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.1.0
 %ghc_lib_subpackage -d time-1.8.0.2
@@ -338,8 +338,8 @@ echo "%%dir %{ghclibdir}" >> ghc-base.files
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
-%ghc_gen_filelists ghc-prim 0.5.0.0
-%ghc_gen_filelists integer-gmp 1.0.0.1
+%ghc_gen_filelists ghc-prim 0.5.1.0
+%ghc_gen_filelists integer-gmp 1.0.1.0
 
 %define merge_filelist()\
 cat ghc-%1.files >> ghc-%2.files\
@@ -528,7 +528,10 @@ fi
 
 
 %changelog
-* Thu Jul  6 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170704-58.5
+* Tue Jul 25 2017 Jens Petersen <petersen@redhat.com> - 8.2.1-58.5
+- 8.2.1 bootstrap
+
+* Thu Jul  6 2017 Jens Petersen <petersen@redhat.com>
 - 8.2.1 rc3 bootstrap
 
 * Tue May 23 2017 Jens Petersen <petersen@redhat.com> - 8.2.0.20170507-58.4
