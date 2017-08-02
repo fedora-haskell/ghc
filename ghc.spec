@@ -167,7 +167,7 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d Cabal-2.0.0.0
+%ghc_lib_subpackage -d Cabal-2.0.0.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
 %ghc_lib_subpackage -d binary-0.8.5.1
