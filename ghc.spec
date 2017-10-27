@@ -1,9 +1,10 @@
-# To bootstrap build a new version of ghc, uncomment the following:
-#%%global ghc_bootstrapping 1
+# To bootstrap build a new version of ghc, comment out this line:
+#%%global perf_build 1
 
-%global ghc_release 8.2.1
+# to handle RCs
+%global ghc_release 8.2.2-rc1
 
-%if %{defined ghc_bootstrapping}
+%if %{undefined pref_build}
 %global without_testsuite 1
 %global without_prof 1
 %{?ghc_bootstrap}
@@ -11,24 +12,28 @@
 #%%undefine without_haddock
 %endif
 
+%if 0%{?fedora} < 27 || 0%{?rhel}
 %global space %(echo -n ' ')
 %global BSDHaskellReport BSD%{space}and%{space}HaskellReport
+%else
+%global BSDHaskellReport %{quote:BSD and HaskellReport}
+%endif
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.1
+Version: 8.2.1.20170929
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 58.6%{?dist}
+Release: 60.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
-License: %BSDHaskellReport
+License: BSD and HaskellReport
 URL: https://haskell.org/ghc/
-Source0: http://www.haskell.org/ghc/dist/%{ghc_release}/ghc-%{version}-src.tar.xz
+Source0: https://downloads.haskell.org/~ghc/dist/%{ghc_release}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source1: http://www.haskell.org/ghc/dist/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
+Source1: https://downloads.haskell.org/~ghc/dist/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -53,7 +58,7 @@ Patch28: x32-use-native-x86_64-insn.patch
 # and retired arches: alpha sparcv9 armv5tel
 # see also deprecated ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 
-%if %{undefined ghc_bootstrapping}
+%if %{defined perf_build}
 BuildRequires: ghc-compiler = %{version}
 %endif
 BuildRequires: ghc-rpm-macros-extra
@@ -68,7 +73,7 @@ BuildRequires: libffi-devel
 # for terminfo
 BuildRequires: ncurses-devel
 # for man and docs
-BuildRequires: perl
+BuildRequires: perl-interpreter
 %if %{undefined without_testsuite}
 BuildRequires: python
 # needed for F25
@@ -167,35 +172,35 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d Cabal-2.0.0.2
+%ghc_lib_subpackage -d -l BSD Cabal-2.0.1.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
-%ghc_lib_subpackage -d binary-0.8.5.1
-%ghc_lib_subpackage -d bytestring-0.10.8.2
+%ghc_lib_subpackage -d -l BSD binary-0.8.5.1
+%ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.10.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.3.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.2
-%ghc_lib_subpackage -d filepath-1.4.1.2
+%ghc_lib_subpackage -d -l BSD filepath-1.4.1.2
 %define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
 %undefine ghc_pkg_obsoletes
-%ghc_lib_subpackage -d -x ghc-boot-%{ghc_version_override}
-%ghc_lib_subpackage -d ghc-boot-th-%{ghc_version_override}
-%ghc_lib_subpackage -d ghc-compact-0.1.0.0
-%ghc_lib_subpackage -d -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage -d haskeline-0.7.4.0
-%ghc_lib_subpackage -d hoopl-3.10.2.2
-%ghc_lib_subpackage -d hpc-0.6.0.3
-%ghc_lib_subpackage -d pretty-1.1.3.3
+%ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
+%ghc_lib_subpackage -d -l BSD ghc-boot-th-%{ghc_version_override}
+%ghc_lib_subpackage -d -l BSD ghc-compact-0.1.0.0
+%ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
+%ghc_lib_subpackage -d -l BSD haskeline-0.7.4.0
+%ghc_lib_subpackage -d -l BSD hoopl-3.10.2.2
+%ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
+%ghc_lib_subpackage -d -l BSD pretty-1.1.3.3
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.1.0
-%ghc_lib_subpackage -d template-haskell-2.12.0.0
-%ghc_lib_subpackage -d -c ncurses-devel%{?_isa} terminfo-0.4.1.0
-%ghc_lib_subpackage -d time-1.8.0.2
-%ghc_lib_subpackage -d transformers-0.5.2.0
-%ghc_lib_subpackage -d unix-2.7.2.2
+%ghc_lib_subpackage -d -l BSD template-haskell-2.12.0.0
+%ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.0
+%ghc_lib_subpackage -d -l BSD time-1.8.0.2
+%ghc_lib_subpackage -d -l BSD transformers-0.5.2.0
+%ghc_lib_subpackage -d -l BSD unix-2.7.2.2
 %if %{undefined without_haddock}
-%ghc_lib_subpackage -d xhtml-3000.2.2
+%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2
 %endif
 %endif
 
@@ -203,7 +208,7 @@ documention.
 
 %package libraries
 Summary: GHC development libraries meta package
-License: %BSDHaskellReport
+License: BSD and HaskellReport
 Requires: ghc-compiler = %{version}-%{release}
 Obsoletes: ghc-devel < %{version}-%{release}
 Provides: ghc-devel = %{version}-%{release}
@@ -252,7 +257,7 @@ fi
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
-%if %{undefined ghc_bootstrapping}
+%if %{defined perf_build}
 %ifarch armv7hl aarch64
 BuildFlavour = perf-llvm
 %else
@@ -297,7 +302,7 @@ autoreconf
 %ifnarch aarch64 ppc64 ppc64le
 export CFLAGS="${CFLAGS:-%optflags}"
 %else
-%if %{undefined ghc_bootstrapping}
+%if %{defined perf_build}
 export CFLAGS="${CFLAGS:-%optflags}"
 %endif
 %endif
@@ -528,6 +533,12 @@ fi
 
 
 %changelog
+* Fri Oct 27 2017 Jens Petersen <petersen@redhat.com> - 8.2.1.20170929-60.1
+- 8.2.2 RC1 bootstrap build
+- fix space in BSDHaskellReport license macro for rpm-4.14
+- mark other subpackages correctly as BSD license
+- drop ghc-boot from ghc-libraries
+
 * Wed Aug  2 2017 Jens Petersen <petersen@redhat.com> - 8.2.1-58.6
 - 8.2.1 perf build
 

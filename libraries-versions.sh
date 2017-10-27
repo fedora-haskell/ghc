@@ -1,7 +1,5 @@
 #!/bin/sh
 
-GHCVER=$(basename $PWD | sed -e "s/ghc-//")
-
 if [ ! -d libraries ]; then
     echo Is CWD a ghc source tree?
     exit 1
