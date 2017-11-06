@@ -2,7 +2,7 @@
 #%%global perf_build 1
 
 # to handle RCs
-%global ghc_release 8.2.2-rc1
+%global ghc_release 8.2.2-rc2
 
 %if %{undefined pref_build}
 %global without_testsuite 1
@@ -21,12 +21,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.1.20170929
+Version: 8.2.1.20171030
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 60.1%{?dist}
+Release: 60.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -172,7 +172,7 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.0.1.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.0.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
@@ -193,7 +193,7 @@ documention.
 %ghc_lib_subpackage -d -l BSD hoopl-3.10.2.2
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.1.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.0.0
 %ghc_lib_subpackage -d -l BSD template-haskell-2.12.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.0
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
