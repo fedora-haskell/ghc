@@ -2,7 +2,7 @@
 #%%global perf_build 1
 
 # to handle RCs
-%global ghc_release 8.2.2-rc2
+%global ghc_release 8.2.2
 
 %if %{undefined pref_build}
 %global without_testsuite 1
@@ -12,28 +12,21 @@
 #%%undefine without_haddock
 %endif
 
-%if 0%{?fedora} < 27 || 0%{?rhel}
-%global space %(echo -n ' ')
-%global BSDHaskellReport BSD%{space}and%{space}HaskellReport
-%else
-%global BSDHaskellReport %{quote:BSD and HaskellReport}
-%endif
-
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.1.20171030
+Version: 8.2.2
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 60.2%{?dist}
+Release: 60.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
 URL: https://haskell.org/ghc/
-Source0: https://downloads.haskell.org/~ghc/dist/%{ghc_release}/ghc-%{version}-src.tar.xz
+Source0: https://downloads.haskell.org/~ghc/%{ghc_release}/ghc-%{version}-src.tar.xz
 %if %{undefined without_testsuite}
-Source1: https://downloads.haskell.org/~ghc/dist/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
+Source1: https://downloads.haskell.org/~ghc/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
@@ -170,11 +163,13 @@ documention.
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
+%global BSDHaskellReport %{quote:BSD and HaskellReport}
+
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.0.0.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.0.1.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.0.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.1.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.10.2
@@ -193,7 +188,7 @@ documention.
 %ghc_lib_subpackage -d -l BSD hoopl-3.10.2.2
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.0.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.1.0
 %ghc_lib_subpackage -d -l BSD template-haskell-2.12.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.0
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
@@ -307,6 +302,7 @@ export CFLAGS="${CFLAGS:-%optflags}"
 %endif
 %endif
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
+# for ghc-8.2
 export CC=%{_bindir}/gcc
 # * %%configure induces cross-build due to different target/host/build platform names
 # * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
@@ -343,7 +339,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base.files
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
-%ghc_gen_filelists ghc-prim 0.5.1.0
+%ghc_gen_filelists ghc-prim 0.5.1.1
 %ghc_gen_filelists integer-gmp 1.0.1.0
 
 %define merge_filelist()\
@@ -533,6 +529,12 @@ fi
 
 
 %changelog
+* Wed Nov 29 2017 Jens Petersen <petersen@redhat.com> - 8.2.2-60.3
+- 8.2.2 release bootstrap build
+
+* Mon Nov  6 2017 Jens Petersen <petersen@redhat.com> - 8.2.1.20171030-60.2
+- 8.2.2 RC2 bootstrap build
+
 * Fri Oct 27 2017 Jens Petersen <petersen@redhat.com> - 8.2.1.20170929-60.1
 - 8.2.2 RC1 bootstrap build
 - fix space in BSDHaskellReport license macro for rpm-4.14
