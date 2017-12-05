@@ -287,25 +287,21 @@ EOF
 autoreconf
 %endif
 
-# still happens when bootstrapping 8.0 with 7.10:
-# x86_64: /usr/bin/ld: utils/ghc-pwd/dist-boot/Main.o: relocation R_X86_64_32S against `.text' can not be used when making a shared object; recompile with -fPIC
-# aarch64: /usr/bin/ld: /usr/lib64/ghc-7.6.3/libHSrts.a(RtsFlags.o)(.text+0x578): unresolvable R_AARCH64_ADR_PREL_PG_HI21 relocation against symbol `stdout@@GLIBC_2.17'
-%ifarch x86_64 armv7hl aarch64 s390x ppc64 ppc64le
-%global _hardened_ldflags %{nil}
-%endif
-
-%ifnarch aarch64 ppc64 ppc64le
-export CFLAGS="${CFLAGS:-%optflags}"
+%if 0%{?fedora} > 27
+%ghc_set_cflags
 %else
-%if %{defined perf_build}
-export CFLAGS="${CFLAGS:-%optflags}"
+# -Wunused-label is extremely noisy\
+%ifarch aarch64 s390x
+CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall -Werror=format-security //')}"
+%else
+CFLAGS="${CFLAGS:-%optflags}"
 %endif
+export CFLAGS
 %endif
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
 # for ghc-8.2
 export CC=%{_bindir}/gcc
 # * %%configure induces cross-build due to different target/host/build platform names
-# * --with-gcc=%{_bindir}/gcc is to avoid ccache hardcoding problem when bootstrapping 
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
   --datadir=%{_datadir} --includedir=%{_includedir} --libdir=%{_libdir} \
