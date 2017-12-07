@@ -290,7 +290,7 @@ autoreconf
 %if 0%{?fedora} > 27
 %ghc_set_cflags
 %else
-# -Wunused-label is extremely noisy\
+# -Wunused-label is extremely noisy
 %ifarch aarch64 s390x
 CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall -Werror=format-security //')}"
 %else
