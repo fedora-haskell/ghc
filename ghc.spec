@@ -163,7 +163,12 @@ documention.
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
+%if 0%{?fedora} < 25 || 0%{?rhel}
+%global space %(echo -n ' ')
+%global BSDHaskellReport BSD%{space}and%{space}HaskellReport
+%else
 %global BSDHaskellReport %{quote:BSD and HaskellReport}
+%endif
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
