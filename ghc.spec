@@ -163,12 +163,7 @@ documention.
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
 
-%if 0%{?fedora} < 25 || 0%{?rhel}
-%global space %(echo -n ' ')
-%global BSDHaskellReport BSD%{space}and%{space}HaskellReport
-%else
 %global BSDHaskellReport %{quote:BSD and HaskellReport}
-%endif
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
@@ -331,7 +326,11 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
+%if 0%{?rhel}
+echo "%%dir libraries/$name/LICENSE" >> ghc-$name.files
+%else
 echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
+%endif
 done
 
 # ghc-base should own ghclibdir
@@ -347,7 +346,11 @@ echo "%%dir %{ghclibdir}" >> ghc-base.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-echo "%%license libraries/LICENSE.%1" >> ghc-%2.files
+%if 0%{?rhel}\
+echo "%%dir libraries/LICENSE.%1" >> ghc-%2.files\
+%else\
+echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
+%endif
 
 %merge_filelist integer-gmp base
 %merge_filelist ghc-prim base
