@@ -327,7 +327,7 @@ name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
 %if 0%{?rhel}
-echo "%%dir libraries/$name/LICENSE" >> ghc-$name.files
+echo "%%doc libraries/$name/LICENSE" >> ghc-$name.files
 %else
 echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
 %endif
@@ -347,7 +347,7 @@ cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
 %if 0%{?rhel}\
-echo "%%dir libraries/LICENSE.%1" >> ghc-%2.files\
+echo "%%doc libraries/LICENSE.%1" >> ghc-%2.files\
 %else\
 echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
 %endif
