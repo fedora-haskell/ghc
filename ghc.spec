@@ -5,8 +5,8 @@
 %global ghc_release 8.2.2
 
 %if %{undefined pref_build}
-%global without_testsuite 1
-%global without_prof 1
+%bcond_without testsuite
+%bcond_without prof
 %{?ghc_bootstrap}
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
@@ -25,7 +25,7 @@ Summary: Glasgow Haskell Compiler
 License: BSD and HaskellReport
 URL: https://haskell.org/ghc/
 Source0: https://downloads.haskell.org/~ghc/%{ghc_release}/ghc-%{version}-src.tar.xz
-%if %{undefined without_testsuite}
+%if %{with testsuite}
 Source1: https://downloads.haskell.org/~ghc/%{ghc_release}/ghc-%{version}-testsuite.tar.xz
 %endif
 Source3: ghc-doc-index.cron
@@ -67,7 +67,7 @@ BuildRequires: libffi-devel
 BuildRequires: ncurses-devel
 # for man and docs
 BuildRequires: perl-interpreter
-%if %{undefined without_testsuite}
+%if %{with testsuite}
 BuildRequires: python
 # needed for F25
 BuildRequires: python3
@@ -219,7 +219,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 
 %prep
-%setup -q -n %{name}-%{version} %{!?without_testsuite:-b1}
+%setup -q -n %{name}-%{version} %{?with_testsuite:-b1}
 
 %patch1 -p1 -b .orig
 
@@ -265,7 +265,7 @@ BuildFlavour = quick-llvm
 BuildFlavour = quick
 %endif
 %endif
-GhcLibWays = v dyn %{!?without_prof:p}
+GhcLibWays = v dyn %{?with_prof:p}
 %if %{defined without_haddock}
 HADDOCK_DOCS = NO
 %endif
@@ -420,7 +420,7 @@ echo 'main = putStrLn "Foo"' > testghc/foo.hs
 $GHC testghc/foo.hs -o testghc/foo -dynamic
 [ "$(testghc/foo)" = "Foo" ]
 rm testghc/*
-%if %{undefined without_testsuite}
+%if %{with testsuite}
 make test
 %endif
 
@@ -475,7 +475,7 @@ fi
 %{ghclibdir}/bin/hsc2hs
 %{ghclibdir}/bin/ghc-iserv
 %{ghclibdir}/bin/ghc-iserv-dyn
-%if %{undefined without_prof}
+%if %{with prof}
 %{ghclibdir}/bin/ghc-iserv-prof
 %endif
 %{ghclibdir}/bin/runghc
