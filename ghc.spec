@@ -4,12 +4,15 @@
 # to handle RCs
 %global ghc_release 8.2.2
 
-%if %{undefined pref_build}
-%bcond_without testsuite
-%bcond_without prof
+%if %{undefined perf_build}
+%bcond_with testsuite
+%bcond_with prof
 %{?ghc_bootstrap}
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
+%else
+%bcond_without testsuite
+%bcond_without prof
 %endif
 
 Name: ghc
@@ -503,7 +506,7 @@ fi
 %{ghclibdir}/latex
 %if %{undefined without_manual}
 # https://ghc.haskell.org/trac/ghc/ticket/12939
-#%{_mandir}/man1/ghc.*
+#%%{_mandir}/man1/ghc.*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
 %{ghc_html_dir}/haddock
