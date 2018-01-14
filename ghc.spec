@@ -22,7 +22,7 @@ Version: 8.2.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 60.4%{?dist}
+Release: 60.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -37,6 +37,8 @@ Source4: ghc-doc-index
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 #Patch2:  ghc-7.8.3-Cabal-install-PATH-warning.patch
 #Patch3:  ghc-8.0.2-Cabal-dynlibdir.patch
+# https://github.com/haskell/cabal/issues/4728
+Patch4:  https://gist.githubusercontent.com/expipiplus1/6720ebc3db90f36031d651ca2e6507c4/raw/b330b21457628dc7088236a000b4a0f16d109665/shadowed-deps.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
@@ -228,6 +230,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 #%%patch2 -p1 -b .orig
 #%%patch3 -p1 -b .orig
+%patch4 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -536,6 +539,9 @@ fi
 
 
 %changelog
+* Sun Jan 14 2018 Jens Petersen <petersen@redhat.com> - 8.2.2-60.5
+- add shadowed-deps.patch (haskell/cabal#4728)
+
 * Fri Dec 15 2017 Jens Petersen <petersen@redhat.com> - 8.2.2-60.4
 - 8.2.2 release perf build
 
