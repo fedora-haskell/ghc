@@ -22,7 +22,7 @@ Version: 8.2.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 60.5%{?dist}
+Release: 60.6%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -328,6 +328,15 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 
+mv %{buildroot}%{ghclibdir}/*/libHS*ghc%{ghc_version}.so %{buildroot}%{_libdir}/
+for i in $(find %{buildroot} -type f -exec sh -c "file {} | grep -q 'dynamically linked'" \; -print); do
+  chrpath -d $i
+done
+
+for i in %{buildroot}%{ghclibdir}/package.conf.d/*.conf; do
+  sed -i -e 's!^dynamic-library-dirs: .*!dynamic-library-dirs: %{_libdir}!' $i
+done
+
 for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
@@ -340,7 +349,7 @@ echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
 done
 
 # ghc-base should own ghclibdir
-echo "%%dir %{ghclibdir}" >> ghc-base.files
+echo "%%dir %{ghclibdir}" >> ghc-base-devel.files
 
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
@@ -362,15 +371,16 @@ echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
 %merge_filelist ghc-prim base
 
 # add rts libs
-echo "%%dir %{ghclibdir}/rts" >> ghc-base.files
-ls %{buildroot}%{ghclibdir}/rts/libHS*.so >> ghc-base.files
+echo "%{ghclibdir}/rts" >> ghc-base-devel.files
+ls %{buildroot}%{_libdir}/libHSrts*.so >> ghc-base.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
 %endif
+sed -i -e 's!^library-dirs: %{ghclibdir}/rts!&\ndynamic-library-dirs: %{_libdir}!' %{buildroot}%{ghclibdir}/package.conf.d/rts.conf
 
 sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
-ls -d %{buildroot}%{ghclibdir}/rts/lib*.a %{buildroot}%{ghclibdir}/package.conf.d/rts.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
+ls -d %{buildroot}%{ghclibdir}/package.conf.d/rts.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so >> ghc-base-devel.files
 %endif
@@ -539,6 +549,9 @@ fi
 
 
 %changelog
+* Mon Jan 22 2018 Jens Petersen <petersen@localhost.localdomain> - 8.2.2-60.6
+- install ghc libs in libdir and remove RUNPATHs
+
 * Sun Jan 14 2018 Jens Petersen <petersen@redhat.com> - 8.2.2-60.5
 - add shadowed-deps.patch (haskell/cabal#4728)
 
