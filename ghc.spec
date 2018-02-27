@@ -33,6 +33,9 @@ Source1: https://downloads.haskell.org/~ghc/%{ghc_release}/ghc-%{version}-testsu
 %endif
 Source3: ghc-doc-index.cron
 Source4: ghc-doc-index
+Source5: ghc-pkg.man
+Source6: haddock.man
+Source7: runghc.man
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-Cabal-install-PATH-warning.patch
@@ -411,6 +414,10 @@ cd ..
 # we package the library license files separately
 find %{buildroot}%{ghc_html_libraries_dir} -name LICENSE -exec rm '{}' ';'
 
+mkdir -p %{buildroot}%{_mandir}/man1
+install -p -m 0644 %{SOURCE5} %{buildroot}%{_mandir}/man1/ghc-pkg.1
+install -p -m 0644 %{SOURCE6} %{buildroot}%{_mandir}/man1/haddock.1
+install -p -m 0644 %{SOURCE7} %{buildroot}%{_mandir}/man1/runghc.1
 
 %check
 export LANG=en_US.utf8
@@ -516,7 +523,10 @@ fi
 %{ghclibdir}/latex
 %if %{undefined without_manual}
 # https://ghc.haskell.org/trac/ghc/ticket/12939
-#%%{_mandir}/man1/ghc.*
+#%%{_mandir}/man1/ghc.1*
+%{_mandir}/man1/ghc-pkg.1*
+%{_mandir}/man1/haddock.1*
+%{_mandir}/man1/runghc.1*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
 %{ghc_html_dir}/haddock
@@ -548,6 +558,7 @@ fi
 %changelog
 * Tue Feb 27 2018 Jens Petersen <petersen@redhat.com> - 8.2.2-65.1
 - re-enable buildpath-abi-stability.patch
+- add manpages from debian for ghc-pkg, haddock, runghc
 - forward port changes from Fedora 28:
 - apply Phabricator D4159.patch to workaround
   https://ghc.haskell.org/trac/ghc/ticket/14381
