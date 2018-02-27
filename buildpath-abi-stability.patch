@@ -1,8 +1,8 @@
-Index: ghc-7.10.1/compiler/iface/MkIface.hs
-===================================================================
---- ghc-7.10.1.orig/compiler/iface/MkIface.hs	2015-05-17 20:34:02.808643844 +0200
-+++ ghc-7.10.1/compiler/iface/MkIface.hs	2015-05-17 20:34:02.804643799 +0200
-@@ -611,7 +611,7 @@
+Forwarded to https://ghc.haskell.org/trac/ghc/ticket/10424
+
+--- a/compiler/iface/MkIface.hs
++++ b/compiler/iface/MkIface.hs
+@@ -681,7 +681,7 @@ addFingerprints hsc_env mb_old_fingerpri
     iface_hash <- computeFingerprint putNameLiterally
                        (mod_hash,
                         ann_fn (mkVarOcc "module"),  -- See mkIfaceAnnCache
@@ -11,7 +11,7 @@ Index: ghc-7.10.1/compiler/iface/MkIface.hs
                         sorted_deps,
                         mi_hpc iface0)
  
-@@ -644,6 +644,9 @@
+@@ -714,6 +714,9 @@ addFingerprints hsc_env mb_old_fingerpri
      (non_orph_fis,   orph_fis)   = mkOrphMap ifFamInstOrph (mi_fam_insts iface0)
      fix_fn = mi_fix_fn iface0
      ann_fn = mkIfaceAnnCache (mi_anns iface0)
@@ -19,5 +19,5 @@ Index: ghc-7.10.1/compiler/iface/MkIface.hs
 +    usages = [ case u of UsageFile _ fp -> UsageFile "" fp; _ -> u | u <- mi_usages iface0 ]
 +
  
- getOrphanHashes :: HscEnv -> [Module] -> IO [Fingerprint]
- getOrphanHashes hsc_env mods = do
+ -- | Retrieve the orphan hashes 'mi_orphan_hash' for a list of modules
+ -- (in particular, the orphan modules which are transitively imported by the

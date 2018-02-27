@@ -1,0 +1,214 @@
+diff --git a/testsuite/tests/backpack/cabal/bkpcabal02/bkpcabal02.stdout b/testsuite/tests/backpack/cabal/bkpcabal02/bkpcabal02.stdout
+--- a/testsuite/tests/backpack/cabal/bkpcabal02/bkpcabal02.stdout
++++ b/testsuite/tests/backpack/cabal/bkpcabal02/bkpcabal02.stdout
+@@ -1,6 +1,11 @@
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
+ Preprocessing library 'p' for bkpcabal01-0.1.0.0..
+ Building library 'p' instantiated with H = <H>
+ for bkpcabal01-0.1.0.0..
++ignoring (possibly broken) abi-depends field for packages
+ Preprocessing library 'q' for bkpcabal01-0.1.0.0..
+ Building library 'q' instantiated with H = <H>
+ for bkpcabal01-0.1.0.0..
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
+diff --git a/testsuite/tests/cabal/T12485a.stdout b/testsuite/tests/cabal/T12485a.stdout
+--- a/testsuite/tests/cabal/T12485a.stdout
++++ b/testsuite/tests/cabal/T12485a.stdout
+@@ -1,3 +1,4 @@
++ignoring (possibly broken) abi-depends field for packages
+ should SUCCEED
+ should SUCCEED
+ should SUCCEED
+diff --git a/testsuite/tests/cabal/T5442d.stdout b/testsuite/tests/cabal/T5442d.stdout
+--- a/testsuite/tests/cabal/T5442d.stdout
++++ b/testsuite/tests/cabal/T5442d.stdout
+@@ -1,6 +1,7 @@
+ Reading package info from "shadow1.pkg" ... done.
+ Reading package info from "shadow4.pkg" ... done.
+ Reading package info from "shadow2.pkg" ... done.
++ignoring (possibly broken) abi-depends field for packages
+ global (should be empty):
+ user:
+ shadow-2
+diff --git a/testsuite/tests/cabal/cabal01/cabal01.stdout b/testsuite/tests/cabal/cabal01/cabal01.stdout
+--- a/testsuite/tests/cabal/cabal01/cabal01.stdout
++++ b/testsuite/tests/cabal/cabal01/cabal01.stdout
+@@ -1,3 +1,4 @@
++ignoring (possibly broken) abi-depends field for packages
+ install1:
+ bin
+ lib
+diff --git a/testsuite/tests/cabal/cabal06/cabal06.stdout b/testsuite/tests/cabal/cabal06/cabal06.stdout
+--- a/testsuite/tests/cabal/cabal06/cabal06.stdout
++++ b/testsuite/tests/cabal/cabal06/cabal06.stdout
+@@ -1,3 +1,7 @@
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
+ Does the first instance of q depend on p-1.0?
+ 1
+ Does the second instance of q depend on p-1.0?
+diff --git a/testsuite/tests/cabal/cabal08/cabal08.stdout b/testsuite/tests/cabal/cabal08/cabal08.stdout
+--- a/testsuite/tests/cabal/cabal08/cabal08.stdout
++++ b/testsuite/tests/cabal/cabal08/cabal08.stdout
+@@ -1,3 +1,5 @@
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
+ [1 of 1] Compiling Main             ( Main.hs, Main.o )
+ Linking Main ...
+ p2
+diff --git a/testsuite/tests/cabal/shadow.stdout b/testsuite/tests/cabal/shadow.stdout
+--- a/testsuite/tests/cabal/shadow.stdout
++++ b/testsuite/tests/cabal/shadow.stdout
+@@ -1,3 +1,4 @@
++ignoring (possibly broken) abi-depends field for packages
+ databases 1 and 2:
+ localshadow1.package.conf
+     (shadow-1)
+diff --git a/testsuite/tests/driver/recomp007/recomp007.stdout b/testsuite/tests/driver/recomp007/recomp007.stdout
+--- a/testsuite/tests/driver/recomp007/recomp007.stdout
++++ b/testsuite/tests/driver/recomp007/recomp007.stdout
+@@ -1,3 +1,5 @@
++ignoring (possibly broken) abi-depends field for packages
++ignoring (possibly broken) abi-depends field for packages
+ Preprocessing executable 'test' for b-1.0..
+ Building executable 'test' for b-1.0..
+ [1 of 2] Compiling B                ( B.hs, dist/build/test/test-tmp/B.o ) [A changed]
+diff --git a/testsuite/tests/safeHaskell/check/pkg01/safePkg01.stdout b/testsuite/tests/safeHaskell/check/pkg01/safePkg01.stdout
+--- a/testsuite/tests/safeHaskell/check/pkg01/safePkg01.stdout
++++ b/testsuite/tests/safeHaskell/check/pkg01/safePkg01.stdout
+@@ -1,49 +1,53 @@
++ignoring (possibly broken) abi-depends field for packages
+ pdb.safePkg01/local.db
+     safePkg01-1.0
+ 
+ trusted: False
+ 
+ M_SafePkg
+-package dependencies: base-4.9.0.0* ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: base-4.11.0.0* ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: safe
+ require own pkg trusted: False
+ 
+ M_SafePkg2
+-package dependencies: base-4.9.0.0 ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: base-4.11.0.0 ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: trustworthy
+ require own pkg trusted: False
+ 
+ M_SafePkg3
+-package dependencies: base-4.9.0.0* ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: base-4.11.0.0* ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: safe
+ require own pkg trusted: True
+ 
+ M_SafePkg4
+-package dependencies: base-4.9.0.0* ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: base-4.11.0.0* ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: safe
+ require own pkg trusted: True
+ 
+ M_SafePkg5
+-package dependencies: base-4.9.0.0* ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: base-4.11.0.0* ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: safe
+ require own pkg trusted: True
+ 
+ M_SafePkg6
+-package dependencies: array-0.5.1.0 base-4.9.0.0* bytestring-0.10.7.0* deepseq-1.4.2.0 ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: array-0.5.2.0 base-4.11.0.0* bytestring-0.10.8.2* deepseq-1.4.3.0 ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: trustworthy
+ require own pkg trusted: False
+ 
+ M_SafePkg7
+-package dependencies: array-0.5.1.0 base-4.9.0.0* bytestring-0.10.7.0* deepseq-1.4.2.0 ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: array-0.5.2.0 base-4.11.0.0* bytestring-0.10.8.2* deepseq-1.4.3.0 ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: safe
+ require own pkg trusted: False
+ 
+ M_SafePkg8
+-package dependencies: array-0.5.1.0 base-4.9.0.0 bytestring-0.10.7.0* deepseq-1.4.2.0 ghc-prim-0.5.0.0 integer-gmp-1.0.0.0
++package dependencies: array-0.5.2.0 base-4.11.0.0 bytestring-0.10.8.2* deepseq-1.4.3.0 ghc-prim-0.5.2.0 integer-gmp-1.0.1.0
+ trusted: trustworthy
+ require own pkg trusted: False
+ 
+ Testing setting trust
++ignoring (possibly broken) abi-depends field for packages
+ trusted: True
++ignoring (possibly broken) abi-depends field for packages
+ trusted: False
++ignoring (possibly broken) abi-depends field for packages
+ trusted: False
+diff --git a/utils/ghc-pkg/Main.hs b/utils/ghc-pkg/Main.hs
+--- a/utils/ghc-pkg/Main.hs
++++ b/utils/ghc-pkg/Main.hs
+@@ -1208,7 +1208,18 @@
+       pkgsCabalFormat = packages db
+ 
+       pkgsGhcCacheFormat :: [PackageCacheFormat]
+-      pkgsGhcCacheFormat = map convertPackageInfoToCacheFormat pkgsCabalFormat
++      pkgsGhcCacheFormat
++        = map (recomputeValidAbiDeps pkgsCabalFormat) -- Note [Recompute abi-depends]
++        $ map convertPackageInfoToCacheFormat
++          pkgsCabalFormat
++
++      hasAnyAbiDepends :: InstalledPackageInfo -> Bool
++      hasAnyAbiDepends x = length (abiDepends x) > 0
++
++  -- warn when we find any (possibly-)bogus abi-depends fields;
++  -- Note [Recompute abi-depends]
++  when (any hasAnyAbiDepends pkgsCabalFormat) $
++      infoLn "ignoring (possibly broken) abi-depends field for packages"
+ 
+   when (verbosity > Normal) $
+       infoLn ("writing cache " ++ filename)
+@@ -1231,6 +1242,45 @@
+                             ModuleName
+                             OpenModule
+ 
++{- Note [Recompute abi-depends]
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++
++Like most fields, `ghc-pkg` relies on who-ever is performing package
++registration to fill in fields; this includes the `abi-depends` field present
++for the package.
++
++However, this was likely a mistake, and is not very robust; in certain cases,
++versions of Cabal may use bogus abi-depends fields for a package when doing
++builds. Why? Because package database information is aggressively cached; it is
++possible to work Cabal into a situation where it uses a cached version of
++`abi-depends`, rather than the one in the actual database after it has been
++recomputed.
++
++However, there is an easy fix: ghc-pkg /already/ knows the `abi-depends` of a
++package, because they are the ABIs of the packages pointed at by the `depends`
++field. So it can simply look up the abi from the dependencies in the original
++database, and ignore whatever the system registering gave it.
++
++So, instead, we do two things here:
++
++  - We throw away the information for a registered package's `abi-depends` field.
++
++  - We recompute it: we simply look up the unit ID of the package in the original
++    database, and use *its* abi-depends.
++
++See Trac #14381, and Cabal issue #4728.
++
++-}
++
++recomputeValidAbiDeps :: [InstalledPackageInfo] -> PackageCacheFormat -> PackageCacheFormat
++recomputeValidAbiDeps db pkg = pkg { GhcPkg.abiDepends = catMaybes (newAbiDeps) }
++  where
++    newAbiDeps = flip map (GhcPkg.abiDepends pkg) $ \(k, _) ->
++      case filter (\d -> installedUnitId d == k) db of
++        []  -> Nothing
++        [x] -> Just (k, unAbiHash (abiHash x))
++        _   -> Nothing -- ???
++
+ convertPackageInfoToCacheFormat :: InstalledPackageInfo -> PackageCacheFormat
+ convertPackageInfoToCacheFormat pkg =
+     GhcPkg.InstalledPackageInfo {
+

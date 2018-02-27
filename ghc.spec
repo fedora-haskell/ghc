@@ -22,7 +22,7 @@ Version: 8.2.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 60.6%{?dist}
+Release: 65.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -37,12 +37,13 @@ Source4: ghc-doc-index
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-Cabal-install-PATH-warning.patch
 # https://github.com/haskell/cabal/issues/4728
-Patch4:  https://gist.githubusercontent.com/expipiplus1/6720ebc3db90f36031d651ca2e6507c4/raw/b330b21457628dc7088236a000b4a0f16d109665/shadowed-deps.patch
+# https://ghc.haskell.org/trac/ghc/ticket/14381
+Patch4:  https://phabricator-files.haskell.org/file/data/pgrn3b7lw22ccodkc4nf/PHID-FILE-o3pkv37yfa5h2q3xflrd/D4159.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
 # Debian patches:
-#Patch24: buildpath-abi-stability.patch
+Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
@@ -72,12 +73,10 @@ BuildRequires: ncurses-devel
 # for man and docs
 BuildRequires: perl-interpreter
 %if %{with testsuite}
-BuildRequires: python
-# needed for F25
 BuildRequires: python3
 %endif
 %if %{undefined without_manual}
-BuildRequires: python-sphinx
+BuildRequires: python3-sphinx
 %endif
 %ifarch armv7hl aarch64
 BuildRequires: llvm%{llvm_major}
@@ -238,7 +237,7 @@ rm -r libffi-tarballs
 %patch12 -p1 -b .orig
 %endif
 
-#%%patch24 -p1 -b .orig
+%patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
 %patch27 -p1 -b .orig
 %patch28 -p1 -b .orig
@@ -547,6 +546,13 @@ fi
 
 
 %changelog
+* Tue Feb 27 2018 Jens Petersen <petersen@redhat.com> - 8.2.2-65.1
+- re-enable buildpath-abi-stability.patch
+- forward port changes from Fedora 28:
+- apply Phabricator D4159.patch to workaround
+  https://ghc.haskell.org/trac/ghc/ticket/14381
+- python3
+
 * Mon Jan 22 2018 Jens Petersen <petersen@localhost.localdomain> - 8.2.2-60.6
 - install ghc libs in libdir and remove RUNPATHs
 
@@ -1281,7 +1287,7 @@ fi
 - try to install man pages
 
 * Thu Nov 12 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-3
-- fix %check
+- fix %%check
 
 * Sun Oct 11 2009 Bryan O'Sullivan <bos@serpentine.com> - 6.12.0.20091010-2
 - disable ppc for now (seems unsupported)
