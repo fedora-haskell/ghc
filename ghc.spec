@@ -1,8 +1,8 @@
 # To bootstrap build a new version of ghc, comment out this line:
-%global perf_build 1
+#%%global perf_build 1
 
 # to handle RCs
-%global ghc_release 8.2.2
+%global ghc_release 8.4.1
 
 %if %{undefined perf_build}
 %bcond_with testsuite
@@ -17,12 +17,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.2.2
+Version: 8.4.0.20180224
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 65.1%{?dist}
+Release: 70.1%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -41,7 +41,7 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-Cabal-install-PATH-warning.patch
 # https://github.com/haskell/cabal/issues/4728
 # https://ghc.haskell.org/trac/ghc/ticket/14381
-Patch4:  https://phabricator-files.haskell.org/file/data/pgrn3b7lw22ccodkc4nf/PHID-FILE-o3pkv37yfa5h2q3xflrd/D4159.patch
+#Patch4:  https://phabricator-files.haskell.org/file/data/pgrn3b7lw22ccodkc4nf/PHID-FILE-o3pkv37yfa5h2q3xflrd/D4159.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
@@ -69,6 +69,7 @@ BuildRequires: ghc-containers-devel
 BuildRequires: ghc-directory-devel
 BuildRequires: ghc-pretty-devel
 BuildRequires: ghc-process-devel
+BuildRequires: ghc-transformers-devel
 BuildRequires: gmp-devel
 BuildRequires: libffi-devel
 # for terminfo
@@ -173,32 +174,33 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.0.1.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.1.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.10.1.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.11.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
-%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.10.2
+%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.11.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.3.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.0.2
-%ghc_lib_subpackage -d -l BSD filepath-1.4.1.2
-%define ghc_pkg_obsoletes ghc-bin-package-db-devel < 0.0.0.0-12
+%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.1.5
+%ghc_lib_subpackage -d -l BSD filepath-1.4.2
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
-%undefine ghc_pkg_obsoletes
 %ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-compact-0.1.0.0
 %ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage -d -l BSD haskeline-0.7.4.0
-%ghc_lib_subpackage -d -l BSD hoopl-3.10.2.2
+%ghc_lib_subpackage -d -l BSD haskeline-0.7.4.2
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
-%ghc_lib_subpackage -d -l BSD pretty-1.1.3.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.1.0
-%ghc_lib_subpackage -d -l BSD template-haskell-2.12.0.0
-%ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.0
+%ghc_lib_subpackage -d -l BSD mtl-2.2.2
+%ghc_lib_subpackage -d -l BSD parsec-3.1.13.0
+%ghc_lib_subpackage -d -l BSD pretty-1.1.3.6
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
+%ghc_lib_subpackage -d -l BSD stm-2.4.5.0
+%ghc_lib_subpackage -d -l BSD template-haskell-2.13.0.0
+%ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.1
+%ghc_lib_subpackage -d -l BSD text-1.2.3.0
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
-%ghc_lib_subpackage -d -l BSD transformers-0.5.2.0
+%ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
 %ghc_lib_subpackage -d -l BSD unix-2.7.2.2
 %if %{undefined without_haddock}
 %ghc_lib_subpackage -d -l BSD xhtml-3000.2.2
@@ -230,7 +232,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %patch1 -p1 -b .orig
 
 %patch2 -p1 -b .orig
-%patch4 -p1 -b .orig
+#%%patch4 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -242,7 +244,7 @@ rm -r libffi-tarballs
 
 %patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
-%patch27 -p1 -b .orig
+#%%patch27 -p1 -b .orig
 %patch28 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
@@ -354,7 +356,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base-devel.files
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
-%ghc_gen_filelists ghc-prim 0.5.1.1
+%ghc_gen_filelists ghc-prim 0.5.2.0
 %ghc_gen_filelists integer-gmp 1.0.1.0
 
 %define merge_filelist()\
@@ -506,6 +508,7 @@ fi
 %{ghclibdir}/bin/unlit
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
+%{ghclibdir}/llvm-targets
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
 %{ghclibdir}/package.conf.d/package.cache.lock
@@ -524,9 +527,6 @@ fi
 %if %{undefined without_manual}
 # https://ghc.haskell.org/trac/ghc/ticket/12939
 #%%{_mandir}/man1/ghc.1*
-%{_mandir}/man1/ghc-pkg.1*
-%{_mandir}/man1/haddock.1*
-%{_mandir}/man1/runghc.1*
 ## needs pandoc
 #%%{ghc_html_dir}/Cabal
 %{ghc_html_dir}/haddock
@@ -546,6 +546,9 @@ fi
 %ghost %{ghc_html_dir}/libraries/plus.gif
 %{_localstatedir}/lib/ghc
 %endif
+%{_mandir}/man1/ghc-pkg.1*
+%{_mandir}/man1/haddock.1*
+%{_mandir}/man1/runghc.1*
 
 %if %{undefined without_haddock}
 %files doc-index
