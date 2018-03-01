@@ -62,7 +62,7 @@ Patch28: x32-use-native-x86_64-insn.patch
 %if %{defined perf_build}
 BuildRequires: ghc-compiler = %{version}
 %endif
-BuildRequires: ghc-rpm-macros-extra >= 1.8
+BuildRequires: ghc-rpm-macros-extra
 BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
 BuildRequires: ghc-containers-devel
@@ -80,7 +80,7 @@ BuildRequires: perl-interpreter
 BuildRequires: python3
 %endif
 %if %{undefined without_manual}
-BuildRequires: python3-sphinx
+BuildRequires: python-sphinx
 %endif
 %ifarch armv7hl aarch64
 BuildRequires: llvm%{llvm_major}
@@ -255,8 +255,6 @@ if [ ! -f "libraries/%{gen_contents_index}" ]; then
 fi
 %endif
 
-
-%build
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
@@ -291,6 +289,7 @@ EOF
 ## (http://ghc.haskell.org/trac/ghc/wiki/Debugging/RuntimeSystem)
 #EXTRA_HC_OPTS=-debug
 
+%build
 %ifarch armv7hl aarch64
 autoreconf
 %endif
@@ -330,14 +329,16 @@ make %{?_smp_mflags}
 %install
 make DESTDIR=%{buildroot} install
 
+%if %{defined _ghcdynlibdir}
 mv %{buildroot}%{ghclibdir}/*/libHS*ghc%{ghc_version}.so %{buildroot}%{_libdir}/
 for i in $(find %{buildroot} -type f -exec sh -c "file {} | grep -q 'dynamically linked'" \; -print); do
   chrpath -d $i
 done
-
 for i in %{buildroot}%{ghclibdir}/package.conf.d/*.conf; do
   sed -i -e 's!^dynamic-library-dirs: .*!dynamic-library-dirs: %{_libdir}!' $i
 done
+sed -i -e 's!^library-dirs: %{ghclibdir}/rts!&\ndynamic-library-dirs: %{_libdir}!' %{buildroot}%{ghclibdir}/package.conf.d/rts.conf
+%endif
 
 for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
@@ -350,8 +351,7 @@ echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
 %endif
 done
 
-# ghc-base should own ghclibdir
-echo "%%dir %{ghclibdir}" >> ghc-base-devel.files
+echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
@@ -373,21 +373,24 @@ echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
 %merge_filelist ghc-prim base
 
 # add rts libs
+%if %{defined _ghcdynlibdir}
 echo "%{ghclibdir}/rts" >> ghc-base-devel.files
-ls %{buildroot}%{_libdir}/libHSrts*.so >> ghc-base.files
+%else
+echo "%%dir %{ghclibdir}/rts" >> ghc-base.files
+ls -d %{buildroot}%{ghclibdir}/rts/lib*.a >> ghc-base-devel.files
+%endif
+ls %{buildroot}%{?_ghcdynlibdir}%{!?_ghcdynlibdir:%{ghclibdir}/rts}/libHSrts*.so >> ghc-base.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
 %endif
-sed -i -e 's!^library-dirs: %{ghclibdir}/rts!&\ndynamic-library-dirs: %{_libdir}!' %{buildroot}%{ghclibdir}/package.conf.d/rts.conf
 
-sed -i -e "s|^%{buildroot}||g" ghc-base.files
 
 ls -d %{buildroot}%{ghclibdir}/package.conf.d/rts.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so >> ghc-base-devel.files
 %endif
 
-sed -i -e "s|^%{buildroot}||g" ghc-base-devel.files
+sed -i -e "s|^%{buildroot}||g" ghc-base*.files
 
 # these are handled as alternatives
 for i in hsc2hs runhaskell; do
@@ -517,6 +520,10 @@ fi
 %{ghclibdir}/template-hsc.h
 %dir %{_docdir}/ghc
 %dir %{ghc_html_dir}
+%{_mandir}/man1/ghc-pkg.1*
+%{_mandir}/man1/haddock.1*
+%{_mandir}/man1/runghc.1*
+
 %if %{undefined without_haddock}
 %{_bindir}/ghc-doc-index
 %{_bindir}/haddock
@@ -546,9 +553,6 @@ fi
 %ghost %{ghc_html_dir}/libraries/plus.gif
 %{_localstatedir}/lib/ghc
 %endif
-%{_mandir}/man1/ghc-pkg.1*
-%{_mandir}/man1/haddock.1*
-%{_mandir}/man1/runghc.1*
 
 %if %{undefined without_haddock}
 %files doc-index
@@ -559,6 +563,12 @@ fi
 
 
 %changelog
+* Thu Mar  1 2018 Jens Petersen <petersen@redhat.com> - 8.4.0.20180224-70.1
+- 8.4.1 RC1 quick build
+- use python-sphinx
+- move build.mk into %prep
+- rts files fixes to allow building for older releases without _ghcdynlibdir
+
 * Tue Feb 27 2018 Jens Petersen <petersen@redhat.com> - 8.2.2-65.1
 - re-enable buildpath-abi-stability.patch
 - add manpages from debian for ghc-pkg, haddock, runghc
