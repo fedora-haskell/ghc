@@ -84,7 +84,7 @@ Patch25: ghc-7.8-arm7_saner-linker-opt-handling-9873.patch
 
 
 # fedora ghc has been bootstrapped on
-# %{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
+# %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
 # see ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 ExcludeArch: sparc64
@@ -482,10 +482,8 @@ fi
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
-%ifarch %ghc_arches_with_ghci
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
-%endif
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
