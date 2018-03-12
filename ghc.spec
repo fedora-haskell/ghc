@@ -473,10 +473,8 @@ fi
 %{_bindir}/ghc-%{version}
 %{_bindir}/ghc-pkg
 %{_bindir}/ghc-pkg-%{version}
-%ifarch %ghc_arches_with_ghci
 %{_bindir}/ghci
 %{_bindir}/ghci-%{version}
-%endif
 %{_bindir}/hp2ps
 %{_bindir}/hpc
 %ghost %{_bindir}/hsc2hs
