@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, uncomment the following:
-%global ghc_bootstrapping 1
+#%%global ghc_bootstrapping 1
 
 %if %{defined ghc_bootstrapping}
 %global without_testsuite 1
@@ -31,7 +31,7 @@ Version: 7.10.3
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
 # ghc-xhtml version not bumped
-Release: 52.1%{?dist}
+Release: 52.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: %BSDHaskellReport
