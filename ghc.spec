@@ -17,12 +17,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.4.0.20180224
+Version: 8.4.1
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.1%{?dist}
+Release: 70.2%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -174,7 +174,7 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.1.0.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.2.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.11.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
@@ -563,6 +563,9 @@ fi
 
 
 %changelog
+* Tue Mar 13 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.2
+- 8.4.1 quick
+
 * Thu Mar  1 2018 Jens Petersen <petersen@redhat.com> - 8.4.0.20180224-70.1
 - 8.4.1 RC1 quick build
 - use python-sphinx
