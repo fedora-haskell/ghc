@@ -11,7 +11,11 @@
 ### uncomment to generate haddocks for bootstrap
 #%%undefine without_haddock
 %else
+%if 0%{?fedora} || 0%{?rhel} && 0%{?rhel} > 7
 %bcond_without testsuite
+%else
+%bcond_with testsuite
+%endif
 %bcond_without prof
 %endif
 
@@ -22,7 +26,7 @@ Version: 8.4.1
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.3%{?dist}
+Release: 70.4%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -565,6 +569,9 @@ fi
 
 
 %changelog
+* Wed Mar 14 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.4
+- disable testsuite for rhel7 to avoid python3
+
 * Tue Mar 13 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.3
 - 8.4.1 perf build
 
