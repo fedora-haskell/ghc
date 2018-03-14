@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, comment out this line:
-#%%global perf_build 1
+%global perf_build 1
 
 # to handle RCs
 %global ghc_release 8.4.1
@@ -22,7 +22,7 @@ Version: 8.4.1
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.2%{?dist}
+Release: 70.3%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -539,18 +539,20 @@ fi
 %{ghc_html_dir}/haddock
 %{ghc_html_dir}/users_guide
 %endif
+%{ghc_html_dir}/index.html
 %dir %{ghc_html_dir}/libraries
 %{ghc_html_dir}/libraries/gen_contents_index
-%{ghc_html_dir}/libraries/hslogo-16.png
-%{ghc_html_dir}/libraries/ocean.css
 %{ghc_html_dir}/libraries/prologue.txt
-%{ghc_html_dir}/libraries/synopsis.png
-%{ghc_html_dir}/index.html
 %ghost %{ghc_html_dir}/libraries/doc-index*.html
+%ghost %{ghc_html_dir}/libraries/haddock-bundle.min.js
 %ghost %{ghc_html_dir}/libraries/haddock-util.js
+%ghost %{ghc_html_dir}/libraries/hslogo-16.png
 %ghost %{ghc_html_dir}/libraries/index*.html
 %ghost %{ghc_html_dir}/libraries/minus.gif
+%ghost %{ghc_html_dir}/libraries/ocean.css
 %ghost %{ghc_html_dir}/libraries/plus.gif
+%ghost %{ghc_html_dir}/libraries/quick-jump.css
+%ghost %{ghc_html_dir}/libraries/synopsis.png
 %{_localstatedir}/lib/ghc
 %endif
 
@@ -563,8 +565,11 @@ fi
 
 
 %changelog
+* Tue Mar 13 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.3
+- 8.4.1 perf build
+
 * Tue Mar 13 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.2
-- 8.4.1 quick
+- 8.4.1 quick build
 
 * Thu Mar  1 2018 Jens Petersen <petersen@redhat.com> - 8.4.0.20180224-70.1
 - 8.4.1 RC1 quick build
