@@ -1,8 +1,8 @@
 # To bootstrap build a new version of ghc, comment out this line:
-%global perf_build 1
+#%%global perf_build 1
 
 # to handle RCs
-%global ghc_release 8.4.1
+%global ghc_release 8.4.2
 
 %if %{undefined perf_build}
 %bcond_with testsuite
@@ -21,12 +21,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.4.1
+Version: 8.4.2
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.4%{?dist}
+Release: 70.5%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -55,8 +55,8 @@ Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
 
-# 8.2 needs llvm-3.9
-%global llvm_major 3.9
+# 8.4 needs llvm-5.0
+%global llvm_major 5.0
 
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
@@ -178,9 +178,9 @@ documention.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.2.0.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.2.0.1
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.11.0.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.11.1.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.11.0
@@ -207,7 +207,7 @@ documention.
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
 %ghc_lib_subpackage -d -l BSD unix-2.7.2.2
 %if %{undefined without_haddock}
-%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2
+%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
 %endif
 %endif
 
@@ -361,7 +361,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
 %ghc_gen_filelists ghc-prim 0.5.2.0
-%ghc_gen_filelists integer-gmp 1.0.1.0
+%ghc_gen_filelists integer-gmp 1.0.2.0
 
 %define merge_filelist()\
 cat ghc-%1.files >> ghc-%2.files\
@@ -569,6 +569,9 @@ fi
 
 
 %changelog
+* Fri Apr 20 2018 Jens Petersen <petersen@redhat.com> - 8.4.2-70.5
+- 8.4.2 quick build
+
 * Wed Mar 14 2018 Jens Petersen <petersen@redhat.com> - 8.4.1-70.4
 - disable testsuite for rhel7 to avoid python3
 
