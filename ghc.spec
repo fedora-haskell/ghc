@@ -1,5 +1,5 @@
 # To bootstrap build a new version of ghc, comment out this line:
-#%%global perf_build 1
+%global perf_build 1
 
 # to handle RCs
 %global ghc_release 8.4.2
@@ -26,7 +26,7 @@ Version: 8.4.2
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.5%{?dist}
+Release: 70.6%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -569,6 +569,9 @@ fi
 
 
 %changelog
+* Mon Apr 30 2018 Jens Petersen <petersen@redhat.com> - 8.4.2-70.6
+- 8.4.2 perf build
+
 * Fri Apr 20 2018 Jens Petersen <petersen@redhat.com> - 8.4.2-70.5
 - 8.4.2 quick build
 
