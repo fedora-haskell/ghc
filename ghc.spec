@@ -2,7 +2,7 @@
 %bcond_without perf_build
 
 # to handle RCs
-%global ghc_release %{version}
+%global ghc_release 8.6.1
 
 # testsuite fails on rhel <= 7
 %bcond_with testsuite
@@ -19,12 +19,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.4.3
+Version: 8.6.0.20180627
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.7%{?dist}
+Release: 70.8%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -45,8 +45,6 @@ Patch2:  ghc-Cabal-install-PATH-warning.patch
 # https://ghc.haskell.org/trac/ghc/ticket/14381
 # https://phabricator.haskell.org/D4159
 Patch4:  D4159.patch
-# https://github.com/ghc/ghc/pull/143
-Patch5:  ghc-configure-fix-sphinx-version-check.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
@@ -86,8 +84,6 @@ BuildRequires: python-sphinx
 %ifarch %{ghc_llvm_archs}
 BuildRequires: llvm%{llvm_major}
 %endif
-# patch5
-BuildRequires: autoconf
 %ifarch armv7hl
 # patch12
 BuildRequires: autoconf, automake
@@ -196,36 +192,38 @@ This package provides the User Guide and Haddock manual.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.2.0.1
+%ghc_lib_subpackage -d -l BSD Cabal-2.3.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.11.1.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.12.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.5.1
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
-%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.5.11.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.3.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.1.5
+%ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.6.0.1
+%ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.4.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.2.3
 %ghc_lib_subpackage -d -l BSD filepath-1.4.2
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
 %ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-compact-0.1.0.0
+%ghc_lib_subpackage -d -l BSD ghc-heap-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD haskeline-0.7.4.2
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
+%ghc_lib_subpackage -d -l %BSDHaskellReport libiserv-%{ghc_release}
 %ghc_lib_subpackage -d -l BSD mtl-2.2.2
-%ghc_lib_subpackage -d -l BSD parsec-3.1.13.0
+%ghc_lib_subpackage -d -l BSD parsec-3.1.13.0.0.0.0.0
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.6
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
-%ghc_lib_subpackage -d -l BSD stm-2.4.5.0
-%ghc_lib_subpackage -d -l BSD template-haskell-2.13.0.0
+%ghc_lib_subpackage -d -l BSD stm-2.5.0.0
+%ghc_lib_subpackage -d -l BSD template-haskell-2.14.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.1
 %ghc_lib_subpackage -d -l BSD text-1.2.3.0
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
-%ghc_lib_subpackage -d -l BSD unix-2.7.2.2
+%ghc_lib_subpackage -d -l BSD unix-2.8.0.0
 %if %{undefined without_haddock}
-%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
+%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2
 %endif
 %endif
 
@@ -255,7 +253,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %patch2 -p1 -b .orig
 #%%patch4 -p1 -b .orig
-%patch5 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -383,7 +380,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 %ghc_gen_filelists ghc-boot %{ghc_version_override}
 %ghc_gen_filelists ghc %{ghc_version_override}
 %ghc_gen_filelists ghci %{ghc_version_override}
-%ghc_gen_filelists ghc-prim 0.5.2.0
+%ghc_gen_filelists ghc-prim 0.5.3
 %ghc_gen_filelists integer-gmp 1.0.2.0
 
 %define merge_filelist()\
@@ -541,6 +538,7 @@ fi
 %{ghclibdir}/bin/unlit
 %{ghclibdir}/ghc-usage.txt
 %{ghclibdir}/ghci-usage.txt
+%{ghclibdir}/llvm-passes
 %{ghclibdir}/llvm-targets
 %dir %{ghclibdir}/package.conf.d
 %ghost %{ghclibdir}/package.conf.d/package.cache
@@ -604,6 +602,9 @@ fi
 
 
 %changelog
+* Sat Jul  7 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180627-70.8
+- update to 8.6.1 Alpha1
+
 * Wed May 30 2018 Jens Petersen <petersen@redhat.com> - 8.4.3-70.7
 - 8.4.3 release
 - package changes from Fedora Rawhide:
