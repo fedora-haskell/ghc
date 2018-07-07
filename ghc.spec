@@ -1,32 +1,34 @@
-# To bootstrap build a new version of ghc, comment out this line:
-%global perf_build 1
+# perf production build (disable for quick build)
+%bcond_without perf_build
 
 # to handle RCs
-%global ghc_release 8.4.2
+%global ghc_release %{version}
 
-%if %{undefined perf_build}
-%bcond_with testsuite
-%bcond_with prof
-%{?ghc_bootstrap}
-### uncomment to generate haddocks for bootstrap
-#%%undefine without_haddock
-%else
+# run testsuite
 %if 0%{?fedora} || 0%{?rhel} && 0%{?rhel} > 7
 %bcond_without testsuite
 %else
 %bcond_with testsuite
 %endif
+# build profiling libraries
 %bcond_without prof
-%endif
+# build docs (haddock and manuals)
+# combined since disabling haddock seems to cause no manuals built
+# <https://ghc.haskell.org/trac/ghc/ticket/15190>
+%bcond_without docs
+
+# 8.4 needs llvm-5.0
+%global llvm_major 5.0
+%global ghc_llvm_archs armv7hl aarch64
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.4.2
+Version: 8.4.3
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.6%{?dist}
+Release: 70.7%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -45,7 +47,10 @@ Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-Cabal-install-PATH-warning.patch
 # https://github.com/haskell/cabal/issues/4728
 # https://ghc.haskell.org/trac/ghc/ticket/14381
-#Patch4:  https://phabricator-files.haskell.org/file/data/pgrn3b7lw22ccodkc4nf/PHID-FILE-o3pkv37yfa5h2q3xflrd/D4159.patch
+# https://phabricator.haskell.org/D4159
+Patch4:  D4159.patch
+# https://github.com/ghc/ghc/pull/143
+Patch5:  ghc-configure-fix-sphinx-version-check.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
@@ -55,17 +60,12 @@ Patch26: no-missing-haddock-file-warning.patch
 Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
 
-# 8.4 needs llvm-5.0
-%global llvm_major 5.0
-
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
 # see also deprecated ghc_arches defined in /etc/rpm/macros.ghc-srpm by redhat-rpm-macros
 
-%if %{defined perf_build}
-BuildRequires: ghc-compiler = %{version}
-%endif
+BuildRequires: ghc-compiler
 BuildRequires: ghc-rpm-macros-extra
 BuildRequires: ghc-binary-devel
 BuildRequires: ghc-bytestring-devel
@@ -83,22 +83,28 @@ BuildRequires: perl-interpreter
 %if %{with testsuite}
 BuildRequires: python3
 %endif
-%if %{undefined without_manual}
+%if %{with docs}
+# for /usr/bin/sphinx-build
 BuildRequires: python-sphinx
 %endif
-%ifarch armv7hl aarch64
+%ifarch %{ghc_llvm_archs}
 BuildRequires: llvm%{llvm_major}
 %endif
-%ifarch armv7hl aarch64
+# patch5
+BuildRequires: autoconf
+%ifarch armv7hl
 # patch12
 BuildRequires: autoconf, automake
 %endif
 Requires: ghc-compiler = %{version}-%{release}
-%if %{undefined without_haddock}
-Requires: ghc-doc-index = %{version}-%{release}
+%if %{with docs}
+Requires: ghc-doc-cron = %{version}-%{release}
 %endif
-Requires: ghc-libraries = %{version}-%{release}
 Requires: ghc-ghc-devel = %{version}-%{release}
+Requires: ghc-libraries = %{version}-%{release}
+%if %{with docs}
+Requires: ghc-manual = %{version}-%{release}
+%endif
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -133,10 +139,12 @@ Requires(post): chkconfig
 Requires(postun): chkconfig
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
-%if %{defined without_haddock}
+%if %{without docs}
+Obsoletes: ghc-doc-cron < %{version}-%{release}
+# added in f28
 Obsoletes: ghc-doc-index < %{version}-%{release}
 %endif
-%ifarch armv7hl aarch64
+%ifarch %{ghc_llvm_archs}
 Requires: llvm%{llvm_major}
 %endif
 
@@ -148,16 +156,30 @@ To install all of ghc (including the ghc library),
 install the main ghc package.
 
 
-%if %{undefined without_haddock}
-%package doc-index
-Summary: GHC library development documentation indexing
+%if %{with docs}
+%package doc-cron
+Summary: GHC library documentation indexing cronjob
 License: BSD
 Requires: ghc-compiler = %{version}-%{release}
 Requires: crontabs
+# added in f28
+Obsoletes: ghc-doc-index < %{version}-%{release}
+BuildArch: noarch
 
-%description doc-index
+%description doc-cron
 The package provides a cronjob for re-indexing installed library development
 documention.
+%endif
+
+
+%if %{with docs}
+%package manual
+Summary: GHC manual
+License: BSD
+BuildArch: noarch
+
+%description manual
+This package provides the User Guide and Haddock manual.
 %endif
 
 
@@ -237,6 +259,7 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 
 %patch2 -p1 -b .orig
 #%%patch4 -p1 -b .orig
+%patch5 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -252,7 +275,7 @@ rm -r libffi-tarballs
 %patch28 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
-%if %{undefined without_haddock}
+%if %{with docs}
 if [ ! -f "libraries/%{gen_contents_index}" ]; then
   echo "Missing libraries/%{gen_contents_index}, needed at end of %%install!"
   exit 1
@@ -262,29 +285,29 @@ fi
 # http://hackage.haskell.org/trac/ghc/wiki/Platforms
 # cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
 cat > mk/build.mk << EOF
-%if %{defined perf_build}
-%ifarch armv7hl aarch64
+%if %{with perf_build}
+%ifarch %{ghc_llvm_archs}
 BuildFlavour = perf-llvm
 %else
 BuildFlavour = perf
 %endif
 %else
-%ifarch armv7hl aarch64
+%ifarch %{ghc_llvm_archs}
 BuildFlavour = quick-llvm
 %else
 BuildFlavour = quick
 %endif
 %endif
 GhcLibWays = v dyn %{?with_prof:p}
-%if %{defined without_haddock}
-HADDOCK_DOCS = NO
-%endif
-EXTRA_HADDOCK_OPTS += --hyperlinked-source
-%if %{undefined without_manual}
+%if %{with docs}
+# breaks build (utils/haddock cannot find xhtml)
+#HADDOCK_DOCS = yes
 BUILD_MAN = yes
 %else
+HADDOCK_DOCS = no
 BUILD_MAN = no
 %endif
+EXTRA_HADDOCK_OPTS += --hyperlinked-source
 BUILD_SPHINX_PDF=no
 EOF
 ## for verbose build output
@@ -294,8 +317,12 @@ EOF
 #EXTRA_HC_OPTS=-debug
 
 %build
-%ifarch armv7hl aarch64
+# for patch12
+%ifarch armv7hl
 autoreconf
+%else
+# for patch5
+autoconf
 %endif
 
 %if 0%{?fedora} > 28
@@ -387,7 +414,9 @@ ls %{buildroot}%{?_ghcdynlibdir}%{!?_ghcdynlibdir:%{ghclibdir}/rts}/libHSrts*.so
 %if 0%{?rhel} && 0%{?rhel} < 7
 ls %{buildroot}%{ghclibdir}/rts/libffi.so.* >> ghc-base.files
 %endif
-
+%if %{defined _ghcdynlibdir}
+sed -i -e 's!^library-dirs: %{ghclibdir}/rts!&\ndynamic-library-dirs: %{_libdir}!' %{buildroot}%{ghclibdir}/package.conf.d/rts.conf
+%endif
 
 ls -d %{buildroot}%{ghclibdir}/package.conf.d/rts.conf %{buildroot}%{ghclibdir}/include >> ghc-base-devel.files
 %if 0%{?rhel} && 0%{?rhel} < 7
@@ -408,10 +437,11 @@ done
 
 %ghc_strip_dynlinked
 
-%if %{undefined without_haddock}
+%if %{with docs}
 mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
 install -p --mode=0755 %SOURCE3 %{buildroot}%{_sysconfdir}/cron.hourly/ghc-doc-index
 mkdir -p %{buildroot}%{_localstatedir}/lib/ghc
+touch %{buildroot}%{_localstatedir}/lib/ghc/pkg-dir.cache{,.new}
 install -p --mode=0755 %SOURCE4 %{buildroot}%{_bindir}/ghc-doc-index
 
 # generate initial lib doc index
@@ -528,22 +558,17 @@ fi
 %{_mandir}/man1/haddock.1*
 %{_mandir}/man1/runghc.1*
 
-%if %{undefined without_haddock}
+%if %{with docs}
 %{_bindir}/ghc-doc-index
 %{_bindir}/haddock
 %{_bindir}/haddock-ghc-%{version}
 %{ghclibdir}/bin/haddock
 %{ghclibdir}/html
 %{ghclibdir}/latex
-%if %{undefined without_manual}
+%if %{with docs}
 # https://ghc.haskell.org/trac/ghc/ticket/12939
 #%%{_mandir}/man1/ghc.1*
-## needs pandoc
-#%%{ghc_html_dir}/Cabal
-%{ghc_html_dir}/haddock
-%{ghc_html_dir}/users_guide
 %endif
-%{ghc_html_dir}/index.html
 %dir %{ghc_html_dir}/libraries
 %{ghc_html_dir}/libraries/gen_contents_index
 %{ghc_html_dir}/libraries/prologue.txt
@@ -557,18 +582,45 @@ fi
 %ghost %{ghc_html_dir}/libraries/plus.gif
 %ghost %{ghc_html_dir}/libraries/quick-jump.css
 %ghost %{ghc_html_dir}/libraries/synopsis.png
-%{_localstatedir}/lib/ghc
+%dir %{_localstatedir}/lib/ghc
+%ghost %{_localstatedir}/lib/ghc/pkg-dir.cache
+%ghost %{_localstatedir}/lib/ghc/pkg-dir.cache.new
 %endif
 
-%if %{undefined without_haddock}
-%files doc-index
+%if %{with docs}
+%files doc-cron
 %config(noreplace) %{_sysconfdir}/cron.hourly/ghc-doc-index
 %endif
 
 %files libraries
 
 
+%if %{with docs}
+%files manual
+## needs pandoc
+#%%{ghc_html_dir}/Cabal
+%if %{with docs}
+%{ghc_html_dir}/haddock
+%endif
+%{ghc_html_dir}/index.html
+%{ghc_html_dir}/users_guide
+%endif
+
+
 %changelog
+* Wed May 30 2018 Jens Petersen <petersen@redhat.com> - 8.4.3-70.7
+- 8.4.3 release
+- package changes from Fedora Rawhide:
+- fix sphinx-build version detection
+- merge bcond for haddock and manual
+- move manuals to ghc-manual (noarch)
+- rename ghc-doc-index to ghc-doc-cron (noarch)
+- ghost the ghc-doc-index local state files
+- ghost some newer libraries index files
+- simplify and extend bcond for build configuration
+- drop bootstrap builds
+- no longer need autotools on aarch64
+
 * Mon Apr 30 2018 Jens Petersen <petersen@redhat.com> - 8.4.2-70.6
 - 8.4.2 perf build
 
