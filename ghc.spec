@@ -4,12 +4,8 @@
 # to handle RCs
 %global ghc_release %{version}
 
-# run testsuite
-%if 0%{?fedora} || 0%{?rhel} && 0%{?rhel} > 7
-%bcond_without testsuite
-%else
+# testsuite fails on rhel <= 7
 %bcond_with testsuite
-%endif
 # build profiling libraries
 %bcond_without prof
 # build docs (haddock and manuals)
