@@ -293,15 +293,14 @@ BuildFlavour = quick
 %endif
 GhcLibWays = v dyn %{?with_prof:p}
 %if %{with docs}
-# breaks build (utils/haddock cannot find xhtml)
-#HADDOCK_DOCS = yes
-BUILD_MAN = yes
+HADDOCK_DOCS = YES
+BUILD_MAN = YES
 %else
-HADDOCK_DOCS = no
-BUILD_MAN = no
+HADDOCK_DOCS = NO
+BUILD_MAN = NO
 %endif
 EXTRA_HADDOCK_OPTS += --hyperlinked-source
-BUILD_SPHINX_PDF=no
+BUILD_SPHINX_PDF = NO
 EOF
 ## for verbose build output
 #GhcStage1HcOpts=-v4
