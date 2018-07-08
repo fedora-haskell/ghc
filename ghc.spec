@@ -313,9 +313,6 @@ EOF
 # for patch12
 %ifarch armv7hl
 autoreconf
-%else
-# for patch5
-autoconf
 %endif
 
 %if 0%{?fedora} > 28
