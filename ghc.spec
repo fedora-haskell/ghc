@@ -4,7 +4,6 @@
 # to handle RCs
 %global ghc_release %{version}
 
-# testsuite fails on rhel <= 7
 %bcond_with testsuite
 # build profiling libraries
 %bcond_without prof
@@ -41,10 +40,6 @@ Source7: runghc.man
 # absolute haddock path (was for html/libraries -> libraries)
 Patch1:  ghc-gen_contents_index-haddock-path.patch
 Patch2:  ghc-Cabal-install-PATH-warning.patch
-# https://github.com/haskell/cabal/issues/4728
-# https://ghc.haskell.org/trac/ghc/ticket/14381
-# https://phabricator.haskell.org/D4159
-Patch4:  D4159.patch
 # https://github.com/ghc/ghc/pull/143
 Patch5:  ghc-configure-fix-sphinx-version-check.patch
 
@@ -254,7 +249,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %patch1 -p1 -b .orig
 
 %patch2 -p1 -b .orig
-#%%patch4 -p1 -b .orig
 %patch5 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
