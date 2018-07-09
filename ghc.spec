@@ -556,8 +556,7 @@ fi
 %{ghclibdir}/html
 %{ghclibdir}/latex
 %if %{with docs}
-# https://ghc.haskell.org/trac/ghc/ticket/12939
-#%%{_mandir}/man1/ghc.1*
+%{_mandir}/man1/ghc.1*
 %endif
 %dir %{ghc_html_dir}/libraries
 %{ghc_html_dir}/libraries/gen_contents_index
