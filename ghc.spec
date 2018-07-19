@@ -19,12 +19,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.6.0.20180627
+Version: 8.6.0.20180714
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.8%{?dist}
+Release: 70.9%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -199,7 +199,7 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.6.0.1
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.4.0
-%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.2.3
+%ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.3.0
 %ghc_lib_subpackage -d -l BSD filepath-1.4.2
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
@@ -208,7 +208,7 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l BSD ghc-compact-0.1.0.0
 %ghc_lib_subpackage -d -l BSD ghc-heap-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
-%ghc_lib_subpackage -d -l BSD haskeline-0.7.4.2
+%ghc_lib_subpackage -d -l BSD haskeline-0.7.4.3
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
 %ghc_lib_subpackage -d -l %BSDHaskellReport libiserv-%{ghc_release}
 %ghc_lib_subpackage -d -l BSD mtl-2.2.2
@@ -223,7 +223,7 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
 %ghc_lib_subpackage -d -l BSD unix-2.8.0.0
 %if %{undefined without_haddock}
-%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2
+%ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
 %endif
 %endif
 
@@ -597,6 +597,9 @@ fi
 
 
 %changelog
+* Thu Jul 19 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180714-70.9
+- update to 8.6.1 Alpha2
+
 * Sat Jul  7 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180627-70.8
 - update to 8.6.1 Alpha1
 
