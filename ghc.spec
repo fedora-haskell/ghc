@@ -319,7 +319,7 @@ autoreconf
 %else
 # -Wunused-label is extremely noisy
 %ifarch aarch64 s390x
-CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall -Werror=format-security //')}"
+CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall //' -e 's/-Werror=format-security //')}"
 %else
 CFLAGS="${CFLAGS:-%optflags}"
 %endif
