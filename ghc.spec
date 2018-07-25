@@ -13,8 +13,8 @@
 # <https://ghc.haskell.org/trac/ghc/ticket/15190>
 %bcond_without docs
 
-# 8.4 needs llvm-5.0
-%global llvm_major 5.0
+# 8.6 needs llvm-6.0
+%global llvm_major 6.0
 %global ghc_llvm_archs armv7hl aarch64
 
 Name: ghc
