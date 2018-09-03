@@ -82,7 +82,7 @@ BuildRequires: python3
 BuildRequires: python-sphinx
 %endif
 %ifarch %{ghc_llvm_archs}
-BuildRequires: llvm%{llvm_major}
+BuildRequires: llvm >= %{llvm_major}
 %endif
 %ifarch armv7hl
 # patch12
@@ -137,7 +137,7 @@ Obsoletes: ghc-doc-cron < %{version}-%{release}
 Obsoletes: ghc-doc-index < %{version}-%{release}
 %endif
 %ifarch %{ghc_llvm_archs}
-Requires: llvm%{llvm_major}
+Requires: llvm >= %{llvm_major}
 %endif
 
 %description compiler
