@@ -19,12 +19,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.6.0.20180714
+Version: 8.6.0.20180810
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.9%{?dist}
+Release: 70.10%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -192,15 +192,15 @@ This package provides the User Guide and Haddock manual.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.3.0.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.4.0.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.12.0.0
-%ghc_lib_subpackage -d -l BSD binary-0.8.5.1
+%ghc_lib_subpackage -d -l BSD binary-0.8.6.0
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
 %ghc_lib_subpackage -d -l %BSDHaskellReport containers-0.6.0.1
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.4.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.3.0
-%ghc_lib_subpackage -d -l BSD filepath-1.4.2
+%ghc_lib_subpackage -d -l BSD filepath-1.4.2.1
 # in ghc not ghc-libraries:
 %ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
 %ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
@@ -217,11 +217,11 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
 %ghc_lib_subpackage -d -l BSD stm-2.5.0.0
 %ghc_lib_subpackage -d -l BSD template-haskell-2.14.0.0
-%ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.1
+%ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.2
 %ghc_lib_subpackage -d -l BSD text-1.2.3.0
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
-%ghc_lib_subpackage -d -l BSD unix-2.8.0.0
+%ghc_lib_subpackage -d -l BSD unix-2.7.2.2
 %if %{undefined without_haddock}
 %ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
 %endif
@@ -597,6 +597,9 @@ fi
 
 
 %changelog
+* Mon Sep  3 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180810-70.10
+- update to 8.6.1 Beta1
+
 * Thu Jul 19 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180714-70.9
 - update to 8.6.1 Alpha2
 
