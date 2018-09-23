@@ -19,12 +19,12 @@
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.6.0.20180810
+Version: %{ghc_release}
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.10%{?dist}
+Release: 70.11%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -192,7 +192,7 @@ This package provides the User Guide and Haddock manual.
 
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
-%ghc_lib_subpackage -d -l BSD Cabal-2.4.0.0
+%ghc_lib_subpackage -d -l BSD Cabal-2.4.0.1
 %ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.12.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.6.0
@@ -212,13 +212,13 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
 %ghc_lib_subpackage -d -l %BSDHaskellReport libiserv-%{ghc_release}
 %ghc_lib_subpackage -d -l BSD mtl-2.2.2
-%ghc_lib_subpackage -d -l BSD parsec-3.1.13.0.0.0.0.0
+%ghc_lib_subpackage -d -l BSD parsec-3.1.13.0
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.6
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
 %ghc_lib_subpackage -d -l BSD stm-2.5.0.0
 %ghc_lib_subpackage -d -l BSD template-haskell-2.14.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.2
-%ghc_lib_subpackage -d -l BSD text-1.2.3.0
+%ghc_lib_subpackage -d -l BSD text-1.2.3.1
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
 %ghc_lib_subpackage -d -l BSD unix-2.7.2.2
@@ -597,6 +597,10 @@ fi
 
 
 %changelog
+* Sat Sep 22 2018 Jens Petersen <petersen@redhat.com> - 8.6.1-70.11
+- 8.6.1 release
+- https://downloads.haskell.org/~ghc/8.6.1/docs/html/users_guide/8.6.1-notes.html
+
 * Mon Sep  3 2018 Jens Petersen <petersen@redhat.com> - 8.6.0.20180810-70.10
 - update to 8.6.1 Beta1
 
