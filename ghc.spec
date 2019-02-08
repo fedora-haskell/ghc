@@ -96,8 +96,11 @@ BuildRequires: perl-interpreter
 BuildRequires: python3
 %endif
 %if %{with docs}
-# for /usr/bin/sphinx-build
+%if 0%{?rhel} && 0%{?rhel} < 8
 BuildRequires: python-sphinx
+%else
+BuildRequires: python3-sphinx
+%endif
 %endif
 %ifarch %{ghc_llvm_archs}
 BuildRequires: llvm%{llvm_major}
@@ -522,7 +525,11 @@ fi
 %files
 
 %files compiler
+%if 0%{?rhel} && 0%{?rhel} < 7
+%doc LICENSE
+%else
 %license LICENSE
+%endif
 %doc ANNOUNCE
 %{_bindir}/ghc
 %{_bindir}/ghc-%{version}
