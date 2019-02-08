@@ -1,29 +1,42 @@
-# perf production build (disable for quick build)
-%bcond_without perf_build
+# disable prof, docs, perf build
+# NB This SHOULD be disabled (bcond_with) for all koji production builds
+%bcond_with quickbuild
 
 # to handle RCs
 %global ghc_release %{version}
 
-%bcond_with testsuite
 # build profiling libraries
-%bcond_without prof
 # build docs (haddock and manuals)
-# combined since disabling haddock seems to cause no manuals built
-# <https://ghc.haskell.org/trac/ghc/ticket/15190>
+# - combined since disabling haddock seems to cause no manuals built
+# - <https://ghc.haskell.org/trac/ghc/ticket/15190>
+# perf production build (disable for quick build)
+%if %{with quickbuild}
+%bcond_with prof
+%bcond_with docs
+%bcond_with perf_build
+%else
+%bcond_without prof
 %bcond_without docs
+%bcond_without perf_build
+%endif
+
+# no longer build testsuite (takes time and not really being used)
+%bcond_with testsuite
 
 # 8.4 needs llvm-5.0
 %global llvm_major 5.0
 %global ghc_llvm_archs armv7hl aarch64
 
+%global ghc_unregisterized_arches s390 s390x %{mips}
+
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
-Version: 8.4.3
+Version: 8.4.4
 # Since library subpackages are versioned:
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.7%{?dist}
+Release: 72%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -45,11 +58,19 @@ Patch5:  ghc-configure-fix-sphinx-version-check.patch
 
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
 
+# for s390x
+# https://ghc.haskell.org/trac/ghc/ticket/15689
+Patch15: ghc-warnings.mk-CC-Wall.patch
+
+# revert 8.4.4 llvm changes
+# https://ghc.haskell.org/trac/ghc/ticket/15780
+Patch16: https://github.com/ghc/ghc/commit/6e361d895dda4600a85e01c72ff219474b5c7190.patch
+
 # Debian patches:
 Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
-Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
+Patch30: fix-build-using-unregisterized-v8.2.patch
 
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
@@ -88,12 +109,10 @@ BuildRequires: autoconf
 BuildRequires: autoconf, automake
 %endif
 Requires: ghc-compiler = %{version}-%{release}
-%if %{with docs}
-Requires: ghc-doc-cron = %{version}-%{release}
-%endif
 Requires: ghc-ghc-devel = %{version}-%{release}
 Requires: ghc-libraries = %{version}-%{release}
 %if %{with docs}
+Requires: ghc-doc-cron = %{version}-%{release}
 Requires: ghc-manual = %{version}-%{release}
 %endif
 
@@ -126,8 +145,8 @@ License: BSD
 Requires: gcc%{?_isa}
 Requires: ghc-base-devel%{?_isa}
 # for alternatives
-Requires(post): chkconfig
-Requires(postun): chkconfig
+Requires(post): %{_sbindir}/update-alternatives
+Requires(postun):  %{_sbindir}/update-alternatives
 # added in f14
 Obsoletes: ghc-doc < 6.12.3-4
 %if %{without docs}
@@ -182,7 +201,7 @@ This package provides the User Guide and Haddock manual.
 # needs ghc_version_override for bootstrapping
 %global _use_internal_dependency_generator 0
 %global __find_provides /usr/lib/rpm/rpmdeps --provides
-%global __find_requires %{_rpmconfigdir}/ghc-deps.sh %{buildroot}%{ghclibdir}
+%global __find_requires %{_rpmconfigdir}/ghc-deps.sh --requires %{buildroot}%{ghclibdir}
 %endif
 
 %global ghc_pkg_c_deps ghc-compiler = %{ghc_version_override}-%{release}
@@ -212,14 +231,14 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l BSD parsec-3.1.13.0
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.6
 %ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
-%ghc_lib_subpackage -d -l BSD stm-2.4.5.0
+%ghc_lib_subpackage -d -l BSD stm-2.4.5.1
 %ghc_lib_subpackage -d -l BSD template-haskell-2.13.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.1
-%ghc_lib_subpackage -d -l BSD text-1.2.3.0
+%ghc_lib_subpackage -d -l BSD text-1.2.3.1
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
 %ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
 %ghc_lib_subpackage -d -l BSD unix-2.7.2.2
-%if %{undefined without_haddock}
+%if %{with docs}
 %ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
 %endif
 %endif
@@ -259,10 +278,20 @@ rm -r libffi-tarballs
 %patch12 -p1 -b .orig
 %endif
 
+%ifarch s390x
+%patch15 -p1 -b .orig
+%endif
+
+%ifarch armv7hl aarch64
+%patch16 -p1 -b .orig -R
+%endif
+
 %patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
-#%%patch27 -p1 -b .orig
 %patch28 -p1 -b .orig
+%ifarch s390x
+%patch30 -p1 -b .orig
+%endif
 
 %global gen_contents_index gen_contents_index.orig
 %if %{with docs}
@@ -272,8 +301,7 @@ if [ ! -f "libraries/%{gen_contents_index}" ]; then
 fi
 %endif
 
-# http://hackage.haskell.org/trac/ghc/wiki/Platforms
-# cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
+# http://ghc.haskell.org/trac/ghc/wiki/Platforms
 cat > mk/build.mk << EOF
 %if %{with perf_build}
 %ifarch %{ghc_llvm_archs}
@@ -314,19 +342,10 @@ autoreconf
 autoconf
 %endif
 
-%if 0%{?fedora} > 28
-%ghc_set_cflags
-%else
-# -Wunused-label is extremely noisy
-%ifarch aarch64 s390x
-CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall //' -e 's/-Werror=format-security //')}"
-%else
-CFLAGS="${CFLAGS:-%optflags}"
-%endif
-export CFLAGS
-%endif
+# replace later with ghc_set_gcc_flags
+export CFLAGS="${CFLAGS:-%optflags}"
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
-# for ghc-8.2
+# for ghc >= 8.2
 export CC=%{_bindir}/gcc
 # * %%configure induces cross-build due to different target/host/build platform names
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
@@ -335,14 +354,16 @@ export CC=%{_bindir}/gcc
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --docdir=%{_docdir}/ghc \
-  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
+%ifarch %{ghc_unregisterized_arches}
+  --enable-unregisterised \
+%endif
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
 %endif
 %{nil}
 
 # avoid "ghc: hGetContents: invalid argument (invalid byte sequence)"
-export LANG=en_US.utf8
+export LANG=C.utf8
 make %{?_smp_mflags}
 
 
@@ -364,7 +385,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-%if 0%{?rhel} && 0%{?rhel} < 8
+%if 0%{?rhel} && 0%{?rhel} < 7
 echo "%%doc libraries/$name/LICENSE" >> ghc-$name.files
 %else
 echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
@@ -383,7 +404,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-%if 0%{?rhel} && 0%{?rhel} < 8\
+%if 0%{?rhel} && 0%{?rhel} < 7\
 echo "%%doc libraries/LICENSE.%1" >> ghc-%2.files\
 %else\
 echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
@@ -527,7 +548,7 @@ fi
 %{ghclibdir}/bin/ghc-iserv-prof
 %endif
 %{ghclibdir}/bin/runghc
-%ifnarch s390 s390x %{mips}
+%ifnarch %{ghc_unregisterized_arches}
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/hp2ps
@@ -596,6 +617,20 @@ fi
 
 
 %changelog
+* Sun Nov 18 2018 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
+- Use C.UTF-8 locale
+  See https://fedoraproject.org/wiki/Changes/Remove_glibc-langpacks-all_from_buildroot
+
+* Wed Oct 17 2018 Jens Petersen <petersen@redhat.com> - 8.4.4-72
+- update to 8.4.4 bugfix release
+
+* Wed Oct 17 2018 Jens Petersen <petersen@redhat.com>
+- use with_prof
+- extend quickbuild to handle perf_build
+
+* Tue Oct 16 2018 Peter Robinson <pbrobinson@fedoraproject.org>
+- Update alternatives dependencies
+
 * Wed May 30 2018 Jens Petersen <petersen@redhat.com> - 8.4.3-70.7
 - 8.4.3 release
 - package changes from Fedora Rawhide:
