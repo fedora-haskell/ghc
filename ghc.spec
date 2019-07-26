@@ -2,20 +2,31 @@
 %bcond_without perf_build
 
 # to handle RCs
-%global ghc_release 8.6.1
+%global ghc_release 8.6.5
 
-# testsuite fails on rhel <= 7
-%bcond_with testsuite
 # build profiling libraries
-%bcond_without prof
 # build docs (haddock and manuals)
-# combined since disabling haddock seems to cause no manuals built
-# <https://ghc.haskell.org/trac/ghc/ticket/15190>
+# - combined since disabling haddock seems to cause no manuals built
+# - <https://ghc.haskell.org/trac/ghc/ticket/15190>
+# perf production build (disable for quick build)
+%if %{with quickbuild}
+%bcond_with prof
+%bcond_with docs
+%bcond_with perf_build
+%else
+%bcond_without prof
 %bcond_without docs
+%bcond_without perf_build
+%endif
+
+# no longer build testsuite (takes time and not really being used)
+%bcond_with testsuite
 
 # 8.6 needs llvm-6.0
 %global llvm_major 6.0
 %global ghc_llvm_archs armv7hl aarch64
+
+%global ghc_unregisterized_arches s390 s390x %{mips}
 
 Name: ghc
 # ghc must be rebuilt after a version bump to avoid ABI change problems
@@ -24,7 +35,7 @@ Version: %{ghc_release}
 # - release can only be reset if *all* library versions get bumped simultaneously
 #   (sometimes after a major release)
 # - minor release numbers for a branch should be incremented monotonically
-Release: 70.11%{?dist}
+Release: 75%{?dist}
 Summary: Glasgow Haskell Compiler
 
 License: BSD and HaskellReport
@@ -46,12 +57,27 @@ Patch2:  ghc-Cabal-install-PATH-warning.patch
 # https://phabricator.haskell.org/D4159
 Patch4:  D4159.patch
 
+# Arch dependent packages
 Patch12: ghc-armv7-VFPv3D16--NEON.patch
+
+# for s390x
+# https://ghc.haskell.org/trac/ghc/ticket/15689
+Patch15: ghc-warnings.mk-CC-Wall.patch
+# https://ghc.haskell.org/trac/ghc/ticket/15853
+# https://phabricator.haskell.org/D5306 (in 8.8)
+Patch17: https://gitlab.haskell.org/ghc/ghc/commit/35a897782b6b0a252da7fdcf4921198ad4e1d96c.patch
+
+# bigendian (s390x and ppc64)
+# fix haddock-library
+# https://gitlab.haskell.org/ghc/ghc/issues/15411
+# https://gitlab.haskell.org/ghc/ghc/issues/16505
+# https://bugzilla.redhat.com/show_bug.cgi?id=1651448
+# https://ghc.haskell.org/trac/ghc/ticket/15914
+Patch18: https://gitlab.haskell.org/ghc/ghc/uploads/5deb133cf910e9e0ca9ad9fe53f7383a/Disable-unboxed-arrays.patch
 
 # Debian patches:
 Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
-Patch27: reproducible-tmp-names.patch
 Patch28: x32-use-native-x86_64-insn.patch
 
 # fedora ghc has been bootstrapped on
@@ -82,7 +108,11 @@ BuildRequires: python3
 BuildRequires: python-sphinx
 %endif
 %ifarch %{ghc_llvm_archs}
+%if 0%{?fedora} >= 29
+BuildRequires: llvm%{llvm_major}
+%else
 BuildRequires: llvm >= %{llvm_major}
+%endif
 %endif
 %ifarch armv7hl
 # patch12
@@ -97,6 +127,7 @@ Requires: ghc-libraries = %{version}-%{release}
 %if %{with docs}
 Requires: ghc-manual = %{version}-%{release}
 %endif
+Requires: zlib-devel
 
 %description
 GHC is a state-of-the-art, open source, compiler and interactive environment
@@ -137,7 +168,11 @@ Obsoletes: ghc-doc-cron < %{version}-%{release}
 Obsoletes: ghc-doc-index < %{version}-%{release}
 %endif
 %ifarch %{ghc_llvm_archs}
+%if 0%{?fedora} >= 29
+Requires: llvm%{llvm_major}
+%else
 Requires: llvm >= %{llvm_major}
+%endif
 %endif
 
 %description compiler
@@ -193,7 +228,7 @@ This package provides the User Guide and Haddock manual.
 # use "./libraries-versions.sh" to check versions
 %if %{defined ghclibdir}
 %ghc_lib_subpackage -d -l BSD Cabal-2.4.0.1
-%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.2.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport array-0.5.3.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport -c gmp-devel%{?_isa},libffi-devel%{?_isa} base-4.12.0.0
 %ghc_lib_subpackage -d -l BSD binary-0.8.6.0
 %ghc_lib_subpackage -d -l BSD bytestring-0.10.8.2
@@ -201,30 +236,30 @@ This package provides the User Guide and Haddock manual.
 %ghc_lib_subpackage -d -l %BSDHaskellReport deepseq-1.4.4.0
 %ghc_lib_subpackage -d -l %BSDHaskellReport directory-1.3.3.0
 %ghc_lib_subpackage -d -l BSD filepath-1.4.2.1
-# in ghc not ghc-libraries:
-%ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
-%ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-boot-th-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD ghc-compact-0.1.0.0
 %ghc_lib_subpackage -d -l BSD ghc-heap-%{ghc_version_override}
-%ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
 %ghc_lib_subpackage -d -l BSD haskeline-0.7.4.3
 %ghc_lib_subpackage -d -l BSD hpc-0.6.0.3
-%ghc_lib_subpackage -d -l %BSDHaskellReport libiserv-%{ghc_release}
+%ghc_lib_subpackage -d -l %BSDHaskellReport libiserv-8.6.3
 %ghc_lib_subpackage -d -l BSD mtl-2.2.2
 %ghc_lib_subpackage -d -l BSD parsec-3.1.13.0
 %ghc_lib_subpackage -d -l BSD pretty-1.1.3.6
-%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.3.0
+%ghc_lib_subpackage -d -l %BSDHaskellReport process-1.6.5.0
 %ghc_lib_subpackage -d -l BSD stm-2.5.0.0
 %ghc_lib_subpackage -d -l BSD template-haskell-2.14.0.0
 %ghc_lib_subpackage -d -l BSD -c ncurses-devel%{?_isa} terminfo-0.4.1.2
 %ghc_lib_subpackage -d -l BSD text-1.2.3.1
 %ghc_lib_subpackage -d -l BSD time-1.8.0.2
-%ghc_lib_subpackage -d -l BSD transformers-0.5.5.0
+%ghc_lib_subpackage -d -l BSD transformers-0.5.6.2
 %ghc_lib_subpackage -d -l BSD unix-2.7.2.2
-%if %{undefined without_haddock}
+%if %{with docs}
 %ghc_lib_subpackage -d -l BSD xhtml-3000.2.2.1
 %endif
+# in ghc not ghc-libraries:
+%ghc_lib_subpackage -d -x ghc-%{ghc_version_override}
+%ghc_lib_subpackage -d -x -l BSD ghc-boot-%{ghc_version_override}
+%ghc_lib_subpackage -d -l BSD -x ghci-%{ghc_version_override}
 %endif
 
 %global version %{ghc_version_override}
@@ -252,7 +287,6 @@ except the ghc library, which is installed by the toplevel ghc metapackage.
 %patch1 -p1 -b .orig
 
 %patch2 -p1 -b .orig
-#%%patch4 -p1 -b .orig
 
 %if 0%{?fedora} || 0%{?rhel} > 6
 rm -r libffi-tarballs
@@ -262,9 +296,18 @@ rm -r libffi-tarballs
 %patch12 -p1 -b .orig
 %endif
 
+%ifarch %{ghc_unregisterized_arches}
+%patch15 -p1 -b .orig
+%patch17 -p1 -b .orig
+%endif
+
+# bigendian
+%ifarch ppc64 s390x
+%patch18 -p1 -b .orig
+%endif
+
 %patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
-#%%patch27 -p1 -b .orig
 %patch28 -p1 -b .orig
 
 %global gen_contents_index gen_contents_index.orig
@@ -275,8 +318,7 @@ if [ ! -f "libraries/%{gen_contents_index}" ]; then
 fi
 %endif
 
-# http://hackage.haskell.org/trac/ghc/wiki/Platforms
-# cf https://github.com/gentoo-haskell/gentoo-haskell/tree/master/dev-lang/ghc
+# http://ghc.haskell.org/trac/ghc/wiki/Platforms
 cat > mk/build.mk << EOF
 %if %{with perf_build}
 %ifarch %{ghc_llvm_archs}
@@ -315,19 +357,25 @@ autoreconf
 %endif
 
 %if 0%{?fedora} > 28
-%ghc_set_cflags
+# included in ghc-rpm-macros-1.9.5-5.fc28
+%ghc_set_gcc_flags
 %else
-# -Wunused-label is extremely noisy
-%ifarch aarch64 s390x
-CFLAGS="${CFLAGS:-$(echo %optflags | sed -e 's/-Wall //' -e 's/-Werror=format-security //')}"
-%else
-CFLAGS="${CFLAGS:-%optflags}"
-%endif
-export CFLAGS
-%endif
+export CFLAGS="${CFLAGS:-%optflags}"
 export LDFLAGS="${LDFLAGS:-%{?__global_ldflags}}"
-# for ghc-8.2
+%endif
+# for ghc >= 8.2
 export CC=%{_bindir}/gcc
+
+# remove after Fedora default moves to 8.6
+%ifarch %{ghc_unregisterized_arches}
+cat > ghc-unregisterised-wrapper << EOF
+#!/usr/bin/sh
+exec /usr/bin/ghc -optc-I%{_libdir}/ghc-$(ghc --numeric-version)/include \${1+"\$@"}
+EOF
+chmod a+x ghc-unregisterised-wrapper
+ln -s /usr/bin/ghc-pkg ghc-pkg-unregisterised-wrapper
+%endif
+
 # * %%configure induces cross-build due to different target/host/build platform names
 ./configure --prefix=%{_prefix} --exec-prefix=%{_exec_prefix} \
   --bindir=%{_bindir} --sbindir=%{_sbindir} --sysconfdir=%{_sysconfdir} \
@@ -335,14 +383,19 @@ export CC=%{_bindir}/gcc
   --libexecdir=%{_libexecdir} --localstatedir=%{_localstatedir} \
   --sharedstatedir=%{_sharedstatedir} --mandir=%{_mandir} \
   --docdir=%{_docdir}/ghc \
-  --with-llc=%{_bindir}/llc-%{llvm_major} --with-opt=%{_bindir}/opt-%{llvm_major} \
 %if 0%{?fedora} || 0%{?rhel} > 6
   --with-system-libffi \
+%endif
+%ifarch %{ghc_unregisterized_arches}
+  --enable-unregisterised \
+%endif
+%ifarch %{ghc_unregisterized_arches}
+  --with-ghc=$PWD/ghc-unregisterised-wrapper \
 %endif
 %{nil}
 
 # avoid "ghc: hGetContents: invalid argument (invalid byte sequence)"
-export LANG=en_US.utf8
+export LANG=C.utf8
 make %{?_smp_mflags}
 
 
@@ -364,7 +417,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-%if 0%{?rhel} && 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 echo "%%doc libraries/$name/LICENSE" >> ghc-$name.files
 %else
 echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
@@ -383,7 +436,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-%if 0%{?rhel} && 0%{?rhel} < 7\
+%if 0%{?rhel} && 0%{?rhel} < 8\
 echo "%%doc libraries/LICENSE.%1" >> ghc-%2.files\
 %else\
 echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
@@ -423,8 +476,6 @@ for i in hsc2hs runhaskell; do
   fi
   touch %{buildroot}%{_bindir}/$i
 done
-
-%ghc_strip_dynlinked
 
 %if %{with docs}
 mkdir -p %{buildroot}%{_sysconfdir}/cron.hourly
@@ -501,7 +552,7 @@ fi
 %files
 
 %files compiler
-%if 0%{?rhel} && 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 %doc LICENSE
 %else
 %license LICENSE
@@ -531,7 +582,7 @@ fi
 %{ghclibdir}/bin/ghc-iserv-prof
 %endif
 %{ghclibdir}/bin/runghc
-%ifnarch s390 s390x %{mips}
+%ifnarch %{ghc_unregisterized_arches}
 %{ghclibdir}/bin/ghc-split
 %endif
 %{ghclibdir}/bin/hp2ps
@@ -601,6 +652,10 @@ fi
 
 
 %changelog
+* Fri Jul 26 2019 Jens Petersen <petersen@redhat.com> - 8.6.5-75
+- update to 8.6.5
+- https://downloads.haskell.org/~ghc/8.6.5/docs/html/users_guide/8.6.5-notes.html
+
 * Sat Sep 22 2018 Jens Petersen <petersen@redhat.com> - 8.6.1-70.11
 - 8.6.1 release
 - https://downloads.haskell.org/~ghc/8.6.1/docs/html/users_guide/8.6.1-notes.html
