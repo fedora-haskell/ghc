@@ -388,7 +388,7 @@ for i in %{ghc_packages_list}; do
 name=$(echo $i | sed -e "s/\(.*\)-.*/\1/")
 ver=$(echo $i | sed -e "s/.*-\(.*\)/\1/")
 %ghc_gen_filelists $name $ver
-%if 0%{?rhel} && 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 echo "%%doc libraries/$name/LICENSE" >> ghc-$name.files
 %else
 echo "%%license libraries/$name/LICENSE" >> ghc-$name.files
@@ -407,7 +407,7 @@ echo "%%dir %{ghclibdir}" >> ghc-base%{?_ghcdynlibdir:-devel}.files
 cat ghc-%1.files >> ghc-%2.files\
 cat ghc-%1-devel.files >> ghc-%2-devel.files\
 cp -p libraries/%1/LICENSE libraries/LICENSE.%1\
-%if 0%{?rhel} && 0%{?rhel} < 7\
+%if 0%{?rhel} && 0%{?rhel} < 8\
 echo "%%doc libraries/LICENSE.%1" >> ghc-%2.files\
 %else\
 echo "%%license libraries/LICENSE.%1" >> ghc-%2.files\
@@ -525,7 +525,7 @@ fi
 %files
 
 %files compiler
-%if 0%{?rhel} && 0%{?rhel} < 7
+%if 0%{?rhel} && 0%{?rhel} < 8
 %doc LICENSE
 %else
 %license LICENSE

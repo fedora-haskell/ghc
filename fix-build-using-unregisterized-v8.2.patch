@@ -1,0 +1,51 @@
+Description: Allow unregisterised ghc-8.2 to build newer GHC
+ Commit b68697e579d38ca29c2b84377dc2affa04659a28 introduced a regression
+ stopping existing unregisteristed compilers from being used to compile a newer
+ version of GHC. The problem is that the bootstrap compiler uses the newer Stg.h
+ where EB_, IB_, etc, definitions have changed resulting in the following error:
+.
+  error: conflicting types for 'ghc_GhcPrelude_zdtrModule4_bytes'
+  note: in definition of macro 'EB_'
+  #define EB_(X)    extern const char X[]
+  note: previous definition of 'ghc_GhcPrelude_zdtrModule4_bytes' was here
+  char ghc_GhcPrelude_zdtrModule4_bytes[] = "ghc";
+.
+ For more information about the problem, see https://phabricator.haskell.org/D4114.
+.
+ This patch is a rework of https://phabricator.haskell.org/D3741.
+ It modifies Stg.h to include the old definitions, if a compiler older than
+ 8.4 is being used.
+.
+ This patch can be removed, once ghc-8.2 is no longer the bootstrap compiler.
+Author: Ilias Tsitsimpis <iliastsi@debian.org>
+Bug: https://ghc.haskell.org/trac/ghc/ticket/15201
+
+Index: b/includes/Stg.h
+===================================================================
+--- a/includes/Stg.h
++++ b/includes/Stg.h
+@@ -232,6 +232,16 @@ typedef StgInt    I_;
+ typedef StgWord StgWordArray[];
+ typedef StgFunPtr       F_;
+ 
++#if __GLASGOW_HASKELL__ < 804
++#define EB_(X)    extern char X[]
++#define IB_(X)    static char X[]
++#define EI_(X)          extern StgWordArray (X) GNU_ATTRIBUTE(aligned (8))
++#define II_(X)          static StgWordArray (X) GNU_ATTRIBUTE(aligned (8))
++#define IF_(f)    static StgFunPtr GNUC3_ATTRIBUTE(used) f(void)
++#define FN_(f)    StgFunPtr f(void)
++#define EF_(f)    StgFunPtr f(void) /* External Cmm functions */
++#define EFF_(f)   void f() /* See Note [External function prototypes] */
++#else
+ /* byte arrays (and strings): */
+ #define EB_(X)    extern const char X[]
+ #define IB_(X)    static const char X[]
+@@ -250,6 +260,7 @@ typedef StgFunPtr       F_;
+ #define EF_(f)           StgFunPtr f(void) /* External Cmm functions */
+ /* foreign functions: */
+ #define EFF_(f)   void f() /* See Note [External function prototypes] */
++#endif  /* __GLASGOW_HASKELL__ < 804 */
+ 
+ /* Note [External function prototypes]  See Trac #8965, #11395
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
