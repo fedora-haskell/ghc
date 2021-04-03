@@ -93,11 +93,11 @@ Index: ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/FreeRegs.hs
                  ArchMipseb    -> panic "maxSpillSlots ArchMipseb"
 Index: ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/Main.hs
 ===================================================================
---- ghc-7.8.3.orig/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.533187516 +0200
-+++ ghc-7.8.3/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.529187516 +0200
+--- ghc-7.8.4.orig/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.533187516 +0200
++++ ghc-7.8.4/compiler/nativeGen/RegAlloc/Linear/Main.hs	2014-07-10 10:16:42.529187516 +0200
 @@ -207,6 +207,7 @@
-       ArchSPARC     -> linearRegAlloc' dflags (frInitFreeRegs platform :: SPARC.FreeRegs)  first_id block_live sccs
-       ArchPPC       -> linearRegAlloc' dflags (frInitFreeRegs platform :: PPC.FreeRegs)    first_id block_live sccs
+       ArchSPARC     -> linearRegAlloc' dflags (frInitFreeRegs platform :: SPARC.FreeRegs)  entry_ids block_live sccs
+       ArchPPC       -> linearRegAlloc' dflags (frInitFreeRegs platform :: PPC.FreeRegs)    entry_ids block_live sccs
        ArchARM _ _ _ -> panic "linearRegAlloc ArchARM"
 +      ArchARM64     -> panic "linearRegAlloc ArchARM64"
        ArchPPC_64    -> panic "linearRegAlloc ArchPPC_64"
