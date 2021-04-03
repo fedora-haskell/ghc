@@ -71,6 +71,7 @@ Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch28: x32-use-native-x86_64-insn.patch
 Patch30: fix-build-using-unregisterized-v8.2.patch
+Patch35: ghc-Stg.h.patch
 
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
@@ -624,6 +625,10 @@ fi
 
 
 %changelog
+* Fri Apr 2 2021 Andriy Tkachuk <andriy.tkachuk@seagate.com>
+- add ghc-Stg.h.patch to fix the build issue on rhel7 aarch64,
+  see https://gitlab.haskell.org/ghc/ghc/-/issues/15201
+
 * Sun Nov 18 2018 Zbigniew Jędrzejewski-Szmek <zbyszek@in.waw.pl>
 - Use C.UTF-8 locale
   See https://fedoraproject.org/wiki/Changes/Remove_glibc-langpacks-all_from_buildroot
