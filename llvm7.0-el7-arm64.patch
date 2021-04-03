@@ -1,0 +1,24 @@
+diff -ur ghc-8.6.5.orig/configure ghc-8.6.5/configure
+--- ghc-8.6.5.orig/configure	2019-04-24 05:31:47.000000000 +0100
++++ ghc-8.6.5/configure	2021-04-03 19:49:48.142052067 +0100
+@@ -8709,7 +8709,7 @@
+ # tools we are looking for. In the past, GHC supported a number of
+ # versions of LLVM simultaneously, but that stopped working around
+ # 3.5/3.6 release of LLVM.
+-LlvmVersion=6.0
++LlvmVersion=7.0
+ 
+ sUPPORTED_LLVM_VERSION=$(echo \($LlvmVersion\) | sed 's/\./,/')
+ 
+diff -ur ghc-8.6.5.orig/configure.ac ghc-8.6.5/configure.ac
+--- ghc-8.6.5.orig/configure.ac	2019-04-23 02:46:43.000000000 +0100
++++ ghc-8.6.5/configure.ac	2021-04-03 19:47:15.661842415 +0100
+@@ -648,7 +648,7 @@
+ # tools we are looking for. In the past, GHC supported a number of
+ # versions of LLVM simultaneously, but that stopped working around
+ # 3.5/3.6 release of LLVM.
+-LlvmVersion=6.0
++LlvmVersion=7.0
+ AC_SUBST([LlvmVersion])
+ sUPPORTED_LLVM_VERSION=$(echo \($LlvmVersion\) | sed 's/\./,/')
+ AC_DEFINE_UNQUOTED([sUPPORTED_LLVM_VERSION], ${sUPPORTED_LLVM_VERSION}, [The supported LLVM version number])
