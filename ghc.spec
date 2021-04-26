@@ -26,6 +26,13 @@
 %global llvm_major 6.0
 %global ghc_llvm_archs armv7hl aarch64
 
+%ifarch %{ghc_llvm_archs}
+%if 0%{?rhel} == 7
+# there is no llvm6.0 on rhel7, but there is llvm7.0
+%global llvm_major 7.0
+%endif
+%endif
+
 %global ghc_unregisterized_arches s390 s390x %{mips}
 
 Name: ghc
@@ -80,6 +87,10 @@ Patch24: buildpath-abi-stability.patch
 Patch26: no-missing-haddock-file-warning.patch
 Patch28: x32-use-native-x86_64-insn.patch
 
+# for rhel7 on aarch64
+Patch33: llvm7.0-el7-arm64.patch
+
+
 # fedora ghc has been bootstrapped on
 # %%{ix86} x86_64 ppc ppc64 armv7hl s390 s390x ppc64le aarch64
 # and retired arches: alpha sparcv9 armv5tel
@@ -108,7 +119,7 @@ BuildRequires: python3
 BuildRequires: python-sphinx
 %endif
 %ifarch %{ghc_llvm_archs}
-%if 0%{?fedora} >= 29
+%if 0%{?fedora} >= 29 || 0%{?rhel} == 7
 BuildRequires: llvm%{llvm_major}
 %else
 BuildRequires: llvm >= %{llvm_major}
@@ -168,7 +179,7 @@ Obsoletes: ghc-doc-cron < %{version}-%{release}
 Obsoletes: ghc-doc-index < %{version}-%{release}
 %endif
 %ifarch %{ghc_llvm_archs}
-%if 0%{?fedora} >= 29
+%if 0%{?fedora} >= 29 || 0%{?rhel} == 7
 Requires: llvm%{llvm_major}
 %else
 Requires: llvm >= %{llvm_major}
@@ -309,6 +320,11 @@ rm -r libffi-tarballs
 %patch24 -p1 -b .orig
 %patch26 -p1 -b .orig
 %patch28 -p1 -b .orig
+
+# update LlvmVersion
+%if "%{llvm_major}" == "7.0"
+%patch33 -p1 -b .orig
+%endif
 
 %global gen_contents_index gen_contents_index.orig
 %if %{with docs}
