@@ -1,3 +1,10 @@
+*Note this repo is not currently maintained*
+
+** Please see the fedora [ghc package](https://src.fedoraproject.org/rpms/ghc/branches?branchname=rawhide) [branches](https://src.fedoraproject.org/rpms/ghc/branches)
+for the latest current branches**
+
+----
+
 This repo is for experimental or unofficial builds of ghc for Fedora.
 
 You can find some corresponding builds currently in
