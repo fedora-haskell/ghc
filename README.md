@@ -1,7 +1,11 @@
-*Note this repo is not currently maintained*
+***Note this repo is currently no longer maintained***
 
-** Please see the fedora [ghc package](https://src.fedoraproject.org/rpms/ghc/branches?branchname=rawhide) [branches](https://src.fedoraproject.org/rpms/ghc/branches)
-for the latest current branches**
+Please see:
+
+* the official main [ghc](https://src.fedoraproject.org/rpms/ghc) package
+* ghcX.Y packages: eg [ghc9.0](https://src.fedoraproject.org/rpms/ghc9.0), [ghc9.2](https://src.fedoraproject.org/rpms/ghc9.2), [ghc9.4](https://src.fedoraproject.org/rpms/ghc9.4)
+
+for current packages.
 
 ----
 
