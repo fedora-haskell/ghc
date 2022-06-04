@@ -2,10 +2,10 @@
 
 Please see:
 
-* the official main [ghc](https://src.fedoraproject.org/rpms/ghc) package
+* the official main Fedora [ghc](https://src.fedoraproject.org/rpms/ghc) package and
 * ghcX.Y packages: eg [ghc9.0](https://src.fedoraproject.org/rpms/ghc9.0), [ghc9.2](https://src.fedoraproject.org/rpms/ghc9.2), [ghc9.4](https://src.fedoraproject.org/rpms/ghc9.4)
 
-for current packages.
+for the current packaging.
 
 ----
 
