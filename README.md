@@ -1,9 +1,14 @@
-***Note this repo is currently no longer maintained***
+***Note this repo is no longer maintained***
 
 Please see:
 
 * the official main Fedora [ghc](https://src.fedoraproject.org/rpms/ghc) package and
-* ghcX.Y packages: eg [ghc9.0](https://src.fedoraproject.org/rpms/ghc9.0), [ghc9.2](https://src.fedoraproject.org/rpms/ghc9.2), [ghc9.4](https://src.fedoraproject.org/rpms/ghc9.4)
+* ghcX.Y packages:
+  * [ghc8.10](https://src.fedoraproject.org/rpms/ghc8.10)
+  * [ghc9.0](https://src.fedoraproject.org/rpms/ghc9.0)
+  * [ghc9.2](https://src.fedoraproject.org/rpms/ghc9.2)
+  * [ghc9.4](https://src.fedoraproject.org/rpms/ghc9.4)
+  * [ghc9.6](https://src.fedoraproject.org/rpms/ghc9.6)
 
 for the current packaging.
 
